@@ -1,0 +1,99 @@
+{
+  "app": {
+    "name": "Spisok",
+    "tagline": "Vaše liste uvek pri ruci"
+  },
+  "nav": {
+    "lists": "Liste",
+    "templates": "Šabloni",
+    "trash": "Korpa",
+    "back": "Nazad",
+    "settings": "Podešavanja"
+  },
+  "lists": {
+    "title": "Liste",
+    "empty": "Još nema lista",
+    "emptyHint": "Napravite listu ili krenite od šablona",
+    "new": "Nova lista",
+    "fromScratch": "Od nule",
+    "fromTemplate": "Iz šablona",
+    "deadline": "Rok",
+    "noDeadline": "Bez roka",
+    "itemsCount": "{{count}} stavki",
+    "checkedCount": "{{done}} / {{total}}",
+    "updated": "Izmenjeno"
+  },
+  "list": {
+    "name": "Naziv liste",
+    "namePlaceholder": "npr. Putovanje u Tursku",
+    "deadline": "Rok (opciono)",
+    "items": "Stavke",
+    "addItem": "Dodaj stavku",
+    "itemName": "Naziv",
+    "quantity": "Kol.",
+    "comment": "Komentar",
+    "commentPlaceholder": "Opciona beleška",
+    "color": "Boja",
+    "colorNone": "Bez boje",
+    "colors": {
+      "mint": "Nana",
+      "peach": "Breskva",
+      "lemon": "Limun",
+      "sky": "Nebo",
+      "lilac": "Jorgovan",
+      "rose": "Ruža",
+      "sand": "Pesak"
+    },
+    "save": "Sačuvaj",
+    "create": "Napravi",
+    "delete": "Obriši",
+    "saveAsTemplate": "Sačuvaj kao šablon",
+    "savedAsTemplate": "Sačuvano kao šablon",
+    "links": "Povezane liste",
+    "manageLinks": "Veze",
+    "noLinks": "Nema povezanih lista",
+    "edit": "Izmeni",
+    "done": "Gotovo",
+    "deleteConfirm": "Premestiti listu u korpu?",
+    "emptyItems": "Dodajte stvari koje trebate"
+  },
+  "templates": {
+    "title": "Šabloni",
+    "empty": "Još nema šablona",
+    "emptyHint": "Otvorite listu i dodirnite „Sačuvaj kao šablon”",
+    "use": "Koristi šablon",
+    "delete": "Obriši šablon",
+    "deleteConfirm": "Obrisati šablon zauvek?"
+  },
+  "trash": {
+    "title": "Korpa",
+    "empty": "Korpa je prazna",
+    "restore": "Vrati",
+    "purge": "Obriši zauvek",
+    "purgeConfirm": "Obrisati zauvek? Ovo se ne može poništiti.",
+    "hint": "Vi čistite korpu sami"
+  },
+  "links": {
+    "title": "Poveži liste",
+    "hint": "Izaberite liste za povezivanje",
+    "empty": "Nema drugih lista",
+    "linked": "Povezano",
+    "link": "Poveži",
+    "unlink": "Odveži"
+  },
+  "theme": {
+    "light": "Svetla",
+    "dark": "Tamna",
+    "toggle": "Tema"
+  },
+  "language": {
+    "title": "Jezik",
+    "toggle": "Jezik"
+  },
+  "common": {
+    "cancel": "Otkaži",
+    "confirm": "Potvrdi",
+    "loading": "Učitavanje…",
+    "offline": "Offline — izmene sačuvane lokalno"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "app": {
+    "name": "Spisok",
+    "tagline": "Your lists, always at hand"
+  },
+  "nav": {
+    "lists": "Lists",
+    "templates": "Templates",
+    "trash": "Trash",
+    "back": "Back",
+    "settings": "Settings"
+  },
+  "lists": {
+    "title": "Lists",
+    "empty": "No lists yet",
+    "emptyHint": "Create a list or start from a template",
+    "new": "New list",
+    "fromScratch": "From scratch",
+    "fromTemplate": "From template",
+    "deadline": "Deadline",
+    "noDeadline": "No deadline",
+    "itemsCount": "{{count}} items",
+    "checkedCount": "{{done}} / {{total}}",
+    "updated": "Updated"
+  },
+  "list": {
+    "name": "List name",
+    "namePlaceholder": "e.g. Trip to Turkey",
+    "deadline": "Deadline (optional)",
+    "items": "Items",
+    "addItem": "Add item",
+    "itemName": "Name",
+    "quantity": "Qty",
+    "comment": "Comment",
+    "commentPlaceholder": "Optional note",
+    "color": "Color",
+    "colorNone": "No color",
+    "colors": {
+      "mint": "Mint",
+      "peach": "Peach",
+      "lemon": "Lemon",
+      "sky": "Sky",
+      "lilac": "Lilac",
+      "rose": "Rose",
+      "sand": "Sand"
+    },
+    "save": "Save",
+    "create": "Create",
+    "delete": "Delete",
+    "saveAsTemplate": "Save as template",
+    "savedAsTemplate": "Saved as template",
+    "links": "Linked lists",
+    "manageLinks": "Manage links",
+    "noLinks": "No linked lists",
+    "edit": "Edit",
+    "done": "Done",
+    "deleteConfirm": "Move this list to trash?",
+    "emptyItems": "Add things you need"
+  },
+  "templates": {
+    "title": "Templates",
+    "empty": "No templates yet",
+    "emptyHint": "Open a list and tap “Save as template”",
+    "use": "Use template",
+    "delete": "Delete template",
+    "deleteConfirm": "Delete this template permanently?"
+  },
+  "trash": {
+    "title": "Trash",
+    "empty": "Trash is empty",
+    "restore": "Restore",
+    "purge": "Delete forever",
+    "purgeConfirm": "Delete forever? This cannot be undone.",
+    "hint": "You manage trash yourself"
+  },
+  "links": {
+    "title": "Link lists",
+    "hint": "Select lists to link",
+    "empty": "No other lists to link",
+    "linked": "Linked",
+    "link": "Link",
+    "unlink": "Unlink"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "toggle": "Theme"
+  },
+  "language": {
+    "title": "Language",
+    "toggle": "Language"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "offline": "Offline — changes saved locally"
+  }
+}
