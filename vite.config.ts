@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/spisak/',
   plugins: [
     react(),
     VitePWA({
@@ -16,7 +17,8 @@ export default defineConfig({
         background_color: '#f5f6f4',
         display: 'standalone',
         orientation: 'portrait-primary',
-        start_url: '/',
+        start_url: '/spisak/',
+        scope: '/spisak/',
         lang: 'en',
         icons: [
           {
@@ -39,7 +41,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
-        navigateFallback: '/index.html',
+        navigateFallback: '/spisak/index.html',
       },
       devOptions: {
         enabled: false,

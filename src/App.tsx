@@ -8,7 +8,7 @@ import { TrashPage } from './pages/TrashPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/spisak">
       <Routes>
         <Route path="/" element={<ListsPage />} />
         <Route path="/lists/new" element={<NewListPage />} />
