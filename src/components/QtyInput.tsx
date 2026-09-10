@@ -14,11 +14,12 @@ export function QtyInput({
   'aria-label': ariaLabel,
   className = 'qty-input',
 }: Props) {
-  const [text, setText] = useState(String(value))
+  const safeValue = Number.isFinite(value) && value > 0 ? value : 1
+  const [text, setText] = useState(String(safeValue))
 
   useEffect(() => {
-    setText(String(value))
-  }, [value])
+    setText(String(safeValue))
+  }, [safeValue])
 
   return (
     <input
@@ -40,7 +41,7 @@ export function QtyInput({
         const n = Number(text)
         const next = Number.isFinite(n) && n > 0 ? Math.floor(n) : 1
         setText(String(next))
-        if (next !== value) onChange(next)
+        if (next !== safeValue) onChange(next)
       }}
     />
   )

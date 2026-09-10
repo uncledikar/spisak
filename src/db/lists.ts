@@ -3,8 +3,8 @@ import type { ListItem, ListRecord, TemplateItem, TemplateRecord } from './types
 import { createId } from '../utils/id'
 import { normalizeLinkPair } from '../utils/links'
 import {
-  normalizeItemPositions,
-  normalizeTemplatePositions,
+  normalizeListRecord,
+  normalizeTemplateRecord,
   reindexPositions,
 } from '../utils/positions'
 
@@ -17,44 +17,26 @@ async function touchSync(
   void flushSyncQueue()
 }
 
-function withNormalizedList(list: ListRecord): ListRecord {
-  return {
-    ...list,
-    trackQuantity: list.trackQuantity !== false,
-    items: normalizeItemPositions(list.items),
-  }
-}
-
-function withNormalizedTemplate(template: TemplateRecord): TemplateRecord {
-  return {
-    ...template,
-    trackQuantity: template.trackQuantity !== false,
-    items: normalizeTemplatePositions(template.items),
-  }
-}
-
 export async function getActiveLists(): Promise<ListRecord[]> {
   const lists = await db.lists.filter((l) => l.deletedAt === null).toArray()
-  return lists.map(withNormalizedList).sort((a, b) => b.updatedAt - a.updatedAt)
+  return lists.map(normalizeListRecord).sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
 export async function getTrashLists(): Promise<ListRecord[]> {
   const lists = await db.lists.filter((l) => l.deletedAt !== null).toArray()
-  return lists.map(withNormalizedList).sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0))
+  return lists.map(normalizeListRecord).sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0))
 }
 
+/** Read-only: never writes (safe for useLiveQuery). */
 export async function getList(id: string): Promise<ListRecord | undefined> {
-  const list = await db.lists.get(id)
-  if (!list) return undefined
-  const normalized = withNormalizedList(list)
-  const changed =
-    normalized.trackQuantity !== list.trackQuantity ||
-    normalized.items.length !== list.items.length ||
-    normalized.items.some((item, i) => item.position !== list.items[i]?.position)
-  if (changed) {
-    await db.lists.put({ ...normalized, updatedAt: list.updatedAt })
+  try {
+    const list = await db.lists.get(id)
+    if (!list) return undefined
+    return normalizeListRecord(list)
+  } catch (error) {
+    console.error('getList failed', id, error)
+    return undefined
   }
-  return normalized
 }
 
 export async function createList(input: {
@@ -64,7 +46,7 @@ export async function createList(input: {
   items: ListItem[]
 }): Promise<ListRecord> {
   const now = Date.now()
-  const list: ListRecord = {
+  const list: ListRecord = normalizeListRecord({
     id: createId(),
     name: input.name.trim() || 'Untitled',
     deadline: input.deadline,
@@ -73,7 +55,7 @@ export async function createList(input: {
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
-  }
+  })
   await db.lists.add(list)
   await touchSync('list', 'upsert', list)
   return list
@@ -85,7 +67,7 @@ export async function createListFromTemplate(
 ): Promise<ListRecord | null> {
   const raw = await db.templates.get(templateId)
   if (!raw) return null
-  const template = withNormalizedTemplate(raw)
+  const template = normalizeTemplateRecord(raw)
   return createList({
     name: name?.trim() || template.name,
     deadline: null,
@@ -108,10 +90,13 @@ export async function updateList(
 ): Promise<ListRecord | null> {
   const existing = await db.lists.get(id)
   if (!existing || existing.deletedAt !== null) return null
-  const base = withNormalizedList(existing)
+  const base = normalizeListRecord(existing)
   const items =
-    patch.items !== undefined ? reindexPositions(patch.items) : base.items
-  const updated: ListRecord = {
+    patch.items !== undefined ? reindexPositions(patch.items.map((item, i) => ({
+      ...item,
+      position: item.position ?? i,
+    }))) : base.items
+  const updated = normalizeListRecord({
     ...base,
     ...patch,
     name: patch.name !== undefined ? patch.name.trim() || base.name : base.name,
@@ -119,7 +104,7 @@ export async function updateList(
       patch.trackQuantity !== undefined ? patch.trackQuantity : base.trackQuantity,
     items,
     updatedAt: Date.now(),
-  }
+  })
   await db.lists.put(updated)
   await touchSync('list', 'upsert', updated)
   return updated
@@ -160,26 +145,26 @@ export async function purgeList(id: string): Promise<void> {
 }
 
 export async function saveListAsTemplate(listId: string): Promise<TemplateRecord | null> {
-  const list = await db.lists.get(listId)
+  const list = await getList(listId)
   if (!list || list.deletedAt !== null) return null
   const now = Date.now()
-  const template: TemplateRecord = {
+  const template = normalizeTemplateRecord({
     id: createId(),
     name: list.name,
-    trackQuantity: list.trackQuantity !== false,
+    trackQuantity: list.trackQuantity,
     items: list.items.map(
       (item, index): TemplateItem => ({
         id: createId(),
         name: item.name,
         quantity: item.quantity,
         comment: item.comment,
-        color: item.color ?? null,
-        position: item.position ?? index,
+        color: item.color,
+        position: index,
       }),
     ),
     createdAt: now,
     updatedAt: now,
-  }
+  })
   await db.templates.add(template)
   await touchSync('template', 'upsert', template)
   return template
@@ -187,7 +172,7 @@ export async function saveListAsTemplate(listId: string): Promise<TemplateRecord
 
 export async function getTemplates(): Promise<TemplateRecord[]> {
   const templates = await db.templates.toArray()
-  return templates.map(withNormalizedTemplate).sort((a, b) => b.updatedAt - a.updatedAt)
+  return templates.map(normalizeTemplateRecord).sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
 export async function deleteTemplate(id: string): Promise<void> {
@@ -209,6 +194,7 @@ export async function getLinkedLists(listId: string): Promise<ListRecord[]> {
   const lists = await db.lists.bulkGet(ids)
   return lists
     .filter((l): l is ListRecord => !!l && l.deletedAt === null)
+    .map(normalizeListRecord)
     .sort((a, b) => b.updatedAt - a.updatedAt)
 }
 

@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { RouteErrorBoundary } from './components/RouteErrorBoundary'
 import { ListsPage } from './pages/ListsPage'
 import { NewListPage } from './pages/NewListPage'
 import { ListDetailPage } from './pages/ListDetailPage'
@@ -6,9 +7,10 @@ import { LinksPage } from './pages/LinksPage'
 import { TemplatesPage } from './pages/TemplatesPage'
 import { TrashPage } from './pages/TrashPage'
 
-export default function App() {
+function AppRoutes() {
+  const location = useLocation()
   return (
-    <BrowserRouter basename="/spisak">
+    <RouteErrorBoundary key={location.pathname}>
       <Routes>
         <Route path="/" element={<ListsPage />} />
         <Route path="/lists/new" element={<NewListPage />} />
@@ -18,6 +20,14 @@ export default function App() {
         <Route path="/trash" element={<TrashPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </RouteErrorBoundary>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter basename="/spisak">
+      <AppRoutes />
     </BrowserRouter>
   )
 }

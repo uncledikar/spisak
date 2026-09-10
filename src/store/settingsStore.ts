@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import i18n, { detectLanguage, type AppLanguage, SUPPORTED_LANGUAGES } from '../i18n'
 import { db } from '../db'
+import { migrateLocalData } from '../db/migrate'
 import type { SettingsRecord } from '../db/types'
 
 type Theme = 'light' | 'dark'
@@ -49,6 +50,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   language: 'en',
   ready: false,
   init: async () => {
+    try {
+      await migrateLocalData()
+    } catch (error) {
+      console.error('Local data migration failed', error)
+    }
     let row = await db.settings.get('app')
     if (!row) {
       row = { id: 'app', theme: systemTheme(), language: detectLanguage() }
