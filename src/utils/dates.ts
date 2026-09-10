@@ -1,15 +1,19 @@
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
-import { enUS, ru, srLatn } from 'date-fns/locale'
+import { enUS, es, fr, ru, srLatn } from 'date-fns/locale'
 import type { Locale } from 'date-fns'
 
 const locales: Record<string, Locale> = {
   en: enUS,
+  es,
+  fr,
   ru,
   sr: srLatn,
 }
 
 const deadlineFormats: Record<string, string> = {
   en: 'MMMM d, yyyy',
+  es: "d 'de' MMMM 'de' yyyy",
+  fr: 'd MMMM yyyy',
   ru: "d MMMM yyyy 'г.'",
   sr: 'd. MMMM yyyy.',
 }

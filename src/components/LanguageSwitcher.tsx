@@ -5,6 +5,8 @@ import { useSettingsStore } from '../store/settingsStore'
 
 const LABELS: Record<AppLanguage, string> = {
   en: 'English',
+  es: 'Español',
+  fr: 'Français',
   ru: 'Русский',
   sr: 'Srpski',
 }

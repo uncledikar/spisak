@@ -1,0 +1,105 @@
+{
+  "app": {
+    "name": "Spisok",
+    "tagline": "Vos listes, toujours à portée de main"
+  },
+  "nav": {
+    "lists": "Listes",
+    "templates": "Modèles",
+    "trash": "Corbeille",
+    "back": "Retour",
+    "settings": "Réglages"
+  },
+  "lists": {
+    "title": "Listes",
+    "empty": "Aucune liste pour l’instant",
+    "emptyHint": "Créez une liste ou partez d’un modèle",
+    "new": "Nouvelle liste",
+    "fromScratch": "À partir de zéro",
+    "fromTemplate": "À partir d’un modèle",
+    "deadline": "Échéance",
+    "noDeadline": "Sans échéance",
+    "itemsCount": "{{count}} éléments",
+    "checkedCount": "{{done}} / {{total}}",
+    "updated": "Mis à jour"
+  },
+  "list": {
+    "name": "Nom de la liste",
+    "namePlaceholder": "ex. Voyage en Turquie",
+    "deadline": "Échéance (facultatif)",
+    "clearDeadline": "Effacer l’échéance",
+    "trackQuantity": "Quantités",
+    "trackQuantityOn": "Avec quantités",
+    "trackQuantityOff": "Sans quantités",
+    "trackQuantityHint": "Utile pour les courses ; souvent inutile pour les bagages",
+    "items": "Éléments",
+    "addItem": "Ajouter un élément",
+    "itemName": "Nom",
+    "quantity": "Qté",
+    "comment": "Commentaire",
+    "commentPlaceholder": "Note facultative",
+    "color": "Couleur",
+    "colorNone": "Sans couleur",
+    "colors": {
+      "mint": "Menthe",
+      "peach": "Pêche",
+      "lemon": "Citron",
+      "sky": "Ciel",
+      "lilac": "Lilas",
+      "rose": "Rose",
+      "sand": "Sable"
+    },
+    "save": "Enregistrer",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "saveAsTemplate": "Enregistrer comme modèle",
+    "savedAsTemplate": "Enregistré comme modèle",
+    "links": "Listes liées",
+    "manageLinks": "Gérer les liens",
+    "noLinks": "Aucune liste liée",
+    "edit": "Modifier",
+    "done": "Terminé",
+    "deleteConfirm": "Déplacer cette liste vers la corbeille ?",
+    "emptyItems": "Ajoutez ce dont vous avez besoin",
+    "dragItem": "Glisser pour réordonner"
+  },
+  "templates": {
+    "title": "Modèles",
+    "empty": "Aucun modèle pour l’instant",
+    "emptyHint": "Ouvrez une liste et appuyez sur « Enregistrer comme modèle »",
+    "use": "Utiliser le modèle",
+    "delete": "Supprimer le modèle",
+    "deleteConfirm": "Supprimer définitivement ce modèle ?"
+  },
+  "trash": {
+    "title": "Corbeille",
+    "empty": "La corbeille est vide",
+    "restore": "Restaurer",
+    "purge": "Supprimer définitivement",
+    "purgeConfirm": "Supprimer définitivement ? Cette action est irréversible.",
+    "hint": "Vous gérez la corbeille vous-même"
+  },
+  "links": {
+    "title": "Lier des listes",
+    "hint": "Sélectionnez les listes à lier",
+    "empty": "Aucune autre liste à lier",
+    "linked": "Liée",
+    "link": "Lier",
+    "unlink": "Délier"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "toggle": "Thème"
+  },
+  "language": {
+    "title": "Langue",
+    "toggle": "Langue"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "loading": "Chargement…",
+    "offline": "Hors ligne — modifications enregistrées localement"
+  }
+}

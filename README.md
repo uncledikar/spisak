@@ -19,7 +19,7 @@ Build: `npm run build` · Preview: `npm run preview`
 - Edit / soft-delete → trash
 - Link lists (M:N)
 - Lists sorted by `updatedAt`
-- i18n: EN / RU / SR (system language)
+- i18n: EN / ES / FR / RU / SR (system language)
 - Light / dark theme
 - Sync queue stub for stage 2
 # spisak

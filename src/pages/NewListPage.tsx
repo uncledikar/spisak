@@ -173,16 +173,14 @@ export function NewListPage() {
 
         <h2 className="section-title">{t('list.items')}</h2>
         <div className="stack stack-items">
-          {items.map((item) => (
+          {items.map((item) => {
+            const tint = itemColorValue(item.color)
+            return (
             <div
               key={item.id}
               id={`item-editor-${item.id}`}
-              className="item-editor"
-              style={
-                itemColorValue(item.color)
-                  ? { background: itemColorValue(item.color) }
-                  : undefined
-              }
+              className={`item-editor${tint ? ' has-color' : ''}`}
+              style={tint ? { background: tint } : undefined}
             >
               <input
                 value={item.name}
@@ -217,7 +215,8 @@ export function NewListPage() {
                 </button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="actions-bar">

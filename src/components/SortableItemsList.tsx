@@ -49,17 +49,18 @@ function SortableRow({
     id: item.id,
   })
 
+  const tint = itemColorValue(item.color)
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    background: itemColorValue(item.color),
+    background: tint,
   }
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}`}
+      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}${tint ? ' has-color' : ''}`}
     >
       <button
         type="button"

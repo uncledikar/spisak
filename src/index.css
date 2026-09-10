@@ -481,6 +481,30 @@ button {
   font-size: 0.9rem;
 }
 
+/* Pastel item tints stay light in dark theme — force dark text for contrast */
+[data-theme='dark'] .item-row.has-color,
+[data-theme='dark'] .item-editor.has-color {
+  color: #1a211c;
+}
+
+[data-theme='dark'] .item-row.has-color .item-name,
+[data-theme='dark'] .item-row.has-color .drag-handle,
+[data-theme='dark'] .item-editor.has-color input,
+[data-theme='dark'] .item-editor.has-color .qty-input {
+  color: #1a211c;
+}
+
+[data-theme='dark'] .item-row.has-color .meta,
+[data-theme='dark'] .item-row.has-color.checked .item-name {
+  color: #3d463f;
+}
+
+[data-theme='dark'] .item-row.has-color .qty-input-view {
+  color: #1a211c;
+  border-color: rgb(26 33 28 / 25%);
+  background: rgb(255 255 255 / 45%);
+}
+
 .qty-badge {
   min-width: 40px;
   height: 40px;
