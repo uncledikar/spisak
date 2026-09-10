@@ -27,6 +27,11 @@
     "name": "Название списка",
     "namePlaceholder": "напр. Поездка в Турцию",
     "deadline": "Дедлайн (необязательно)",
+    "clearDeadline": "Убрать дедлайн",
+    "trackQuantity": "Количество пунктов",
+    "trackQuantityOn": "С количеством",
+    "trackQuantityOff": "Без количества",
+    "trackQuantityHint": "Для покупок удобно с количеством, для сборов — часто без",
     "items": "Пункты",
     "addItem": "Добавить пункт",
     "itemName": "Название",
@@ -55,7 +60,8 @@
     "edit": "Изменить",
     "done": "Готово",
     "deleteConfirm": "Переместить список в корзину?",
-    "emptyItems": "Добавьте нужные вещи"
+    "emptyItems": "Добавьте нужные вещи",
+    "dragItem": "Перетащить"
   },
   "templates": {
     "title": "Шаблоны",

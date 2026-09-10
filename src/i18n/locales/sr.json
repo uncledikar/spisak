@@ -27,6 +27,11 @@
     "name": "Naziv liste",
     "namePlaceholder": "npr. Putovanje u Tursku",
     "deadline": "Rok (opciono)",
+    "clearDeadline": "Ukloni rok",
+    "trackQuantity": "Količine stavki",
+    "trackQuantityOn": "Sa količinama",
+    "trackQuantityOff": "Bez količina",
+    "trackQuantityHint": "Za kupovinu su korisne količine; za pakovanje često nisu",
     "items": "Stavke",
     "addItem": "Dodaj stavku",
     "itemName": "Naziv",
@@ -55,7 +60,8 @@
     "edit": "Izmeni",
     "done": "Gotovo",
     "deleteConfirm": "Premestiti listu u korpu?",
-    "emptyItems": "Dodajte stvari koje trebate"
+    "emptyItems": "Dodajte stvari koje trebate",
+    "dragItem": "Prevuci za promenu redosleda"
   },
   "templates": {
     "title": "Šabloni",

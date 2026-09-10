@@ -27,6 +27,11 @@
     "name": "List name",
     "namePlaceholder": "e.g. Trip to Turkey",
     "deadline": "Deadline (optional)",
+    "clearDeadline": "Clear deadline",
+    "trackQuantity": "Item quantities",
+    "trackQuantityOn": "With quantities",
+    "trackQuantityOff": "Without quantities",
+    "trackQuantityHint": "Shopping lists often need quantities; packing lists may not",
     "items": "Items",
     "addItem": "Add item",
     "itemName": "Name",
@@ -55,7 +60,8 @@
     "edit": "Edit",
     "done": "Done",
     "deleteConfirm": "Move this list to trash?",
-    "emptyItems": "Add things you need"
+    "emptyItems": "Add things you need",
+    "dragItem": "Drag to reorder"
   },
   "templates": {
     "title": "Templates",

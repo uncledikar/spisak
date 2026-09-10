@@ -270,9 +270,27 @@ button {
   margin-bottom: 16px;
 }
 
-.field label {
+.field label,
+.field-label {
   font-weight: 650;
   font-size: 1rem;
+}
+
+.choice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.choice-row .btn {
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .field input,
@@ -307,10 +325,52 @@ button {
 }
 
 .color-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.color-trigger {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.color-trigger.has-color {
+  border-color: var(--accent);
+}
+
+.color-trigger-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  text-shadow: 0 0 0 currentColor;
+}
+
+.color-trigger.has-color .color-trigger-icon {
+  color: var(--text);
+  mix-blend-mode: multiply;
+}
+
+.color-palette {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
+  max-width: min(280px, 70vw);
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .color-swatch {
@@ -340,13 +400,42 @@ button {
 
 .item-row {
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 36px 44px 1fr auto;
   gap: 8px;
   align-items: start;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 8px 10px 4px;
+  touch-action: manipulation;
+}
+
+.item-row.no-qty {
+  grid-template-columns: 36px 44px 1fr;
+}
+
+.item-row.dragging {
+  opacity: 0.92;
+  box-shadow: var(--shadow);
+  z-index: 5;
+}
+
+.drag-handle {
+  width: 36px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  cursor: grab;
+  font-size: 0.95rem;
+  letter-spacing: -2px;
+  user-select: none;
+  touch-action: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .item-row.checked .item-name {
@@ -401,6 +490,27 @@ button {
   display: grid;
   place-items: center;
   font-weight: 700;
+}
+
+.qty-input-view {
+  width: 52px;
+  min-width: 52px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.qty-input-view::-webkit-outer-spin-button,
+.qty-input-view::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .sheet {
@@ -473,6 +583,31 @@ button {
   font-weight: 700;
 }
 
+.section-title-links {
+  margin-top: 32px;
+}
+
+.actions-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+@media (min-width: 720px) {
+  .actions-bar-inline {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .actions-bar-inline > .btn,
+  .actions-bar-inline > a.btn {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 .offline-banner {
   background: var(--surface-2);
   color: var(--muted);
@@ -485,13 +620,6 @@ button {
 
 .qty-input {
   width: 88px;
-}
-
-.actions-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
 }
 
 .chip {
@@ -539,6 +667,7 @@ button {
   font-size: 1.05em;
   letter-spacing: -0.02em;
   color: var(--accent);
+  margin-left: 10px;
 }
 
 .progress-chip .progress-count {
@@ -550,6 +679,7 @@ button {
   color: var(--accent);
   font-size: 1.08em;
   font-weight: 800;
+  margin-left: 10px;
 }
 
 .meta .progress-count {

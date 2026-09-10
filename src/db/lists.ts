@@ -2,6 +2,11 @@ import { db, enqueueSync, flushSyncQueue } from './index'
 import type { ListItem, ListRecord, TemplateItem, TemplateRecord } from './types'
 import { createId } from '../utils/id'
 import { normalizeLinkPair } from '../utils/links'
+import {
+  normalizeItemPositions,
+  normalizeTemplatePositions,
+  reindexPositions,
+} from '../utils/positions'
 
 async function touchSync(
   entity: 'list' | 'template' | 'link',
@@ -12,23 +17,50 @@ async function touchSync(
   void flushSyncQueue()
 }
 
+function withNormalizedList(list: ListRecord): ListRecord {
+  return {
+    ...list,
+    trackQuantity: list.trackQuantity !== false,
+    items: normalizeItemPositions(list.items),
+  }
+}
+
+function withNormalizedTemplate(template: TemplateRecord): TemplateRecord {
+  return {
+    ...template,
+    trackQuantity: template.trackQuantity !== false,
+    items: normalizeTemplatePositions(template.items),
+  }
+}
+
 export async function getActiveLists(): Promise<ListRecord[]> {
   const lists = await db.lists.filter((l) => l.deletedAt === null).toArray()
-  return lists.sort((a, b) => b.updatedAt - a.updatedAt)
+  return lists.map(withNormalizedList).sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
 export async function getTrashLists(): Promise<ListRecord[]> {
   const lists = await db.lists.filter((l) => l.deletedAt !== null).toArray()
-  return lists.sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0))
+  return lists.map(withNormalizedList).sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0))
 }
 
 export async function getList(id: string): Promise<ListRecord | undefined> {
-  return db.lists.get(id)
+  const list = await db.lists.get(id)
+  if (!list) return undefined
+  const normalized = withNormalizedList(list)
+  const changed =
+    normalized.trackQuantity !== list.trackQuantity ||
+    normalized.items.length !== list.items.length ||
+    normalized.items.some((item, i) => item.position !== list.items[i]?.position)
+  if (changed) {
+    await db.lists.put({ ...normalized, updatedAt: list.updatedAt })
+  }
+  return normalized
 }
 
 export async function createList(input: {
   name: string
   deadline: string | null
+  trackQuantity: boolean
   items: ListItem[]
 }): Promise<ListRecord> {
   const now = Date.now()
@@ -36,7 +68,8 @@ export async function createList(input: {
     id: createId(),
     name: input.name.trim() || 'Untitled',
     deadline: input.deadline,
-    items: input.items,
+    trackQuantity: input.trackQuantity,
+    items: reindexPositions(input.items),
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
@@ -50,32 +83,41 @@ export async function createListFromTemplate(
   templateId: string,
   name?: string,
 ): Promise<ListRecord | null> {
-  const template = await db.templates.get(templateId)
-  if (!template) return null
+  const raw = await db.templates.get(templateId)
+  if (!raw) return null
+  const template = withNormalizedTemplate(raw)
   return createList({
     name: name?.trim() || template.name,
     deadline: null,
-    items: template.items.map((item) => ({
+    trackQuantity: template.trackQuantity,
+    items: template.items.map((item, index) => ({
       id: createId(),
       name: item.name,
       quantity: item.quantity,
       comment: item.comment,
       color: item.color ?? null,
       checked: false,
+      position: index,
     })),
   })
 }
 
 export async function updateList(
   id: string,
-  patch: Partial<Pick<ListRecord, 'name' | 'deadline' | 'items'>>,
+  patch: Partial<Pick<ListRecord, 'name' | 'deadline' | 'items' | 'trackQuantity'>>,
 ): Promise<ListRecord | null> {
   const existing = await db.lists.get(id)
   if (!existing || existing.deletedAt !== null) return null
+  const base = withNormalizedList(existing)
+  const items =
+    patch.items !== undefined ? reindexPositions(patch.items) : base.items
   const updated: ListRecord = {
-    ...existing,
+    ...base,
     ...patch,
-    name: patch.name !== undefined ? patch.name.trim() || existing.name : existing.name,
+    name: patch.name !== undefined ? patch.name.trim() || base.name : base.name,
+    trackQuantity:
+      patch.trackQuantity !== undefined ? patch.trackQuantity : base.trackQuantity,
+    items,
     updatedAt: Date.now(),
   }
   await db.lists.put(updated)
@@ -124,13 +166,15 @@ export async function saveListAsTemplate(listId: string): Promise<TemplateRecord
   const template: TemplateRecord = {
     id: createId(),
     name: list.name,
+    trackQuantity: list.trackQuantity !== false,
     items: list.items.map(
-      (item): TemplateItem => ({
+      (item, index): TemplateItem => ({
         id: createId(),
         name: item.name,
         quantity: item.quantity,
         comment: item.comment,
         color: item.color ?? null,
+        position: item.position ?? index,
       }),
     ),
     createdAt: now,
@@ -143,7 +187,7 @@ export async function saveListAsTemplate(listId: string): Promise<TemplateRecord
 
 export async function getTemplates(): Promise<TemplateRecord[]> {
   const templates = await db.templates.toArray()
-  return templates.sort((a, b) => b.updatedAt - a.updatedAt)
+  return templates.map(withNormalizedTemplate).sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
 export async function deleteTemplate(id: string): Promise<void> {
@@ -196,7 +240,7 @@ export async function unlinkLists(a: string, b: string): Promise<void> {
   await touchSync('link', 'delete', { id: existing.id })
 }
 
-export function emptyItem(): ListItem {
+export function emptyItem(position = 0): ListItem {
   return {
     id: createId(),
     name: '',
@@ -204,5 +248,6 @@ export function emptyItem(): ListItem {
     comment: '',
     checked: false,
     color: null,
+    position,
   }
 }

@@ -12,12 +12,15 @@ import {
   softDeleteList,
   updateList,
 } from '../db/lists'
-import { createId } from '../utils/id'
 import { itemColorValue, isItemColorId, type ItemColorId } from '../utils/itemColors'
 import { formatDeadline } from '../utils/dates'
 import { scrollItemIntoView } from '../utils/scroll'
+import { reindexPositions } from '../utils/positions'
 import { ItemColorPicker } from '../components/ItemColorPicker'
 import { ProgressBadge } from '../components/ProgressBadge'
+import { QtyInput } from '../components/QtyInput'
+import { SortableItemsList } from '../components/SortableItemsList'
+import { useOverflowAddButton } from '../hooks/useOverflowAddButton'
 
 function asColor(value: string | null | undefined): ItemColorId | null {
   return isItemColorId(value) ? value : null
@@ -33,17 +36,26 @@ export function ListDetailPage() {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
   const [deadline, setDeadline] = useState('')
+  const [trackQuantity, setTrackQuantity] = useState(true)
   const [items, setItems] = useState<ListItem[]>([])
   const [toast, setToast] = useState<string | null>(null)
+
+  const { itemsRef, showBottomAdd } = useOverflowAddButton([
+    list?.items.length ?? 0,
+    list?.trackQuantity,
+    editing,
+  ])
 
   useEffect(() => {
     if (!list) return
     setName(list.name)
     setDeadline(list.deadline ?? '')
+    setTrackQuantity(list.trackQuantity !== false)
     setItems(
       list.items.map((item) => ({
         ...item,
         color: item.color ?? null,
+        position: item.position ?? 0,
       })),
     )
   }, [list])
@@ -109,6 +121,7 @@ export function ListDetailPage() {
     await updateList(current.id, {
       name,
       deadline: deadline || null,
+      trackQuantity,
       items: cleaned,
     })
     setEditing(false)
@@ -130,9 +143,32 @@ export function ListDetailPage() {
   }
 
   function addItem() {
-    const id = createId()
-    setItems((prev) => [...prev, { ...emptyItem(), id }])
-    scrollItemIntoView(id)
+    const item = emptyItem()
+    setItems((prev) => {
+      const next = reindexPositions([...prev, item])
+      return next
+    })
+    scrollItemIntoView(item.id)
+  }
+
+  async function addItemFromView() {
+    const item = emptyItem(current.items.length)
+    const next = reindexPositions([...current.items, item])
+    setItems(next)
+    setEditing(true)
+    await updateList(current.id, { items: next })
+    scrollItemIntoView(item.id)
+  }
+
+  async function reorderItems(next: ListItem[]) {
+    await updateList(current.id, { items: next })
+  }
+
+  async function changeQuantity(itemId: string, quantity: number) {
+    const next = current.items.map((item) =>
+      item.id === itemId ? { ...item, quantity } : item,
+    )
+    await updateList(current.id, { items: next })
   }
 
   return (
@@ -171,12 +207,50 @@ export function ListDetailPage() {
           </div>
           <div className="field">
             <label htmlFor="edit-deadline">{t('list.deadline')}</label>
-            <input
-              id="edit-deadline"
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-            />
+            <div className="row">
+              <input
+                id="edit-deadline"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              {deadline ? (
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={() => setDeadline('')}
+                  aria-label={t('list.clearDeadline')}
+                  title={t('list.clearDeadline')}
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="field">
+            <span className="field-label" id="edit-track-quantity-label">
+              {t('list.trackQuantity')}
+            </span>
+            <div className="choice-row" role="group" aria-labelledby="edit-track-quantity-label">
+              <button
+                type="button"
+                className={`btn ${trackQuantity ? 'btn-primary' : 'btn-secondary'}`}
+                aria-pressed={trackQuantity}
+                onClick={() => setTrackQuantity(true)}
+              >
+                {t('list.trackQuantityOn')}
+              </button>
+              <button
+                type="button"
+                className={`btn ${!trackQuantity ? 'btn-primary' : 'btn-secondary'}`}
+                aria-pressed={!trackQuantity}
+                onClick={() => setTrackQuantity(false)}
+              >
+                {t('list.trackQuantityOff')}
+              </button>
+            </div>
+            <p className="field-hint">{t('list.trackQuantityHint')}</p>
           </div>
           <h2 className="section-title">{t('list.items')}</h2>
           <div className="stack stack-items">
@@ -197,15 +271,17 @@ export function ListDetailPage() {
                   placeholder={t('list.itemName')}
                 />
                 <div className="row">
-                  <input
-                    className="qty-input"
-                    type="number"
-                    min={1}
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateItem(item.id, { quantity: Number(e.target.value) || 1 })
-                    }
+                  <ItemColorPicker
+                    value={asColor(item.color)}
+                    onChange={(color) => updateItem(item.id, { color })}
                   />
+                  {trackQuantity ? (
+                    <QtyInput
+                      value={item.quantity}
+                      onChange={(quantity) => updateItem(item.id, { quantity })}
+                      aria-label={t('list.quantity')}
+                    />
+                  ) : null}
                   <input
                     style={{ flex: 1 }}
                     value={item.comment}
@@ -217,17 +293,15 @@ export function ListDetailPage() {
                     className="icon-btn"
                     onClick={() =>
                       setItems((prev) =>
-                        prev.length <= 1 ? prev : prev.filter((x) => x.id !== item.id),
+                        prev.length <= 1
+                          ? prev
+                          : reindexPositions(prev.filter((x) => x.id !== item.id)),
                       )
                     }
                   >
                     ×
                   </button>
                 </div>
-                <ItemColorPicker
-                  value={asColor(item.color)}
-                  onChange={(color) => updateItem(item.id, { color })}
-                />
               </div>
             ))}
           </div>
@@ -246,56 +320,55 @@ export function ListDetailPage() {
         </form>
       ) : (
         <>
+          <button
+            type="button"
+            className="btn btn-ghost btn-block"
+            style={{ marginBottom: 12 }}
+            onClick={() => void addItemFromView()}
+          >
+            + {t('list.addItem')}
+          </button>
+
           {current.items.length === 0 ? (
             <div className="empty">
               <h2>{t('list.emptyItems')}</h2>
             </div>
           ) : (
-            <div className="stack stack-items">
-              {current.items.map((item) => (
-                <div
-                  key={item.id}
-                  className={`item-row${item.checked ? ' checked' : ''}`}
-                  style={
-                    itemColorValue(item.color)
-                      ? { background: itemColorValue(item.color) }
-                      : undefined
-                  }
-                >
-                  <button
-                    type="button"
-                    className={`check${item.checked ? ' on' : ''}`}
-                    onClick={() => void toggleChecked(item.id)}
-                    aria-pressed={item.checked}
-                  >
-                    {item.checked ? '✓' : ''}
-                  </button>
-                  <div>
-                    <p className="item-name">{item.name}</p>
-                    {item.comment ? <p className="meta">{item.comment}</p> : null}
-                  </div>
-                  <div className="qty-badge">{item.quantity}</div>
-                </div>
-              ))}
-            </div>
+            <SortableItemsList
+              items={current.items}
+              trackQuantity={current.trackQuantity !== false}
+              onReorder={reorderItems}
+              onToggle={toggleChecked}
+              onQuantityChange={changeQuantity}
+              listRef={itemsRef}
+            />
           )}
 
-          <h2 className="section-title">{t('list.links')}</h2>
+          {showBottomAdd ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-block"
+              style={{ marginTop: 12 }}
+              onClick={() => void addItemFromView()}
+            >
+              + {t('list.addItem')}
+            </button>
+          ) : null}
+
           {linked && linked.length > 0 ? (
-            <div className="stack" style={{ marginBottom: 12 }}>
-              {linked.map((l) => (
-                <Link key={l.id} to={`/lists/${l.id}`} className="card card-button">
-                  <h3 className="card-title">{l.name}</h3>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="meta" style={{ marginBottom: 12 }}>
-              {t('list.noLinks')}
-            </p>
-          )}
+            <>
+              <h2 className="section-title section-title-links">{t('list.links')}</h2>
+              <div className="stack" style={{ marginBottom: 12 }}>
+                {linked.map((l) => (
+                  <Link key={l.id} to={`/lists/${l.id}`} className="card card-button">
+                    <h3 className="card-title">{l.name}</h3>
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : null}
 
-          <div className="actions-bar">
+          <div className="actions-bar actions-bar-inline">
             <Link className="btn btn-secondary btn-block" to={`/lists/${current.id}/links`}>
               {t('list.manageLinks')}
             </Link>
