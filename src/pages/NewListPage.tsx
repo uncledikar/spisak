@@ -9,7 +9,7 @@ import {
   emptyItem,
   getTemplates,
 } from '../db/lists'
-import { itemColorValue, isItemColorId, type ItemColorId } from '../utils/itemColors'
+import { isItemColorId, type ItemColorId } from '../utils/itemColors'
 import { scrollItemIntoView } from '../utils/scroll'
 import { reindexPositions } from '../utils/positions'
 import { ItemColorPicker } from '../components/ItemColorPicker'
@@ -173,15 +173,8 @@ export function NewListPage() {
 
         <h2 className="section-title">{t('list.items')}</h2>
         <div className="stack stack-items">
-          {items.map((item) => {
-            const tint = itemColorValue(item.color)
-            return (
-            <div
-              key={item.id}
-              id={`item-editor-${item.id}`}
-              className={`item-editor${tint ? ' has-color' : ''}`}
-              style={tint ? { background: tint } : undefined}
-            >
+          {items.map((item) => (
+            <div key={item.id} id={`item-editor-${item.id}`} className="item-editor">
               <input
                 value={item.name}
                 onChange={(e) => updateItem(item.id, { name: e.target.value })}
@@ -215,8 +208,7 @@ export function NewListPage() {
                 </button>
               </div>
             </div>
-            )
-          })}
+          ))}
         </div>
 
         <div className="actions-bar">

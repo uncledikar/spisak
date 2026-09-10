@@ -20,16 +20,15 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from 'react-i18next'
 import type { ListItem } from '../db/types'
-import { itemColorValue } from '../utils/itemColors'
+import { itemTintClass } from '../utils/itemColors'
 import { reindexPositions } from '../utils/positions'
-import { QtyInput } from './QtyInput'
 
 interface Props {
   items: ListItem[]
   trackQuantity: boolean
   onReorder: (items: ListItem[]) => void | Promise<void>
   onToggle: (itemId: string) => void | Promise<void>
-  onQuantityChange: (itemId: string, quantity: number) => void | Promise<void>
+  onOpenItem: (itemId: string) => void
   listRef?: Ref<HTMLDivElement>
 }
 
@@ -37,34 +36,33 @@ function SortableRow({
   item,
   trackQuantity,
   onToggle,
-  onQuantityChange,
+  onOpenItem,
 }: {
   item: ListItem
   trackQuantity: boolean
   onToggle: (itemId: string) => void | Promise<void>
-  onQuantityChange: (itemId: string, quantity: number) => void | Promise<void>
+  onOpenItem: (itemId: string) => void
 }) {
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   })
 
-  const tint = itemColorValue(item.color)
+  const tintClass = itemTintClass(item.color)
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    background: tint,
   }
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}${tint ? ' has-color' : ''}`}
+      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}`}
     >
       <button
         type="button"
-        className="drag-handle"
+        className={`drag-handle${tintClass ? ` ${tintClass}` : ''}`}
         aria-label={t('list.dragItem')}
         {...attributes}
         {...listeners}
@@ -79,17 +77,24 @@ function SortableRow({
       >
         {item.checked ? '✓' : ''}
       </button>
-      <div>
-        <p className="item-name">{item.name}</p>
+      <button
+        type="button"
+        className="item-row-main"
+        onClick={() => onOpenItem(item.id)}
+        aria-label={t('list.editItem')}
+      >
+        <p className="item-name">{item.name || t('list.untitledItem')}</p>
         {item.comment ? <p className="meta">{item.comment}</p> : null}
-      </div>
+      </button>
       {trackQuantity ? (
-        <QtyInput
-          className="qty-input qty-input-view"
-          value={item.quantity}
-          onChange={(quantity) => void onQuantityChange(item.id, quantity)}
+        <button
+          type="button"
+          className="qty-badge"
+          onClick={() => onOpenItem(item.id)}
           aria-label={t('list.quantity')}
-        />
+        >
+          {item.quantity}
+        </button>
       ) : null}
     </div>
   )
@@ -100,7 +105,7 @@ export function SortableItemsList({
   trackQuantity,
   onReorder,
   onToggle,
-  onQuantityChange,
+  onOpenItem,
   listRef,
 }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -142,7 +147,7 @@ export function SortableItemsList({
               item={item}
               trackQuantity={trackQuantity}
               onToggle={onToggle}
-              onQuantityChange={onQuantityChange}
+              onOpenItem={onOpenItem}
             />
           ))}
         </div>

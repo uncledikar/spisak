@@ -12,19 +12,17 @@ import {
   softDeleteList,
   updateList,
 } from '../db/lists'
-import { itemColorValue, isItemColorId, type ItemColorId } from '../utils/itemColors'
 import { formatDeadline } from '../utils/dates'
-import { scrollItemIntoView } from '../utils/scroll'
 import { reindexPositions } from '../utils/positions'
-import { ItemColorPicker } from '../components/ItemColorPicker'
+import { ItemEditModal } from '../components/ItemEditModal'
 import { ProgressBadge } from '../components/ProgressBadge'
-import { QtyInput } from '../components/QtyInput'
 import { SortableItemsList } from '../components/SortableItemsList'
 import { useOverflowAddButton } from '../hooks/useOverflowAddButton'
 
-function asColor(value: string | null | undefined): ItemColorId | null {
-  return isItemColorId(value) ? value : null
-}
+type ItemModal =
+  | { mode: 'edit'; itemId: string }
+  | { mode: 'create'; draft: ListItem }
+  | null
 
 export function ListDetailPage() {
   const { id = '' } = useParams()
@@ -37,8 +35,8 @@ export function ListDetailPage() {
   const [name, setName] = useState('')
   const [deadline, setDeadline] = useState('')
   const [trackQuantity, setTrackQuantity] = useState(true)
-  const [items, setItems] = useState<ListItem[]>([])
   const [toast, setToast] = useState<string | null>(null)
+  const [itemModal, setItemModal] = useState<ItemModal>(null)
 
   const { itemsRef, showBottomAdd } = useOverflowAddButton([
     list?.items.length ?? 0,
@@ -51,13 +49,6 @@ export function ListDetailPage() {
     setName(list.name)
     setDeadline(list.deadline ?? '')
     setTrackQuantity(list.trackQuantity !== false)
-    setItems(
-      list.items.map((item) => ({
-        ...item,
-        color: item.color ?? null,
-        position: item.position ?? 0,
-      })),
-    )
   }, [list])
 
   const progress = useMemo(() => {
@@ -107,22 +98,12 @@ export function ListDetailPage() {
     await updateList(current.id, { items: next })
   }
 
-  async function saveEdit(e: FormEvent) {
+  async function saveListMeta(e: FormEvent) {
     e.preventDefault()
-    const cleaned = items
-      .map((item) => ({
-        ...item,
-        name: item.name.trim(),
-        comment: item.comment.trim(),
-        quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? item.quantity : 1,
-      }))
-      .filter((item) => item.name.length > 0)
-
     await updateList(current.id, {
       name,
       deadline: deadline || null,
       trackQuantity,
-      items: cleaned,
     })
     setEditing(false)
   }
@@ -138,38 +119,37 @@ export function ListDetailPage() {
     navigate('/', { replace: true })
   }
 
-  function updateItem(itemId: string, patch: Partial<ListItem>) {
-    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, ...patch } : item)))
-  }
-
-  function addItem() {
-    const item = emptyItem()
-    setItems((prev) => {
-      const next = reindexPositions([...prev, item])
-      return next
-    })
-    scrollItemIntoView(item.id)
-  }
-
-  async function addItemFromView() {
-    const item = emptyItem(current.items.length)
-    const next = reindexPositions([...current.items, item])
-    setItems(next)
-    setEditing(true)
-    await updateList(current.id, { items: next })
-    scrollItemIntoView(item.id)
+  function openNewItem() {
+    setItemModal({ mode: 'create', draft: emptyItem(current.items.length) })
   }
 
   async function reorderItems(next: ListItem[]) {
     await updateList(current.id, { items: next })
   }
 
-  async function changeQuantity(itemId: string, quantity: number) {
-    const next = current.items.map((item) =>
-      item.id === itemId ? { ...item, quantity } : item,
-    )
+  async function saveItem(updated: ListItem) {
+    if (itemModal?.mode === 'create') {
+      const next = reindexPositions([...current.items, updated])
+      await updateList(current.id, { items: next })
+      return
+    }
+    const next = current.items.map((item) => (item.id === updated.id ? updated : item))
     await updateList(current.id, { items: next })
   }
+
+  async function deleteItem(itemId: string) {
+    if (!window.confirm(t('list.deleteItemConfirm'))) return
+    const next = reindexPositions(current.items.filter((item) => item.id !== itemId))
+    await updateList(current.id, { items: next })
+    setItemModal(null)
+  }
+
+  const modalItem =
+    itemModal?.mode === 'edit'
+      ? current.items.find((item) => item.id === itemModal.itemId)
+      : itemModal?.mode === 'create'
+        ? itemModal.draft
+        : undefined
 
   return (
     <div className="app-shell">
@@ -182,7 +162,14 @@ export function ListDetailPage() {
           <button
             type="button"
             className="icon-btn"
-            onClick={() => setEditing((v) => !v)}
+            onClick={() => {
+              if (!editing) {
+                setName(current.name)
+                setDeadline(current.deadline ?? '')
+                setTrackQuantity(current.trackQuantity !== false)
+              }
+              setEditing((v) => !v)
+            }}
             aria-label={editing ? t('list.done') : t('list.edit')}
           >
             {editing ? '✓' : '✎'}
@@ -200,7 +187,7 @@ export function ListDetailPage() {
       </p>
 
       {editing ? (
-        <form onSubmit={(e) => void saveEdit(e)}>
+        <form onSubmit={(e) => void saveListMeta(e)}>
           <div className="field">
             <label htmlFor="edit-name">{t('list.name')}</label>
             <input id="edit-name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -252,68 +239,35 @@ export function ListDetailPage() {
             </div>
             <p className="field-hint">{t('list.trackQuantityHint')}</p>
           </div>
-          <h2 className="section-title">{t('list.items')}</h2>
-          <div className="stack stack-items">
-            {items.map((item) => {
-              const tint = itemColorValue(item.color)
-              return (
-              <div
-                key={item.id}
-                id={`item-editor-${item.id}`}
-                className={`item-editor${tint ? ' has-color' : ''}`}
-                style={tint ? { background: tint } : undefined}
-              >
-                <input
-                  value={item.name}
-                  onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                  placeholder={t('list.itemName')}
-                />
-                <div className="row">
-                  <ItemColorPicker
-                    value={asColor(item.color)}
-                    onChange={(color) => updateItem(item.id, { color })}
-                  />
-                  {trackQuantity ? (
-                    <QtyInput
-                      value={item.quantity}
-                      onChange={(quantity) => updateItem(item.id, { quantity })}
-                      aria-label={t('list.quantity')}
-                    />
-                  ) : null}
-                  <input
-                    style={{ flex: 1 }}
-                    value={item.comment}
-                    onChange={(e) => updateItem(item.id, { comment: e.target.value })}
-                    placeholder={t('list.commentPlaceholder')}
-                  />
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={() =>
-                      setItems((prev) =>
-                        prev.length <= 1
-                          ? prev
-                          : reindexPositions(prev.filter((x) => x.id !== item.id)),
-                      )
-                    }
-                  >
-                    ×
-                  </button>
-                </div>
+
+          <div className="field">
+            <span className="field-label">{t('list.links')}</span>
+            {linked && linked.length > 0 ? (
+              <div className="stack" style={{ marginBottom: 8 }}>
+                {linked.map((l) => (
+                  <Link key={l.id} to={`/lists/${l.id}`} className="card card-button">
+                    <h3 className="card-title">{l.name}</h3>
+                  </Link>
+                ))}
               </div>
-              )
-            })}
+            ) : (
+              <p className="meta">{t('list.noLinks')}</p>
+            )}
+            <Link className="btn btn-secondary btn-block" to={`/lists/${current.id}/links`}>
+              {t('list.manageLinks')}
+            </Link>
           </div>
+
           <div className="actions-bar">
+            <button type="submit" className="btn btn-primary btn-block">
+              {t('list.save')}
+            </button>
             <button
               type="button"
               className="btn btn-ghost btn-block"
-              onClick={addItem}
+              onClick={() => setEditing(false)}
             >
-              + {t('list.addItem')}
-            </button>
-            <button type="submit" className="btn btn-primary btn-block">
-              {t('list.save')}
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -323,7 +277,7 @@ export function ListDetailPage() {
             type="button"
             className="btn btn-ghost btn-block"
             style={{ marginBottom: 12 }}
-            onClick={() => void addItemFromView()}
+            onClick={openNewItem}
           >
             + {t('list.addItem')}
           </button>
@@ -338,7 +292,7 @@ export function ListDetailPage() {
               trackQuantity={current.trackQuantity !== false}
               onReorder={reorderItems}
               onToggle={toggleChecked}
-              onQuantityChange={changeQuantity}
+              onOpenItem={(itemId) => setItemModal({ mode: 'edit', itemId })}
               listRef={itemsRef}
             />
           )}
@@ -348,7 +302,7 @@ export function ListDetailPage() {
               type="button"
               className="btn btn-ghost btn-block"
               style={{ marginTop: 12 }}
-              onClick={() => void addItemFromView()}
+              onClick={openNewItem}
             >
               + {t('list.addItem')}
             </button>
@@ -380,6 +334,21 @@ export function ListDetailPage() {
           </div>
         </>
       )}
+
+      {modalItem && itemModal ? (
+        <ItemEditModal
+          item={modalItem}
+          trackQuantity={current.trackQuantity !== false}
+          isNew={itemModal.mode === 'create'}
+          onSave={saveItem}
+          onDelete={
+            itemModal.mode === 'edit'
+              ? () => deleteItem(itemModal.itemId)
+              : undefined
+          }
+          onClose={() => setItemModal(null)}
+        />
+      ) : null}
 
       {toast ? <div className="toast">{toast}</div> : null}
     </div>

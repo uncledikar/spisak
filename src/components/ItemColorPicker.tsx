@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ITEM_COLORS, itemColorValue, type ItemColorId } from '../utils/itemColors'
+import { ITEM_COLORS, itemTintClass, type ItemColorId } from '../utils/itemColors'
 
 interface Props {
   value: ItemColorId | null
@@ -28,14 +28,13 @@ export function ItemColorPicker({ value, onChange }: Props) {
     }
   }, [open])
 
-  const preview = itemColorValue(value)
+  const tintClass = itemTintClass(value)
 
   return (
     <div className="color-picker" ref={rootRef}>
       <button
         type="button"
-        className={`color-trigger${value ? ' has-color' : ''}`}
-        style={preview ? { background: preview } : undefined}
+        className={`color-trigger${value ? ' has-color' : ''}${tintClass ? ` ${tintClass}` : ''}`}
         onClick={() => setOpen((v) => !v)}
         title={t('list.color')}
         aria-label={t('list.color')}
@@ -65,7 +64,7 @@ export function ItemColorPicker({ value, onChange }: Props) {
               key={color.id}
               type="button"
               className={`color-swatch${value === color.id ? ' active' : ''}`}
-              style={{ background: color.value }}
+              data-color={color.id}
               onClick={() => {
                 onChange(color.id)
                 setOpen(false)
