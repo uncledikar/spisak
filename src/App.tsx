@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { AuthGate } from './components/AuthGate'
 import { RouteErrorBoundary } from './components/RouteErrorBoundary'
+import { useAuthStore } from './store/authStore'
 import { ListsPage } from './pages/ListsPage'
 import { NewListPage } from './pages/NewListPage'
 import { ListDetailPage } from './pages/ListDetailPage'
@@ -25,6 +27,12 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const user = useAuthStore((s) => s.user)
+
+  if (!user) {
+    return <AuthGate />
+  }
+
   return (
     <BrowserRouter basename="/spisak">
       <AppRoutes />

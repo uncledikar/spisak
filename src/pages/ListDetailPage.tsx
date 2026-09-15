@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useTranslation } from 'react-i18next'
-import type { ListItem } from '../db/types'
+import type { ListItem } from '../types/models'
 import {
   emptyItem,
   getLinkedLists,
@@ -11,7 +10,8 @@ import {
   saveListAsTemplate,
   softDeleteList,
   updateList,
-} from '../db/lists'
+} from '../api/lists'
+import { useLiveData } from '../hooks/useLiveData'
 import { formatDeadline } from '../utils/dates'
 import { reindexPositions } from '../utils/positions'
 import { ItemEditModal } from '../components/ItemEditModal'
@@ -28,8 +28,8 @@ export function ListDetailPage() {
   const { id = '' } = useParams()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const list = useLiveQuery(() => getList(id), [id])
-  const linked = useLiveQuery(() => getLinkedLists(id), [id])
+  const list = useLiveData(() => getList(id), [id])
+  const linked = useLiveData(() => getLinkedLists(id), [id])
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')

@@ -100,10 +100,16 @@
     "title": "Langue",
     "toggle": "Langue"
   },
+  "auth": {
+    "signInGoogle": "Se connecter avec Google",
+    "signOut": "Se déconnecter",
+    "account": "Compte",
+    "required": "Connectez-vous avec Google pour synchroniser vos listes"
+  },
   "common": {
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "loading": "Chargement…",
-    "offline": "Hors ligne — modifications enregistrées localement"
+    "offline": "Hors ligne — une connexion est nécessaire pour synchroniser"
   }
 }

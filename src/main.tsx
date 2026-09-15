@@ -4,28 +4,35 @@ import './i18n'
 import './index.css'
 import App from './App'
 import { useSettingsStore } from './store/settingsStore'
-import { flushSyncQueue } from './db'
+import { useAuthStore } from './store/authStore'
 import { registerSW } from 'virtual:pwa-register'
 
 registerSW({ immediate: true })
 
 function Root() {
-  const init = useSettingsStore((s) => s.init)
-  const ready = useSettingsStore((s) => s.ready)
+  const initSettings = useSettingsStore((s) => s.init)
+  const settingsReady = useSettingsStore((s) => s.ready)
+  const initAuth = useAuthStore((s) => s.init)
+  const authReady = useAuthStore((s) => s.ready)
+  const user = useAuthStore((s) => s.user)
 
   useEffect(() => {
-    void init()
-  }, [init])
+    void initAuth()
+  }, [initAuth])
 
   useEffect(() => {
-    const onOnline = () => {
-      void flushSyncQueue()
+    if (!authReady) return
+    if (user) {
+      void initSettings()
+      return
     }
-    window.addEventListener('online', onOnline)
-    return () => window.removeEventListener('online', onOnline)
-  }, [])
+    // Signed out: local defaults only (settings page gated behind auth).
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    document.documentElement.dataset.theme = theme
+    useSettingsStore.setState({ ready: true, theme, language: useSettingsStore.getState().language })
+  }, [authReady, user, initSettings])
 
-  if (!ready) return null
+  if (!authReady || (user && !settingsReady)) return null
   return <App />
 }
 

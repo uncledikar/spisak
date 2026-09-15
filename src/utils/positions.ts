@@ -1,4 +1,4 @@
-import type { ListItem, ListRecord, TemplateItem, TemplateRecord } from '../db/types'
+import type { ListItem, ListRecord, TemplateItem, TemplateRecord } from '../types/models'
 import { createId } from './id'
 
 type Positioned = { position?: number | null }

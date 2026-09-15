@@ -100,10 +100,16 @@
     "title": "Idioma",
     "toggle": "Idioma"
   },
+  "auth": {
+    "signInGoogle": "Iniciar sesión con Google",
+    "signOut": "Cerrar sesión",
+    "account": "Cuenta",
+    "required": "Inicia sesión con Google para sincronizar tus listas"
+  },
   "common": {
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "loading": "Cargando…",
-    "offline": "Sin conexión — cambios guardados en el dispositivo"
+    "offline": "Sin conexión — necesitas internet para sincronizar"
   }
 }

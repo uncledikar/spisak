@@ -48,16 +48,7 @@ export interface ListLink {
   createdAt: number
 }
 
-export interface SyncOp {
-  id: string
-  entity: 'list' | 'template' | 'link' | 'settings'
-  action: 'upsert' | 'delete'
-  payload: unknown
-  createdAt: number
-}
-
 export interface SettingsRecord {
-  id: 'app'
   theme: 'light' | 'dark'
   /** null = follow system once, then persist chosen/detected code */
   language: string | null

@@ -1,8 +1,6 @@
 import { create } from 'zustand'
 import i18n, { detectLanguage, type AppLanguage, SUPPORTED_LANGUAGES } from '../i18n'
-import { db } from '../db'
-import { migrateLocalData } from '../db/migrate'
-import type { SettingsRecord } from '../db/types'
+import { getSettings, upsertSettings } from '../api/settings'
 
 type Theme = 'light' | 'dark'
 
@@ -41,8 +39,12 @@ function normalizeLanguage(value: string | null | undefined): AppLanguage {
 }
 
 async function persist(theme: Theme, language: AppLanguage): Promise<void> {
-  const row: SettingsRecord = { id: 'app', theme, language }
-  await db.settings.put(row)
+  try {
+    await upsertSettings({ theme, language })
+  } catch (error) {
+    // Before sign-in, keep preferences in memory only.
+    console.warn('Settings not saved remotely', error)
+  }
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -50,23 +52,25 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   language: 'en',
   ready: false,
   init: async () => {
+    set({ ready: false })
     try {
-      await migrateLocalData()
+      const remote = await getSettings()
+      const theme = remote?.theme ?? systemTheme()
+      const language = normalizeLanguage(remote?.language)
+      applyTheme(theme)
+      applyLanguage(language)
+      if (!remote || remote.language !== language) {
+        await persist(theme, language)
+      }
+      set({ theme, language, ready: true })
     } catch (error) {
-      console.error('Local data migration failed', error)
+      console.error('Settings init failed', error)
+      const theme = systemTheme()
+      const language = detectLanguage()
+      applyTheme(theme)
+      applyLanguage(language)
+      set({ theme, language, ready: true })
     }
-    let row = await db.settings.get('app')
-    if (!row) {
-      row = { id: 'app', theme: systemTheme(), language: detectLanguage() }
-      await db.settings.put(row)
-    }
-    const language = normalizeLanguage(row.language)
-    applyTheme(row.theme)
-    applyLanguage(language)
-    if (row.language !== language) {
-      await persist(row.theme, language)
-    }
-    set({ theme: row.theme, language, ready: true })
   },
   setTheme: async (theme) => {
     applyTheme(theme)

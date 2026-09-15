@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from 'react-i18next'
-import type { ListItem } from '../db/types'
+import type { ListItem } from '../types/models'
 import { itemTintClass } from '../utils/itemColors'
 import { reindexPositions } from '../utils/positions'
 

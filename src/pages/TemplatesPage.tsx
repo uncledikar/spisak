@@ -1,14 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useTranslation } from 'react-i18next'
-import { createListFromTemplate, deleteTemplate, getTemplates } from '../db/lists'
+import { createListFromTemplate, deleteTemplate, getTemplates } from '../api/lists'
+import { useLiveData } from '../hooks/useLiveData'
 
 export function TemplatesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const templates = useLiveQuery(() => getTemplates(), [])
+  const templates = useLiveData(() => getTemplates(), [])
 
-  async function useTemplate(id: string) {
+  async function startFromTemplate(id: string) {
     const list = await createListFromTemplate(id)
     if (list) navigate(`/lists/${list.id}`)
   }
@@ -47,7 +47,7 @@ export function TemplatesPage() {
                   type="button"
                   className="btn btn-primary"
                   style={{ flex: 1 }}
-                  onClick={() => void useTemplate(tpl.id)}
+                  onClick={() => void startFromTemplate(tpl.id)}
                 >
                   {t('templates.use')}
                 </button>

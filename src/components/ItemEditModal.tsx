@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ListItem } from '../db/types'
+import type { ListItem } from '../types/models'
 import { isItemColorId, type ItemColorId } from '../utils/itemColors'
 import { ItemColorPicker } from './ItemColorPicker'
 import { QtyInput } from './QtyInput'

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useTranslation } from 'react-i18next'
-import { getTrashLists, purgeList, restoreList } from '../db/lists'
+import { getTrashLists, purgeList, restoreList } from '../api/lists'
+import { useLiveData } from '../hooks/useLiveData'
 
 export function TrashPage() {
   const { t } = useTranslation()
-  const lists = useLiveQuery(() => getTrashLists(), [])
+  const lists = useLiveData(() => getTrashLists(), [])
 
   async function onPurge(id: string) {
     if (!window.confirm(t('trash.purgeConfirm'))) return

@@ -100,10 +100,16 @@
     "title": "Language",
     "toggle": "Language"
   },
+  "auth": {
+    "signInGoogle": "Sign in with Google",
+    "signOut": "Sign out",
+    "account": "Account",
+    "required": "Sign in with Google to sync your lists"
+  },
   "common": {
     "cancel": "Cancel",
     "confirm": "Confirm",
     "loading": "Loading…",
-    "offline": "Offline — changes saved locally"
+    "offline": "Offline — connect to the internet to sync"
   }
 }

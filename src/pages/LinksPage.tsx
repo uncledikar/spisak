@@ -1,5 +1,4 @@
 import { Link, useParams } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useTranslation } from 'react-i18next'
 import {
   getActiveLists,
@@ -7,22 +6,39 @@ import {
   getList,
   linkLists,
   unlinkLists,
-} from '../db/lists'
+} from '../api/lists'
+import { useLiveData } from '../hooks/useLiveData'
 
 export function LinksPage() {
   const { id = '' } = useParams()
   const { t } = useTranslation()
-  const list = useLiveQuery(() => getList(id), [id])
-  const all = useLiveQuery(() => getActiveLists(), [])
-  const linkedIds = useLiveQuery(() => getLinkedListIds(id), [id])
+  const list = useLiveData(() => getList(id), [id])
+  const all = useLiveData(() => getActiveLists(), [])
+  const linkedIds = useLiveData(() => getLinkedListIds(id), [id])
 
   const linkedSet = new Set(linkedIds ?? [])
   const others = (all ?? []).filter((l) => l.id !== id)
 
-  if (!list || list.deletedAt !== null) {
+  if (list === undefined || all === undefined || linkedIds === undefined) {
     return (
       <div className="app-shell">
         <p className="meta">{t('common.loading')}</p>
+      </div>
+    )
+  }
+
+  if (!list || list.deletedAt !== null) {
+    return (
+      <div className="app-shell">
+        <header className="topbar">
+          <Link className="icon-btn" to="/" aria-label={t('nav.back')}>
+            ←
+          </Link>
+          <h1>{t('links.title')}</h1>
+        </header>
+        <div className="empty">
+          <h2>{t('lists.empty')}</h2>
+        </div>
       </div>
     )
   }

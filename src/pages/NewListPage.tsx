@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { ListItem } from '../db/types'
+import type { ListItem } from '../types/models'
 import {
   createList,
   createListFromTemplate,
   emptyItem,
   getTemplates,
-} from '../db/lists'
+} from '../api/lists'
 import { isItemColorId, type ItemColorId } from '../utils/itemColors'
 import { scrollItemIntoView } from '../utils/scroll'
 import { reindexPositions } from '../utils/positions'

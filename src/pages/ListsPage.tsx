@@ -1,18 +1,22 @@
-import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AuthButton } from '../components/AuthButton'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { ProgressBadge } from '../components/ProgressBadge'
-import { getActiveLists } from '../db/lists'
+import { getActiveLists } from '../api/lists'
 import { useSettingsStore } from '../store/settingsStore'
+import { useAuthStore } from '../store/authStore'
+import { useLiveData } from '../hooks/useLiveData'
 import { useOnline } from '../hooks/useOnline'
 import { formatRelative, formatDeadline } from '../utils/dates'
 
 export function ListsPage() {
   const { t, i18n } = useTranslation()
-  const lists = useLiveQuery(() => getActiveLists(), [])
+  const lists = useLiveData(() => getActiveLists(), [])
   const toggleTheme = useSettingsStore((s) => s.toggleTheme)
   const theme = useSettingsStore((s) => s.theme)
+  const authError = useAuthStore((s) => s.error)
+  const clearAuthError = useAuthStore((s) => s.clearError)
   const online = useOnline()
 
   return (
@@ -26,6 +30,7 @@ export function ListsPage() {
           <Link className="icon-btn" to="/trash" title={t('nav.trash')} aria-label={t('nav.trash')}>
             ⌫
           </Link>
+          <AuthButton />
           <LanguageSwitcher />
           <button
             type="button"
@@ -40,6 +45,14 @@ export function ListsPage() {
       </header>
 
       {!online && <div className="offline-banner">{t('common.offline')}</div>}
+      {authError ? (
+        <div className="offline-banner auth-error-banner" role="alert">
+          <span>{authError}</span>
+          <button type="button" className="sheet-close" onClick={clearAuthError} aria-label={t('common.cancel')}>
+            ×
+          </button>
+        </div>
+      ) : null}
 
       {!lists ? (
         <p className="meta">{t('common.loading')}</p>

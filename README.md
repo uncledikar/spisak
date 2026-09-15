@@ -1,25 +1,20 @@
 # Spisok
 
-PWA for trip/shopping lists. Offline-first (IndexedDB). Stage 1: local only.
+PWA for trip/shopping lists. Data and auth via Supabase (Google sign-in).
 
 ## Run
 
 ```bash
+cp .env.example .env   # fill VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
 
 Build: `npm run build` · Preview: `npm run preview`
 
-## Stage 1
+## Features
 
-- Create list (scratch / template)
-- Items: name, qty, comment, checkbox
-- Save as template
-- Edit / soft-delete → trash
-- Link lists (M:N)
-- Lists sorted by `updatedAt`
-- i18n: EN / ES / FR / RU / SR (system language)
+- Google OAuth (Supabase Auth)
+- Lists / items / templates / links / trash — stored in Supabase per user
+- i18n: EN / ES / FR / RU / SR
 - Light / dark theme
-- Sync queue stub for stage 2
-# spisak

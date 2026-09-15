@@ -100,10 +100,16 @@
     "title": "Jezik",
     "toggle": "Jezik"
   },
+  "auth": {
+    "signInGoogle": "Prijava preko Google",
+    "signOut": "Odjavi se",
+    "account": "Nalog",
+    "required": "Prijavite se preko Google da biste sinhronizovali liste"
+  },
   "common": {
     "cancel": "Otkaži",
     "confirm": "Potvrdi",
     "loading": "Učitavanje…",
-    "offline": "Offline — izmene sačuvane lokalno"
+    "offline": "Offline — potrebna je veza za sinhronizaciju"
   }
 }
