@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Show second "add" control only when list items don't fully fit in the viewport. */
+/** Show second "add" control when the page content overflows the viewport. */
 export function useOverflowAddButton(deps: unknown[] = []) {
   const itemsRef = useRef<HTMLDivElement>(null)
   const [showBottom, setShowBottom] = useState(false)
 
   useEffect(() => {
-    const el = itemsRef.current
+    const ro = new ResizeObserver(() => {
+      window.requestAnimationFrame(measure)
+    })
 
     function measure() {
       const node = itemsRef.current
@@ -14,21 +16,30 @@ export function useOverflowAddButton(deps: unknown[] = []) {
         setShowBottom(false)
         return
       }
-      const rect = node.getBoundingClientRect()
-      const spaceBelowTop = window.innerHeight - rect.top
-      setShowBottom(node.scrollHeight > spaceBelowTop + 8)
+      // Document scroll size stays stable while scrolling — unlike getBoundingClientRect().
+      setShowBottom(document.documentElement.scrollHeight > window.innerHeight + 24)
     }
 
-    measure()
+    function attach() {
+      measure()
+      if (itemsRef.current) ro.observe(itemsRef.current)
+      ro.observe(document.documentElement)
+    }
+
+    const frame = window.requestAnimationFrame(attach)
+    // Second frame: list may mount after this effect when data just arrived.
+    const frame2 = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(attach)
+    })
     window.addEventListener('resize', measure)
-    window.addEventListener('scroll', measure, { passive: true })
-    const ro = new ResizeObserver(measure)
-    if (el) ro.observe(el)
+
     return () => {
+      window.cancelAnimationFrame(frame)
+      window.cancelAnimationFrame(frame2)
       window.removeEventListener('resize', measure)
-      window.removeEventListener('scroll', measure)
       ro.disconnect()
     }
+    // Caller-provided deps (item count, layout flags, …)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 

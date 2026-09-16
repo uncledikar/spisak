@@ -1,22 +1,20 @@
 {
   "app": {
-    "name": "Spisok",
+    "name": "Spisak",
     "tagline": "Tus listas, siempre a mano"
   },
   "nav": {
     "lists": "Listas",
-    "templates": "Plantillas",
     "trash": "Papelera",
     "back": "Atrás",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "breadcrumbs": "Ruta"
   },
   "lists": {
     "title": "Listas",
     "empty": "Aún no hay listas",
-    "emptyHint": "Crea una lista o parte de una plantilla",
+    "emptyHint": "Crea una lista para empezar",
     "new": "Nueva lista",
-    "fromScratch": "Desde cero",
-    "fromTemplate": "Desde plantilla",
     "deadline": "Fecha límite",
     "noDeadline": "Sin fecha límite",
     "itemsCount": "{{count}} elementos",
@@ -25,13 +23,12 @@
   },
   "list": {
     "name": "Nombre de la lista",
-    "namePlaceholder": "p. ej. Viaje a Turquía",
     "deadline": "Fecha límite (opcional)",
-    "clearDeadline": "Borrar fecha límite",
+    "clearDeadline": "Quitar fecha",
     "trackQuantity": "Cantidades",
     "trackQuantityOn": "Con cantidades",
     "trackQuantityOff": "Sin cantidades",
-    "trackQuantityHint": "Para la compra suelen hacer falta; para el equipaje, a menudo no",
+    "trackQuantityHint": "Las compras suelen necesitar cantidades; el equipaje a veces no",
     "items": "Elementos",
     "addItem": "Añadir elemento",
     "itemName": "Nombre",
@@ -52,14 +49,12 @@
     "save": "Guardar",
     "create": "Crear",
     "delete": "Eliminar",
-    "saveAsTemplate": "Guardar como plantilla",
-    "savedAsTemplate": "Guardado como plantilla",
-    "links": "Listas vinculadas",
-    "manageLinks": "Gestionar vínculos",
-    "noLinks": "Sin listas vinculadas",
+    "copy": "Copiar lista",
+    "copyName": "{{name}} (copia)",
+    "copied": "Lista copiada",
     "edit": "Editar",
     "editItem": "Editar elemento",
-    "untitledItem": "Sin nombre",
+    "untitledItem": "Sin título",
     "deleteItem": "Eliminar elemento",
     "deleteItemConfirm": "¿Eliminar este elemento?",
     "done": "Listo",
@@ -67,29 +62,12 @@
     "emptyItems": "Añade lo que necesites",
     "dragItem": "Arrastrar para reordenar"
   },
-  "templates": {
-    "title": "Plantillas",
-    "empty": "Aún no hay plantillas",
-    "emptyHint": "Abre una lista y toca «Guardar como plantilla»",
-    "use": "Usar plantilla",
-    "delete": "Eliminar plantilla",
-    "deleteConfirm": "¿Eliminar esta plantilla definitivamente?"
-  },
   "trash": {
     "title": "Papelera",
     "empty": "La papelera está vacía",
     "restore": "Restaurar",
     "purge": "Eliminar para siempre",
-    "purgeConfirm": "¿Eliminar para siempre? No se puede deshacer.",
-    "hint": "Tú gestionas la papelera"
-  },
-  "links": {
-    "title": "Vincular listas",
-    "hint": "Selecciona listas para vincular",
-    "empty": "No hay otras listas para vincular",
-    "linked": "Vinculada",
-    "link": "Vincular",
-    "unlink": "Desvincular"
+    "purgeConfirm": "¿Eliminar para siempre? No se puede deshacer."
   },
   "theme": {
     "light": "Claro",

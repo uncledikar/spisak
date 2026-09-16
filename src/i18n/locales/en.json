@@ -1,22 +1,20 @@
 {
   "app": {
-    "name": "Spisok",
+    "name": "Spisak",
     "tagline": "Your lists, always at hand"
   },
   "nav": {
     "lists": "Lists",
-    "templates": "Templates",
     "trash": "Trash",
     "back": "Back",
-    "settings": "Settings"
+    "settings": "Settings",
+    "breadcrumbs": "Breadcrumb"
   },
   "lists": {
     "title": "Lists",
     "empty": "No lists yet",
-    "emptyHint": "Create a list or start from a template",
+    "emptyHint": "Create a list to get started",
     "new": "New list",
-    "fromScratch": "From scratch",
-    "fromTemplate": "From template",
     "deadline": "Deadline",
     "noDeadline": "No deadline",
     "itemsCount": "{{count}} items",
@@ -25,7 +23,6 @@
   },
   "list": {
     "name": "List name",
-    "namePlaceholder": "e.g. Trip to Turkey",
     "deadline": "Deadline (optional)",
     "clearDeadline": "Clear deadline",
     "trackQuantity": "Item quantities",
@@ -52,11 +49,9 @@
     "save": "Save",
     "create": "Create",
     "delete": "Delete",
-    "saveAsTemplate": "Save as template",
-    "savedAsTemplate": "Saved as template",
-    "links": "Linked lists",
-    "manageLinks": "Manage links",
-    "noLinks": "No linked lists",
+    "copy": "Copy list",
+    "copyName": "{{name}} (copy)",
+    "copied": "List copied",
     "edit": "Edit",
     "editItem": "Edit item",
     "untitledItem": "Untitled item",
@@ -67,29 +62,12 @@
     "emptyItems": "Add things you need",
     "dragItem": "Drag to reorder"
   },
-  "templates": {
-    "title": "Templates",
-    "empty": "No templates yet",
-    "emptyHint": "Open a list and tap “Save as template”",
-    "use": "Use template",
-    "delete": "Delete template",
-    "deleteConfirm": "Delete this template permanently?"
-  },
   "trash": {
     "title": "Trash",
     "empty": "Trash is empty",
     "restore": "Restore",
     "purge": "Delete forever",
-    "purgeConfirm": "Delete forever? This cannot be undone.",
-    "hint": "You manage trash yourself"
-  },
-  "links": {
-    "title": "Link lists",
-    "hint": "Select lists to link",
-    "empty": "No other lists to link",
-    "linked": "Linked",
-    "link": "Link",
-    "unlink": "Unlink"
+    "purgeConfirm": "Delete forever? This cannot be undone."
   },
   "theme": {
     "light": "Light",

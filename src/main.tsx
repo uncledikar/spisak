@@ -5,9 +5,24 @@ import './index.css'
 import App from './App'
 import { useSettingsStore } from './store/settingsStore'
 import { useAuthStore } from './store/authStore'
-import { registerSW } from 'virtual:pwa-register'
 
-registerSW({ immediate: true })
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return
+  const swUrl = `${import.meta.env.BASE_URL}sw.js`
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register(swUrl).then((registration) => {
+      const ping = () => {
+        void registration.update()
+      }
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') ping()
+      })
+      window.setInterval(ping, 60 * 60 * 1000)
+    })
+  })
+}
+
+registerServiceWorker()
 
 function Root() {
   const initSettings = useSettingsStore((s) => s.init)

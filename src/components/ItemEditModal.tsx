@@ -68,11 +68,13 @@ export function ItemEditModal({
     }
   }
 
+  const title = isNew ? t('list.addItem') : t('list.editItem')
+
   return (
-    <div className="sheet" role="dialog" aria-modal="true" aria-label={t('list.editItem')} onClick={onClose}>
+    <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
       <div className="sheet-panel item-modal-panel" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-header">
-          <h2 className="section-title">{t('list.editItem')}</h2>
+          <h2 className="section-title">{title}</h2>
           <button type="button" className="sheet-close" onClick={onClose} aria-label={t('common.cancel')}>
             ×
           </button>
@@ -103,37 +105,35 @@ export function ItemEditModal({
           ) : null}
 
           <div className="field">
-            <span className="field-label">{t('list.color')}</span>
-            <ItemColorPicker value={color} onChange={setColor} />
-          </div>
-
-          <div className="field">
             <label htmlFor="item-modal-comment">{t('list.comment')}</label>
-            <input
-              id="item-modal-comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={t('list.commentPlaceholder')}
-            />
+            <div className="item-modal-meta-row">
+              <ItemColorPicker value={color} onChange={setColor} />
+              <input
+                id="item-modal-comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder={t('list.commentPlaceholder')}
+              />
+            </div>
           </div>
 
-          <div className="actions-bar">
-            <button type="submit" className="btn btn-primary btn-block" disabled={saving || !name.trim()}>
+          <div className="btn-row">
+            <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
               {t('list.save')}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={onClose} disabled={saving}>
+              {t('common.cancel')}
             </button>
             {!isNew && onDelete ? (
               <button
                 type="button"
-                className="btn btn-danger btn-block"
+                className="btn btn-danger"
                 disabled={saving}
                 onClick={() => void onDelete()}
               >
                 {t('list.deleteItem')}
               </button>
             ) : null}
-            <button type="button" className="btn btn-ghost btn-block" onClick={onClose} disabled={saving}>
-              {t('common.cancel')}
-            </button>
           </div>
         </form>
       </div>

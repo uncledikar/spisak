@@ -14,19 +14,21 @@ export function AuthGate() {
 
   return (
     <div className="app-shell auth-gate">
-      <header className="topbar">
-        <h1>{t('app.name')}</h1>
-        <div className="topbar-actions">
-          <LanguageSwitcher />
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={() => void toggleTheme()}
-            title={t('theme.toggle')}
-            aria-label={t('theme.toggle')}
-          >
-            {theme === 'light' ? '☾' : '☀'}
-          </button>
+      <header className="app-header">
+        <div className="app-header-bar">
+          <span className="app-header-brand">{t('app.name')}</span>
+          <div className="app-header-actions">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={() => void toggleTheme()}
+              title={t('theme.toggle')}
+              aria-label={t('theme.toggle')}
+            >
+              {theme === 'light' ? '☾' : '☀'}
+            </button>
+          </div>
         </div>
       </header>
 

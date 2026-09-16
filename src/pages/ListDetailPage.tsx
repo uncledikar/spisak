@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ListItem } from '../types/models'
 import {
+  copyList,
   emptyItem,
-  getLinkedLists,
   getList,
-  saveListAsTemplate,
   softDeleteList,
   updateList,
 } from '../api/lists'
 import { useLiveData } from '../hooks/useLiveData'
 import { formatDeadline } from '../utils/dates'
 import { reindexPositions } from '../utils/positions'
+import { PageShell } from '../components/AppHeader'
 import { ItemEditModal } from '../components/ItemEditModal'
 import { ProgressBadge } from '../components/ProgressBadge'
 import { SortableItemsList } from '../components/SortableItemsList'
@@ -29,9 +29,10 @@ export function ListDetailPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const list = useLiveData(() => getList(id), [id])
-  const linked = useLiveData(() => getLinkedLists(id), [id])
 
   const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [copying, setCopying] = useState(false)
   const [name, setName] = useState('')
   const [deadline, setDeadline] = useState('')
   const [trackQuantity, setTrackQuantity] = useState(true)
@@ -67,25 +68,19 @@ export function ListDetailPage() {
 
   if (list === undefined) {
     return (
-      <div className="app-shell">
+      <PageShell crumbs={[{ label: t('lists.title'), to: '/' }, { label: t('common.loading') }]}>
         <p className="meta">{t('common.loading')}</p>
-      </div>
+      </PageShell>
     )
   }
 
   if (!list || list.deletedAt !== null) {
     return (
-      <div className="app-shell">
-        <header className="topbar">
-          <Link className="icon-btn" to="/" aria-label={t('nav.back')}>
-            ←
-          </Link>
-          <h1>{t('lists.title')}</h1>
-        </header>
+      <PageShell crumbs={[{ label: t('lists.title') }]}>
         <div className="empty">
           <h2>{t('lists.empty')}</h2>
         </div>
-      </div>
+      </PageShell>
     )
   }
 
@@ -98,19 +93,38 @@ export function ListDetailPage() {
     await updateList(current.id, { items: next })
   }
 
-  async function saveListMeta(e: FormEvent) {
-    e.preventDefault()
-    await updateList(current.id, {
-      name,
-      deadline: deadline || null,
-      trackQuantity,
-    })
-    setEditing(false)
+  async function commitListMeta() {
+    if (saving) return
+    setSaving(true)
+    try {
+      await updateList(current.id, {
+        name,
+        deadline: deadline || null,
+        trackQuantity,
+      })
+      setEditing(false)
+    } finally {
+      setSaving(false)
+    }
   }
 
-  async function onSaveTemplate() {
-    await saveListAsTemplate(current.id)
-    setToast(t('list.savedAsTemplate'))
+  async function saveListMeta(e: FormEvent) {
+    e.preventDefault()
+    await commitListMeta()
+  }
+
+  async function onCopyList() {
+    if (copying) return
+    setCopying(true)
+    try {
+      const copied = await copyList(current.id, t('list.copyName', { name: current.name }))
+      if (copied) {
+        setToast(t('list.copied'))
+        navigate(`/lists/${copied.id}`)
+      }
+    } finally {
+      setCopying(false)
+    }
   }
 
   async function onDelete() {
@@ -121,6 +135,13 @@ export function ListDetailPage() {
 
   function openNewItem() {
     setItemModal({ mode: 'create', draft: emptyItem(current.items.length) })
+  }
+
+  function enterEdit() {
+    setName(current.name)
+    setDeadline(current.deadline ?? '')
+    setTrackQuantity(current.trackQuantity !== false)
+    setEditing(true)
   }
 
   async function reorderItems(next: ListItem[]) {
@@ -152,42 +173,57 @@ export function ListDetailPage() {
         : undefined
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link className="icon-btn" to="/" aria-label={t('nav.back')}>
-          ←
-        </Link>
-        <h1>{current.name}</h1>
-        <div className="topbar-actions">
+    <PageShell
+      crumbs={[
+        { label: t('lists.title'), to: '/' },
+        { label: current.name },
+      ]}
+          pageActions={
+        <>
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn icon-btn-accent"
+            disabled={saving}
             onClick={() => {
-              if (!editing) {
-                setName(current.name)
-                setDeadline(current.deadline ?? '')
-                setTrackQuantity(current.trackQuantity !== false)
+              if (editing) {
+                void commitListMeta()
+              } else {
+                enterEdit()
               }
-              setEditing((v) => !v)
             }}
-            aria-label={editing ? t('list.done') : t('list.edit')}
+            aria-label={editing ? t('list.save') : t('list.edit')}
+            title={editing ? t('list.save') : t('list.edit')}
           >
             {editing ? '✓' : '✎'}
           </button>
-        </div>
-      </header>
-
-      <p className="meta row" style={{ marginTop: -8, marginBottom: 16, flexWrap: 'wrap' }}>
-        <span>
-          {current.deadline
-            ? `${t('lists.deadline')}: ${formatDeadline(current.deadline, i18n.language)}`
-            : t('lists.noDeadline')}
-        </span>
-        <ProgressBadge done={progress.done} total={progress.total} />
-      </p>
+          {!editing ? (
+            <button
+              type="button"
+              className="icon-btn"
+              disabled={copying}
+              onClick={() => void onCopyList()}
+              aria-label={t('list.copy')}
+              title={t('list.copy')}
+            >
+              ⧉
+            </button>
+          ) : null}
+        </>
+      }
+    >
+      {!editing ? (
+        <p className="meta row" style={{ marginTop: -4, marginBottom: 16, flexWrap: 'wrap' }}>
+          <span>
+            {current.deadline
+              ? `${t('lists.deadline')}: ${formatDeadline(current.deadline, i18n.language)}`
+              : t('lists.noDeadline')}
+          </span>
+          <ProgressBadge done={progress.done} total={progress.total} />
+        </p>
+      ) : null}
 
       {editing ? (
-        <form onSubmit={(e) => void saveListMeta(e)}>
+        <form id="edit-list-form" onSubmit={(e) => void saveListMeta(e)}>
           <div className="field">
             <label htmlFor="edit-name">{t('list.name')}</label>
             <input id="edit-name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -240,34 +276,25 @@ export function ListDetailPage() {
             <p className="field-hint">{t('list.trackQuantityHint')}</p>
           </div>
 
-          <div className="field">
-            <span className="field-label">{t('list.links')}</span>
-            {linked && linked.length > 0 ? (
-              <div className="stack" style={{ marginBottom: 8 }}>
-                {linked.map((l) => (
-                  <Link key={l.id} to={`/lists/${l.id}`} className="card card-button">
-                    <h3 className="card-title">{l.name}</h3>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="meta">{t('list.noLinks')}</p>
-            )}
-            <Link className="btn btn-secondary btn-block" to={`/lists/${current.id}/links`}>
-              {t('list.manageLinks')}
-            </Link>
-          </div>
-
-          <div className="actions-bar">
-            <button type="submit" className="btn btn-primary btn-block">
+          <div className="btn-row">
+            <button type="submit" className="btn btn-primary" disabled={saving}>
               {t('list.save')}
             </button>
             <button
               type="button"
-              className="btn btn-ghost btn-block"
+              className="btn btn-ghost"
               onClick={() => setEditing(false)}
+              disabled={saving}
             >
               {t('common.cancel')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => void onDelete()}
+              disabled={saving}
+            >
+              {t('list.delete')}
             </button>
           </div>
         </form>
@@ -307,31 +334,6 @@ export function ListDetailPage() {
               + {t('list.addItem')}
             </button>
           ) : null}
-
-          {linked && linked.length > 0 ? (
-            <>
-              <h2 className="section-title section-title-links">{t('list.links')}</h2>
-              <div className="stack" style={{ marginBottom: 12 }}>
-                {linked.map((l) => (
-                  <Link key={l.id} to={`/lists/${l.id}`} className="card card-button">
-                    <h3 className="card-title">{l.name}</h3>
-                  </Link>
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          <div className="actions-bar actions-bar-inline">
-            <Link className="btn btn-secondary btn-block" to={`/lists/${current.id}/links`}>
-              {t('list.manageLinks')}
-            </Link>
-            <button type="button" className="btn btn-ghost btn-block" onClick={() => void onSaveTemplate()}>
-              {t('list.saveAsTemplate')}
-            </button>
-            <button type="button" className="btn btn-danger btn-block" onClick={() => void onDelete()}>
-              {t('list.delete')}
-            </button>
-          </div>
         </>
       )}
 
@@ -351,6 +353,6 @@ export function ListDetailPage() {
       ) : null}
 
       {toast ? <div className="toast">{toast}</div> : null}
-    </div>
+    </PageShell>
   )
 }

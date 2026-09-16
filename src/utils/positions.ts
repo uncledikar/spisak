@@ -1,4 +1,4 @@
-import type { ListItem, ListRecord, TemplateItem, TemplateRecord } from '../types/models'
+import type { ListItem, ListRecord } from '../types/models'
 import { createId } from './id'
 
 type Positioned = { position?: number | null }
@@ -56,35 +56,6 @@ export function normalizeItemPositions(items: ListItem[] | null | undefined): Li
   return reindexPositions(sortByPosition(normalized))
 }
 
-export function normalizeTemplateItem(
-  raw: Partial<TemplateItem> | null | undefined,
-  index: number,
-  usedIds: Set<string> = new Set(),
-): TemplateItem {
-  const item = raw ?? {}
-  const quantity = Number(item.quantity)
-  return {
-    id: uniqueId(item.id, usedIds),
-    name: typeof item.name === 'string' ? item.name : '',
-    quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
-    comment: typeof item.comment === 'string' ? item.comment : '',
-    color: typeof item.color === 'string' ? item.color : null,
-    position:
-      typeof item.position === 'number' && Number.isFinite(item.position)
-        ? item.position
-        : index,
-  }
-}
-
-export function normalizeTemplatePositions(
-  items: TemplateItem[] | null | undefined,
-): TemplateItem[] {
-  const raw = Array.isArray(items) ? items : []
-  const usedIds = new Set<string>()
-  const normalized = raw.map((item, index) => normalizeTemplateItem(item, index, usedIds))
-  return reindexPositions(sortByPosition(normalized))
-}
-
 export function normalizeListRecord(list: ListRecord): ListRecord {
   return {
     ...list,
@@ -96,32 +67,4 @@ export function normalizeListRecord(list: ListRecord): ListRecord {
     updatedAt: typeof list.updatedAt === 'number' ? list.updatedAt : Date.now(),
     items: normalizeItemPositions(list.items),
   }
-}
-
-export function normalizeTemplateRecord(template: TemplateRecord): TemplateRecord {
-  return {
-    ...template,
-    name: typeof template.name === 'string' ? template.name : '',
-    trackQuantity: template.trackQuantity !== false,
-    createdAt: typeof template.createdAt === 'number' ? template.createdAt : Date.now(),
-    updatedAt: typeof template.updatedAt === 'number' ? template.updatedAt : Date.now(),
-    items: normalizeTemplatePositions(template.items),
-  }
-}
-
-export function listNeedsPersist(before: ListRecord, after: ListRecord): boolean {
-  if (before.trackQuantity !== after.trackQuantity) return true
-  if (!Array.isArray(before.items)) return true
-  if (before.items.length !== after.items.length) return true
-  return after.items.some((item, i) => {
-    const prev = before.items[i]
-    if (!prev) return true
-    return (
-      prev.position !== item.position ||
-      prev.color !== item.color ||
-      typeof prev.quantity !== 'number' ||
-      typeof prev.checked !== 'boolean' ||
-      typeof prev.id !== 'string'
-    )
-  })
 }

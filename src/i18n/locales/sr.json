@@ -1,37 +1,34 @@
 {
   "app": {
-    "name": "Spisok",
+    "name": "Spisak",
     "tagline": "Vaše liste uvek pri ruci"
   },
   "nav": {
     "lists": "Liste",
-    "templates": "Šabloni",
     "trash": "Korpa",
     "back": "Nazad",
-    "settings": "Podešavanja"
+    "settings": "Podešavanja",
+    "breadcrumbs": "Navigacija"
   },
   "lists": {
     "title": "Liste",
     "empty": "Još nema lista",
-    "emptyHint": "Napravite listu ili krenite od šablona",
+    "emptyHint": "Napravite listu da počnete",
     "new": "Nova lista",
-    "fromScratch": "Od nule",
-    "fromTemplate": "Iz šablona",
     "deadline": "Rok",
     "noDeadline": "Bez roka",
     "itemsCount": "{{count}} stavki",
     "checkedCount": "{{done}} / {{total}}",
-    "updated": "Izmenjeno"
+    "updated": "Ažurirano"
   },
   "list": {
     "name": "Naziv liste",
-    "namePlaceholder": "npr. Putovanje u Tursku",
     "deadline": "Rok (opciono)",
     "clearDeadline": "Ukloni rok",
-    "trackQuantity": "Količine stavki",
+    "trackQuantity": "Količine",
     "trackQuantityOn": "Sa količinama",
     "trackQuantityOff": "Bez količina",
-    "trackQuantityHint": "Za kupovinu su korisne količine; za pakovanje često nisu",
+    "trackQuantityHint": "Za kupovinu su količine često potrebne; za pakovanje ponekad nisu",
     "items": "Stavke",
     "addItem": "Dodaj stavku",
     "itemName": "Naziv",
@@ -52,44 +49,25 @@
     "save": "Sačuvaj",
     "create": "Napravi",
     "delete": "Obriši",
-    "saveAsTemplate": "Sačuvaj kao šablon",
-    "savedAsTemplate": "Sačuvano kao šablon",
-    "links": "Povezane liste",
-    "manageLinks": "Veze",
-    "noLinks": "Nema povezanih lista",
+    "copy": "Kopiraj listu",
+    "copyName": "{{name}} (kopija)",
+    "copied": "Lista kopirana",
     "edit": "Izmeni",
     "editItem": "Izmeni stavku",
     "untitledItem": "Bez naziva",
     "deleteItem": "Obriši stavku",
-    "deleteItemConfirm": "Obriši ovu stavku?",
+    "deleteItemConfirm": "Obrisati ovu stavku?",
     "done": "Gotovo",
     "deleteConfirm": "Premestiti listu u korpu?",
-    "emptyItems": "Dodajte stvari koje trebate",
-    "dragItem": "Prevuci za promenu redosleda"
-  },
-  "templates": {
-    "title": "Šabloni",
-    "empty": "Još nema šablona",
-    "emptyHint": "Otvorite listu i dodirnite „Sačuvaj kao šablon”",
-    "use": "Koristi šablon",
-    "delete": "Obriši šablon",
-    "deleteConfirm": "Obrisati šablon zauvek?"
+    "emptyItems": "Dodajte što vam treba",
+    "dragItem": "Prevucite za promenu redosleda"
   },
   "trash": {
     "title": "Korpa",
     "empty": "Korpa je prazna",
     "restore": "Vrati",
     "purge": "Obriši zauvek",
-    "purgeConfirm": "Obrisati zauvek? Ovo se ne može poništiti.",
-    "hint": "Vi čistite korpu sami"
-  },
-  "links": {
-    "title": "Poveži liste",
-    "hint": "Izaberite liste za povezivanje",
-    "empty": "Nema drugih lista",
-    "linked": "Povezano",
-    "link": "Poveži",
-    "unlink": "Odveži"
+    "purgeConfirm": "Obrisati zauvek? Ovo se ne može poništiti."
   },
   "theme": {
     "light": "Svetla",

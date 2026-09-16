@@ -22,32 +22,6 @@ export interface ListRecord {
   deletedAt: number | null
 }
 
-export interface TemplateItem {
-  id: string
-  name: string
-  quantity: number
-  comment: string
-  color: string | null
-  position: number
-}
-
-export interface TemplateRecord {
-  id: string
-  name: string
-  trackQuantity: boolean
-  items: TemplateItem[]
-  createdAt: number
-  updatedAt: number
-}
-
-/** Undirected M:N link. listIdA < listIdB lexicographically. */
-export interface ListLink {
-  id: string
-  listIdA: string
-  listIdB: string
-  createdAt: number
-}
-
 export interface SettingsRecord {
   theme: 'light' | 'dark'
   /** null = follow system once, then persist chosen/detected code */

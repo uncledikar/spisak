@@ -11,6 +11,14 @@ const LABELS: Record<AppLanguage, string> = {
   sr: 'Srpski',
 }
 
+const FLAGS: Record<AppLanguage, string> = {
+  en: '🇬🇧',
+  es: '🇪🇸',
+  fr: '🇫🇷',
+  ru: '🇷🇺',
+  sr: '🇷🇸',
+}
+
 export function LanguageSwitcher() {
   const { t } = useTranslation()
   const language = useSettingsStore((s) => s.language)
@@ -26,7 +34,9 @@ export function LanguageSwitcher() {
         title={t('language.toggle')}
         aria-label={t('language.toggle')}
       >
-        {language.toUpperCase()}
+        <span className="lang-flag" aria-hidden="true">
+          {FLAGS[language]}
+        </span>
       </button>
 
       {open ? (
@@ -50,13 +60,16 @@ export function LanguageSwitcher() {
                   <button
                     key={code}
                     type="button"
-                    className={`btn btn-block ${active ? 'btn-primary' : 'btn-secondary'}`}
+                    className={`btn btn-block lang-option ${active ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => {
                       void setLanguage(code)
                       setOpen(false)
                     }}
                   >
-                    {LABELS[code]}
+                    <span className="lang-flag" aria-hidden="true">
+                      {FLAGS[code]}
+                    </span>
+                    <span>{LABELS[code]}</span>
                   </button>
                 )
               })}

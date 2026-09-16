@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AuthButton } from '../components/AuthButton'
-import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { PageShell } from '../components/AppHeader'
 import { ProgressBadge } from '../components/ProgressBadge'
 import { getActiveLists } from '../api/lists'
-import { useSettingsStore } from '../store/settingsStore'
 import { useAuthStore } from '../store/authStore'
 import { useLiveData } from '../hooks/useLiveData'
 import { useOnline } from '../hooks/useOnline'
@@ -13,37 +11,12 @@ import { formatRelative, formatDeadline } from '../utils/dates'
 export function ListsPage() {
   const { t, i18n } = useTranslation()
   const lists = useLiveData(() => getActiveLists(), [])
-  const toggleTheme = useSettingsStore((s) => s.toggleTheme)
-  const theme = useSettingsStore((s) => s.theme)
   const authError = useAuthStore((s) => s.error)
   const clearAuthError = useAuthStore((s) => s.clearError)
   const online = useOnline()
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <h1>{t('lists.title')}</h1>
-        <div className="topbar-actions">
-          <Link className="icon-btn" to="/templates" title={t('nav.templates')} aria-label={t('nav.templates')}>
-            ▦
-          </Link>
-          <Link className="icon-btn" to="/trash" title={t('nav.trash')} aria-label={t('nav.trash')}>
-            ⌫
-          </Link>
-          <AuthButton />
-          <LanguageSwitcher />
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={() => void toggleTheme()}
-            title={t('theme.toggle')}
-            aria-label={t('theme.toggle')}
-          >
-            {theme === 'light' ? '☾' : '☀'}
-          </button>
-        </div>
-      </header>
-
+    <PageShell crumbs={[{ label: t('lists.title') }]}>
       {!online && <div className="offline-banner">{t('common.offline')}</div>}
       {authError ? (
         <div className="offline-banner auth-error-banner" role="alert">
@@ -87,6 +60,6 @@ export function ListsPage() {
       <Link className="fab" to="/lists/new">
         + {t('lists.new')}
       </Link>
-    </div>
+    </PageShell>
   )
 }

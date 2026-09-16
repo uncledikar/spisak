@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getTrashLists, purgeList, restoreList } from '../api/lists'
 import { useLiveData } from '../hooks/useLiveData'
+import { PageShell } from '../components/AppHeader'
 
 export function TrashPage() {
   const { t } = useTranslation()
@@ -13,18 +13,7 @@ export function TrashPage() {
   }
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link className="icon-btn" to="/" aria-label={t('nav.back')}>
-          ←
-        </Link>
-        <h1>{t('trash.title')}</h1>
-      </header>
-
-      <p className="meta" style={{ marginBottom: 16 }}>
-        {t('trash.hint')}
-      </p>
-
+    <PageShell crumbs={[{ label: t('trash.title') }]}>
       {!lists ? (
         <p className="meta">{t('common.loading')}</p>
       ) : lists.length === 0 ? (
@@ -39,11 +28,10 @@ export function TrashPage() {
               <p className="meta" style={{ marginBottom: 12 }}>
                 {t('lists.itemsCount', { count: list.items.length })}
               </p>
-              <div className="row" style={{ gap: 8 }}>
+              <div className="btn-row" style={{ marginTop: 0 }}>
                 <button
                   type="button"
                   className="btn btn-primary"
-                  style={{ flex: 1 }}
                   onClick={() => void restoreList(list.id)}
                 >
                   {t('trash.restore')}
@@ -60,6 +48,6 @@ export function TrashPage() {
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   )
 }

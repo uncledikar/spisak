@@ -29,7 +29,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
             <Link className="icon-btn" to="/" aria-label="Back">
               ←
             </Link>
-            <h1>Spisok</h1>
+            <h1>Spisak</h1>
           </header>
           <div className="empty">
             <h2>Something went wrong</h2>
