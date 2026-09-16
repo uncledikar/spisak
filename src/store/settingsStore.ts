@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import i18n, { detectLanguage, type AppLanguage, SUPPORTED_LANGUAGES } from '../i18n'
 import { getSettings, upsertSettings } from '../api/settings'
+import { supabase } from '../lib/supabase'
 
 type Theme = 'light' | 'dark'
 
@@ -14,44 +15,84 @@ interface SettingsState {
   setLanguage: (language: AppLanguage) => Promise<void>
 }
 
-const LOCAL_SETTINGS_KEY = 'spisak.settings'
-/** Set when user explicitly picks theme/language (e.g. on AuthGate) — wins over stale cloud prefs once. */
-const LOCAL_OVERRIDE_KEY = 'spisak.settings.override'
+/** Mirror of last applied settings (faster boot + offline). */
+const CACHE_KEY = 'spisak.settings'
+/**
+ * Explicit pre-login choice. Kept in localStorage (not sessionStorage) so it
+ * survives Google OAuth full-page redirects, then upserted into Supabase.
+ */
+const PENDING_KEY = 'spisak.pendingSettings'
+/** Legacy flag from older fix — ignore/clear. */
+const LEGACY_OVERRIDE_KEY = 'spisak.settings.override'
 
-type LocalSettings = {
-  theme?: Theme
-  language?: AppLanguage
+type Prefs = {
+  theme: Theme
+  language: AppLanguage
 }
 
-function readLocalSettings(): LocalSettings {
+function isTheme(value: unknown): value is Theme {
+  return value === 'light' || value === 'dark'
+}
+
+function isLanguage(value: unknown): value is AppLanguage {
+  return typeof value === 'string' && (SUPPORTED_LANGUAGES as readonly string[]).includes(value)
+}
+
+function readCache(): Partial<Prefs> {
   try {
-    const raw = localStorage.getItem(LOCAL_SETTINGS_KEY)
+    const raw = localStorage.getItem(CACHE_KEY)
     if (!raw) return {}
-    const parsed = JSON.parse(raw) as LocalSettings
+    const row = JSON.parse(raw) as Record<string, unknown>
     return {
-      theme: parsed.theme === 'dark' || parsed.theme === 'light' ? parsed.theme : undefined,
-      language:
-        parsed.language && (SUPPORTED_LANGUAGES as readonly string[]).includes(parsed.language)
-          ? parsed.language
-          : undefined,
+      theme: isTheme(row.theme) ? row.theme : undefined,
+      language: isLanguage(row.language) ? row.language : undefined,
     }
   } catch {
     return {}
   }
 }
 
-function writeLocalSettings(theme: Theme, language: AppLanguage): void {
-  localStorage.setItem(LOCAL_SETTINGS_KEY, JSON.stringify({ theme, language }))
+function writeCache(prefs: Prefs): void {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(prefs))
 }
 
-function markLocalOverride(): void {
-  localStorage.setItem(LOCAL_OVERRIDE_KEY, '1')
+/** In-memory copy so StrictMode double-init cannot drop pending before DB upsert. */
+let memoryPending: Partial<Prefs> | null = null
+
+function readPending(): Partial<Prefs> | null {
+  if (memoryPending) return memoryPending
+  try {
+    const raw = localStorage.getItem(PENDING_KEY)
+    if (!raw) return null
+    const row = JSON.parse(raw) as Record<string, unknown>
+    const prefs: Partial<Prefs> = {}
+    if (isTheme(row.theme)) prefs.theme = row.theme
+    if (isLanguage(row.language)) prefs.language = row.language
+    if (prefs.theme || prefs.language) {
+      memoryPending = prefs
+      return prefs
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
-function consumeLocalOverride(): boolean {
-  const active = localStorage.getItem(LOCAL_OVERRIDE_KEY) === '1'
-  if (active) localStorage.removeItem(LOCAL_OVERRIDE_KEY)
-  return active
+function writePending(prefs: Prefs): void {
+  memoryPending = prefs
+  localStorage.setItem(PENDING_KEY, JSON.stringify(prefs))
+  writeCache(prefs)
+}
+
+function clearPending(): void {
+  memoryPending = null
+  localStorage.removeItem(PENDING_KEY)
+  localStorage.removeItem(LEGACY_OVERRIDE_KEY)
+  try {
+    sessionStorage.removeItem(PENDING_KEY)
+  } catch {
+    /* ignore */
+  }
 }
 
 function applyTheme(theme: Theme) {
@@ -62,46 +103,39 @@ function applyTheme(theme: Theme) {
   }
 }
 
-function applyLanguage(language: AppLanguage) {
+async function applyLanguage(language: AppLanguage) {
   document.documentElement.lang = language === 'sr' ? 'sr-Latn' : language
-  void i18n.changeLanguage(language)
+  await i18n.changeLanguage(language)
 }
 
 function systemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function normalizeLanguage(value: string | null | undefined): AppLanguage | null {
-  if (value && (SUPPORTED_LANGUAGES as readonly string[]).includes(value)) {
-    return value as AppLanguage
+async function isSignedIn(): Promise<boolean> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  return !!session
+}
+
+async function saveToDb(prefs: Prefs): Promise<void> {
+  await upsertSettings({ theme: prefs.theme, language: prefs.language })
+}
+
+/** Boot UI language/theme before React (pending → cache → system). */
+export function bootstrapLocalSettings(): Prefs {
+  localStorage.removeItem(LEGACY_OVERRIDE_KEY)
+  const pending = readPending()
+  const cache = readCache()
+  const prefs: Prefs = {
+    theme: pending?.theme ?? cache.theme ?? systemTheme(),
+    language: pending?.language ?? cache.language ?? detectLanguage(),
   }
-  return null
-}
-
-async function persistRemote(theme: Theme, language: AppLanguage): Promise<void> {
-  try {
-    await upsertSettings({ theme, language })
-  } catch (error) {
-    // Before sign-in (or offline), localStorage is enough.
-    console.warn('Settings not saved remotely', error)
-  }
-}
-
-/** User-driven change: keep locally and flag so it beats cloud after OAuth. */
-function persistUserChoice(theme: Theme, language: AppLanguage): void {
-  writeLocalSettings(theme, language)
-  markLocalOverride()
-  void persistRemote(theme, language)
-}
-
-/** Bootstrap language/theme before React mounts (survives OAuth redirect). */
-export function bootstrapLocalSettings(): { theme: Theme; language: AppLanguage } {
-  const local = readLocalSettings()
-  const theme = local.theme ?? systemTheme()
-  const language = local.language ?? detectLanguage()
-  applyTheme(theme)
-  applyLanguage(language)
-  return { theme, language }
+  applyTheme(prefs.theme)
+  void applyLanguage(prefs.language)
+  writeCache(prefs)
+  return prefs
 }
 
 const boot = bootstrapLocalSettings()
@@ -110,63 +144,82 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   theme: boot.theme,
   language: boot.language,
   ready: false,
+
   init: async () => {
     set({ ready: false })
-    const local = readLocalSettings()
-    const inMemory = get()
-    const preferLocal = consumeLocalOverride()
+    const pending = readPending()
+
     try {
       const remote = await getSettings()
+      let prefs: Prefs
 
-      let theme: Theme
-      let language: AppLanguage
-
-      if (preferLocal) {
-        // Explicit AuthGate / pre-login choice wins over stale Supabase row (e.g. old "ru").
-        theme = local.theme ?? inMemory.theme ?? remote?.theme ?? systemTheme()
-        language =
-          local.language ??
-          normalizeLanguage(inMemory.language) ??
-          normalizeLanguage(remote?.language) ??
-          detectLanguage()
+      if (pending?.language || pending?.theme) {
+        // Pre-login choice (AuthGate) wins and is saved to DB.
+        prefs = {
+          theme: pending.theme ?? remote?.theme ?? get().theme,
+          language: pending.language ?? (isLanguage(remote?.language) ? remote.language : get().language),
+        }
+        await saveToDb(prefs)
+        clearPending()
+      } else if (remote) {
+        prefs = {
+          theme: remote.theme,
+          language: isLanguage(remote.language) ? remote.language : get().language,
+        }
+        if (!isLanguage(remote.language)) {
+          await saveToDb(prefs)
+        }
       } else {
-        theme = remote?.theme ?? local.theme ?? inMemory.theme ?? systemTheme()
-        language =
-          normalizeLanguage(remote?.language) ??
-          local.language ??
-          normalizeLanguage(inMemory.language) ??
-          detectLanguage()
+        prefs = { theme: get().theme, language: get().language }
+        await saveToDb(prefs)
       }
 
-      applyTheme(theme)
-      applyLanguage(language)
-      writeLocalSettings(theme, language)
-      if (!remote || remote.theme !== theme || remote.language !== language) {
-        await persistRemote(theme, language)
-      }
-      set({ theme, language, ready: true })
+      applyTheme(prefs.theme)
+      await applyLanguage(prefs.language)
+      writeCache(prefs)
+      set({ ...prefs, ready: true })
     } catch (error) {
       console.error('Settings init failed', error)
-      const theme = local.theme ?? inMemory.theme ?? systemTheme()
-      const language = local.language ?? inMemory.language ?? detectLanguage()
-      applyTheme(theme)
-      applyLanguage(language)
-      writeLocalSettings(theme, language)
-      set({ theme, language, ready: true })
+      // Keep pending so a retry after login can still push AuthGate language to DB.
+      const prefs: Prefs = {
+        theme: pending?.theme ?? get().theme,
+        language: pending?.language ?? get().language,
+      }
+      applyTheme(prefs.theme)
+      await applyLanguage(prefs.language)
+      writeCache(prefs)
+      set({ ...prefs, ready: true })
     }
   },
+
   setTheme: async (theme) => {
     applyTheme(theme)
+    const prefs: Prefs = { theme, language: get().language }
     set({ theme })
-    persistUserChoice(theme, get().language)
+    if (await isSignedIn()) {
+      clearPending()
+      writeCache(prefs)
+      await saveToDb(prefs)
+      return
+    }
+    writePending(prefs)
   },
+
   toggleTheme: async () => {
     const next = get().theme === 'light' ? 'dark' : 'light'
     await get().setTheme(next)
   },
+
   setLanguage: async (language) => {
-    applyLanguage(language)
+    await applyLanguage(language)
+    const prefs: Prefs = { theme: get().theme, language }
     set({ language })
-    persistUserChoice(get().theme, language)
+    if (await isSignedIn()) {
+      clearPending()
+      writeCache(prefs)
+      await saveToDb(prefs)
+      return
+    }
+    writePending(prefs)
   },
 }))

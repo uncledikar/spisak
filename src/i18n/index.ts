@@ -19,6 +19,22 @@ export function detectLanguage(): AppLanguage {
   return 'en'
 }
 
+function languageFromStorage(): AppLanguage | null {
+  for (const key of ['spisak.pendingSettings', 'spisak.settings']) {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      const language = (JSON.parse(raw) as { language?: unknown }).language
+      if (typeof language === 'string' && (SUPPORTED_LANGUAGES as readonly string[]).includes(language)) {
+        return language as AppLanguage
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return null
+}
+
 void i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
@@ -27,7 +43,7 @@ void i18n.use(initReactI18next).init({
     ru: { translation: ru },
     sr: { translation: sr },
   },
-  lng: detectLanguage(),
+  lng: languageFromStorage() ?? detectLanguage(),
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
 })
