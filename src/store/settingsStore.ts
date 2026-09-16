@@ -15,6 +15,8 @@ interface SettingsState {
 }
 
 const LOCAL_SETTINGS_KEY = 'spisak.settings'
+/** Set when user explicitly picks theme/language (e.g. on AuthGate) — wins over stale cloud prefs once. */
+const LOCAL_OVERRIDE_KEY = 'spisak.settings.override'
 
 type LocalSettings = {
   theme?: Theme
@@ -40,6 +42,16 @@ function readLocalSettings(): LocalSettings {
 
 function writeLocalSettings(theme: Theme, language: AppLanguage): void {
   localStorage.setItem(LOCAL_SETTINGS_KEY, JSON.stringify({ theme, language }))
+}
+
+function markLocalOverride(): void {
+  localStorage.setItem(LOCAL_OVERRIDE_KEY, '1')
+}
+
+function consumeLocalOverride(): boolean {
+  const active = localStorage.getItem(LOCAL_OVERRIDE_KEY) === '1'
+  if (active) localStorage.removeItem(LOCAL_OVERRIDE_KEY)
+  return active
 }
 
 function applyTheme(theme: Theme) {
@@ -75,8 +87,10 @@ async function persistRemote(theme: Theme, language: AppLanguage): Promise<void>
   }
 }
 
-function persistAll(theme: Theme, language: AppLanguage): void {
+/** User-driven change: keep locally and flag so it beats cloud after OAuth. */
+function persistUserChoice(theme: Theme, language: AppLanguage): void {
   writeLocalSettings(theme, language)
+  markLocalOverride()
   void persistRemote(theme, language)
 }
 
@@ -100,14 +114,29 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ ready: false })
     const local = readLocalSettings()
     const inMemory = get()
+    const preferLocal = consumeLocalOverride()
     try {
       const remote = await getSettings()
-      const theme = remote?.theme ?? local.theme ?? inMemory.theme ?? systemTheme()
-      const language =
-        normalizeLanguage(remote?.language) ??
-        local.language ??
-        normalizeLanguage(inMemory.language) ??
-        detectLanguage()
+
+      let theme: Theme
+      let language: AppLanguage
+
+      if (preferLocal) {
+        // Explicit AuthGate / pre-login choice wins over stale Supabase row (e.g. old "ru").
+        theme = local.theme ?? inMemory.theme ?? remote?.theme ?? systemTheme()
+        language =
+          local.language ??
+          normalizeLanguage(inMemory.language) ??
+          normalizeLanguage(remote?.language) ??
+          detectLanguage()
+      } else {
+        theme = remote?.theme ?? local.theme ?? inMemory.theme ?? systemTheme()
+        language =
+          normalizeLanguage(remote?.language) ??
+          local.language ??
+          normalizeLanguage(inMemory.language) ??
+          detectLanguage()
+      }
 
       applyTheme(theme)
       applyLanguage(language)
@@ -129,7 +158,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setTheme: async (theme) => {
     applyTheme(theme)
     set({ theme })
-    persistAll(theme, get().language)
+    persistUserChoice(theme, get().language)
   },
   toggleTheme: async () => {
     const next = get().theme === 'light' ? 'dark' : 'light'
@@ -138,6 +167,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setLanguage: async (language) => {
     applyLanguage(language)
     set({ language })
-    persistAll(get().theme, language)
+    persistUserChoice(get().theme, language)
   },
 }))
