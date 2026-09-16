@@ -41,10 +41,8 @@ function Root() {
       void initSettings()
       return
     }
-    // Signed out: local defaults only (settings page gated behind auth).
-    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    document.documentElement.dataset.theme = theme
-    useSettingsStore.setState({ ready: true, theme, language: useSettingsStore.getState().language })
+    // Signed out: keep bootstrapped local prefs (language chosen on AuthGate survives OAuth).
+    useSettingsStore.setState({ ready: true })
   }, [authReady, user, initSettings])
 
   if (!authReady || (user && !settingsReady)) return null

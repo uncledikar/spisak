@@ -14,6 +14,34 @@ interface SettingsState {
   setLanguage: (language: AppLanguage) => Promise<void>
 }
 
+const LOCAL_SETTINGS_KEY = 'spisak.settings'
+
+type LocalSettings = {
+  theme?: Theme
+  language?: AppLanguage
+}
+
+function readLocalSettings(): LocalSettings {
+  try {
+    const raw = localStorage.getItem(LOCAL_SETTINGS_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw) as LocalSettings
+    return {
+      theme: parsed.theme === 'dark' || parsed.theme === 'light' ? parsed.theme : undefined,
+      language:
+        parsed.language && (SUPPORTED_LANGUAGES as readonly string[]).includes(parsed.language)
+          ? parsed.language
+          : undefined,
+    }
+  } catch {
+    return {}
+  }
+}
+
+function writeLocalSettings(theme: Theme, language: AppLanguage): void {
+  localStorage.setItem(LOCAL_SETTINGS_KEY, JSON.stringify({ theme, language }))
+}
+
 function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme
   const meta = document.querySelector('meta[name="theme-color"]')
@@ -31,51 +59,77 @@ function systemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function normalizeLanguage(value: string | null | undefined): AppLanguage {
+function normalizeLanguage(value: string | null | undefined): AppLanguage | null {
   if (value && (SUPPORTED_LANGUAGES as readonly string[]).includes(value)) {
     return value as AppLanguage
   }
-  return detectLanguage()
+  return null
 }
 
-async function persist(theme: Theme, language: AppLanguage): Promise<void> {
+async function persistRemote(theme: Theme, language: AppLanguage): Promise<void> {
   try {
     await upsertSettings({ theme, language })
   } catch (error) {
-    // Before sign-in, keep preferences in memory only.
+    // Before sign-in (or offline), localStorage is enough.
     console.warn('Settings not saved remotely', error)
   }
 }
 
+function persistAll(theme: Theme, language: AppLanguage): void {
+  writeLocalSettings(theme, language)
+  void persistRemote(theme, language)
+}
+
+/** Bootstrap language/theme before React mounts (survives OAuth redirect). */
+export function bootstrapLocalSettings(): { theme: Theme; language: AppLanguage } {
+  const local = readLocalSettings()
+  const theme = local.theme ?? systemTheme()
+  const language = local.language ?? detectLanguage()
+  applyTheme(theme)
+  applyLanguage(language)
+  return { theme, language }
+}
+
+const boot = bootstrapLocalSettings()
+
 export const useSettingsStore = create<SettingsState>((set, get) => ({
-  theme: 'light',
-  language: 'en',
+  theme: boot.theme,
+  language: boot.language,
   ready: false,
   init: async () => {
     set({ ready: false })
+    const local = readLocalSettings()
+    const inMemory = get()
     try {
       const remote = await getSettings()
-      const theme = remote?.theme ?? systemTheme()
-      const language = normalizeLanguage(remote?.language)
+      const theme = remote?.theme ?? local.theme ?? inMemory.theme ?? systemTheme()
+      const language =
+        normalizeLanguage(remote?.language) ??
+        local.language ??
+        normalizeLanguage(inMemory.language) ??
+        detectLanguage()
+
       applyTheme(theme)
       applyLanguage(language)
-      if (!remote || remote.language !== language) {
-        await persist(theme, language)
+      writeLocalSettings(theme, language)
+      if (!remote || remote.theme !== theme || remote.language !== language) {
+        await persistRemote(theme, language)
       }
       set({ theme, language, ready: true })
     } catch (error) {
       console.error('Settings init failed', error)
-      const theme = systemTheme()
-      const language = detectLanguage()
+      const theme = local.theme ?? inMemory.theme ?? systemTheme()
+      const language = local.language ?? inMemory.language ?? detectLanguage()
       applyTheme(theme)
       applyLanguage(language)
+      writeLocalSettings(theme, language)
       set({ theme, language, ready: true })
     }
   },
   setTheme: async (theme) => {
     applyTheme(theme)
     set({ theme })
-    await persist(theme, get().language)
+    persistAll(theme, get().language)
   },
   toggleTheme: async () => {
     const next = get().theme === 'light' ? 'dark' : 'light'
@@ -84,6 +138,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setLanguage: async (language) => {
     applyLanguage(language)
     set({ language })
-    await persist(get().theme, language)
+    persistAll(get().theme, language)
   },
 }))
