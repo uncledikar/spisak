@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -28,7 +28,11 @@ export function ListDetailPage() {
   const { id = '' } = useParams()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const list = useLiveData(() => getList(id), [id])
+  const remote = useLiveData(() => getList(id), [id])
+  /** Local mirror so toggle/DnD paint before any network / effect tick. */
+  const [list, setList] = useState(remote)
+  const listRef = useRef(list)
+  listRef.current = list
 
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -44,6 +48,20 @@ export function ListDetailPage() {
     list?.trackQuantity,
     editing,
   ])
+
+  useEffect(() => {
+    setList(undefined)
+  }, [id])
+
+  useEffect(() => {
+    if (remote === undefined) return
+    setList((prev) => {
+      if (prev && remote && prev.id === remote.id && prev.updatedAt > remote.updatedAt) {
+        return prev
+      }
+      return remote
+    })
+  }, [remote])
 
   useEffect(() => {
     if (!list) return
@@ -86,11 +104,27 @@ export function ListDetailPage() {
 
   const current = list
 
-  async function toggleChecked(itemId: string) {
-    const next = current.items.map((item) =>
-      item.id === itemId ? { ...item, checked: !item.checked } : item,
+  function applyItems(nextItems: ListItem[]) {
+    const base = listRef.current
+    if (!base || base.deletedAt !== null) return
+    const next = {
+      ...base,
+      items: reindexPositions(nextItems),
+      updatedAt: Date.now(),
+    }
+    listRef.current = next
+    setList(next)
+    void updateList(base.id, { items: next.items })
+  }
+
+  function toggleChecked(itemId: string) {
+    const base = listRef.current
+    if (!base || base.deletedAt !== null) return
+    applyItems(
+      base.items.map((item) =>
+        item.id === itemId ? { ...item, checked: !item.checked } : item,
+      ),
     )
-    await updateList(current.id, { items: next })
   }
 
   async function commitListMeta() {
@@ -144,24 +178,21 @@ export function ListDetailPage() {
     setEditing(true)
   }
 
-  async function reorderItems(next: ListItem[]) {
-    await updateList(current.id, { items: next })
+  function reorderItems(next: ListItem[]) {
+    applyItems(next)
   }
 
-  async function saveItem(updated: ListItem) {
+  function saveItem(updated: ListItem) {
     if (itemModal?.mode === 'create') {
-      const next = reindexPositions([...current.items, updated])
-      await updateList(current.id, { items: next })
+      applyItems([...current.items, updated])
       return
     }
-    const next = current.items.map((item) => (item.id === updated.id ? updated : item))
-    await updateList(current.id, { items: next })
+    applyItems(current.items.map((item) => (item.id === updated.id ? updated : item)))
   }
 
-  async function deleteItem(itemId: string) {
+  function deleteItem(itemId: string) {
     if (!window.confirm(t('list.deleteItemConfirm'))) return
-    const next = reindexPositions(current.items.filter((item) => item.id !== itemId))
-    await updateList(current.id, { items: next })
+    applyItems(current.items.filter((item) => item.id !== itemId))
     setItemModal(null)
   }
 

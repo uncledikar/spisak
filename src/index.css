@@ -558,12 +558,6 @@ button {
   background: var(--item-sand) !important;
 }
 
-/* Color mark on drag handle — dark glyph for contrast on vivid tints */
-.drag-handle[class*='item-tint-'] {
-  color: #1a211c;
-  border: 1px solid rgb(26 33 28 / 12%);
-}
-
 .color-trigger[class*='item-tint-'] .color-trigger-icon {
   color: #1a211c;
   mix-blend-mode: normal;
@@ -615,6 +609,13 @@ button {
   z-index: 5;
 }
 
+.item-row-touch-drag {
+  /* Allows delayed TouchSensor to take over without killing scroll immediately. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .drag-handle {
   width: 36px;
   height: 44px;
@@ -633,9 +634,49 @@ button {
   cursor: grabbing;
 }
 
+.item-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.item-title-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.item-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.4em;
+  border: 1px solid rgb(26 33 28 / 14%);
+  box-sizing: border-box;
+}
+
+[data-theme='dark'] .item-color-dot {
+  border-color: rgb(255 255 255 / 28%);
+}
+
 .item-row.checked .item-name {
   text-decoration: line-through;
   color: var(--muted);
+}
+
+@media (max-width: 719px) {
+  .item-row {
+    grid-template-columns: 44px 1fr auto;
+  }
+
+  .item-row.no-qty {
+    grid-template-columns: 44px 1fr;
+  }
+
+  .drag-handle {
+    display: none;
+  }
 }
 
 .check {

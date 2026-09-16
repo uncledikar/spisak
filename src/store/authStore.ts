@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
+import { clearListCache } from '../api/listCache'
 import { authRedirectTo, supabase } from '../lib/supabase'
+import { bumpData } from './dataStore'
 
 interface AuthState {
   session: Session | null
@@ -28,6 +30,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ session, user: session?.user ?? null, ready: true })
 
     supabase.auth.onAuthStateChange((_event, next) => {
+      if (!next) {
+        clearListCache()
+        bumpData()
+      }
       set({ session: next, user: next?.user ?? null })
     })
   },
@@ -53,6 +59,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ busy: false, error: error.message })
       return
     }
+    clearListCache()
+    bumpData()
     set({ session: null, user: null, busy: false, error: null })
   },
 
