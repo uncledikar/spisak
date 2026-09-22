@@ -1222,12 +1222,22 @@ button {
   width: 100%;
   min-height: var(--tap);
   height: var(--tap);
+  max-height: var(--tap);
   box-sizing: border-box;
+  margin: 0;
+  padding: 0 10px;
   line-height: 1.2;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field-date input[type='date'] {
+  display: flex;
+  align-items: center;
 }
 
 .field-qty input {
-  padding: 0 8px;
   text-align: center;
   -moz-appearance: textfield;
 }
@@ -1241,6 +1251,10 @@ button {
 .log-fields {
   align-items: flex-end;
   gap: 20px;
+}
+
+.catalog-add {
+  margin: 0 0 12px;
 }
 
 .row-actions {

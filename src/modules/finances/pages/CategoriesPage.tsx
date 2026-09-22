@@ -14,14 +14,7 @@ export function CategoriesPage() {
   const [creating, setCreating] = useState(false)
 
   return (
-    <PageShell
-      title={t('finances.categories.title')}
-      pageActions={
-        <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-          {t('common.add')}
-        </button>
-      }
-    >
+    <PageShell title={t('finances.categories.title')}>
       {!categories ? (
         <p className="meta">{t('common.loading')}</p>
       ) : categories.length === 0 ? (
@@ -33,30 +26,37 @@ export function CategoriesPage() {
           </button>
         </div>
       ) : (
-        <ul className="list-plain stack">
-          {categories.map((category) => (
-            <li key={category.id} className="list-row card">
-              <div className="medicine-line">
-                <span className="category-list-icon" aria-hidden="true">
-                  {category.icon}
-                </span>
-                <strong className="card-title">{category.name}</strong>
-              </div>
-              <div className="row row-actions">
-                <IconActionButton label={t('common.edit')} onClick={() => setEditing(category)} />
-                <IconActionButton
-                  label={t('common.delete')}
-                  variant="danger"
-                  onClick={() => {
-                    if (window.confirm(t('finances.categories.deleteConfirm'))) {
-                      void deleteCategory(category.id)
-                    }
-                  }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="catalog-add">
+            <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
+              {t('common.add')}
+            </button>
+          </div>
+          <ul className="list-plain stack">
+            {categories.map((category) => (
+              <li key={category.id} className="list-row card">
+                <div className="medicine-line">
+                  <span className="category-list-icon" aria-hidden="true">
+                    {category.icon}
+                  </span>
+                  <strong className="card-title">{category.name}</strong>
+                </div>
+                <div className="row row-actions">
+                  <IconActionButton label={t('common.edit')} onClick={() => setEditing(category)} />
+                  <IconActionButton
+                    label={t('common.delete')}
+                    variant="danger"
+                    onClick={() => {
+                      if (window.confirm(t('finances.categories.deleteConfirm'))) {
+                        void deleteCategory(category.id)
+                      }
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
       <CategoryEditModal

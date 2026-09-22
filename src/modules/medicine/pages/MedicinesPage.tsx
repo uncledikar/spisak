@@ -15,14 +15,7 @@ export function MedicinesPage() {
   const [creating, setCreating] = useState(false)
 
   return (
-    <PageShell
-      title={t('medicine.medicines.title')}
-      pageActions={
-        <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-          {t('common.add')}
-        </button>
-      }
-    >
+    <PageShell title={t('medicine.medicines.title')}>
       {!medicines ? (
         <p className="meta">{t('common.loading')}</p>
       ) : medicines.length === 0 ? (
@@ -34,28 +27,35 @@ export function MedicinesPage() {
           </button>
         </div>
       ) : (
-        <ul className="list-plain stack">
-          {medicines.map((medicine) => (
-            <li key={medicine.id} className="list-row card">
-              <div className="medicine-line">
-                <strong className="card-title">{medicine.name}</strong>
-                <span className="meta"> ({formatUnitLabel(medicine.unit, t)})</span>
-              </div>
-              <div className="row row-actions">
-                <IconActionButton label={t('common.edit')} onClick={() => setEditing(medicine)} />
-                <IconActionButton
-                  label={t('common.delete')}
-                  variant="danger"
-                  onClick={() => {
-                    if (window.confirm(t('medicine.medicines.deleteConfirm'))) {
-                      void deleteMedicine(medicine.id)
-                    }
-                  }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="catalog-add">
+            <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
+              {t('common.add')}
+            </button>
+          </div>
+          <ul className="list-plain stack">
+            {medicines.map((medicine) => (
+              <li key={medicine.id} className="list-row card">
+                <div className="medicine-line">
+                  <strong className="card-title">{medicine.name}</strong>
+                  <span className="meta"> ({formatUnitLabel(medicine.unit, t)})</span>
+                </div>
+                <div className="row row-actions">
+                  <IconActionButton label={t('common.edit')} onClick={() => setEditing(medicine)} />
+                  <IconActionButton
+                    label={t('common.delete')}
+                    variant="danger"
+                    onClick={() => {
+                      if (window.confirm(t('medicine.medicines.deleteConfirm'))) {
+                        void deleteMedicine(medicine.id)
+                      }
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
       <MedicineEditModal

@@ -1,14 +1,12 @@
 import { useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthButton } from '../shared/components/AuthButton'
 import { LanguageSwitcher } from '../shared/components/LanguageSwitcher'
 import { useSettingsStore } from '../shared/store/settingsStore'
 import { ModuleDrawer } from './ModuleDrawer'
-import { MODULE_HOME, readActiveModule } from './modules'
 
 type Props = {
-  /** Extra icon buttons between brand and language (e.g. trash, medicines). */
+  /** Extra icon buttons between leading cluster and language (e.g. trash, medicines). */
   moduleActions?: ReactNode
 }
 
@@ -25,7 +23,6 @@ export function AppChrome({ moduleActions }: Props) {
   const toggleTheme = useSettingsStore((s) => s.toggleTheme)
   const theme = useSettingsStore((s) => s.theme)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const home = MODULE_HOME[readActiveModule()]
 
   return (
     <>
@@ -42,9 +39,6 @@ export function AppChrome({ moduleActions }: Props) {
           </button>
           <AuthButton />
         </div>
-        <Link to={home} className="app-header-brand" title={t('app.name')}>
-          {t('app.name')}
-        </Link>
         <div className="app-header-actions">
           {moduleActions}
           <LanguageSwitcher />
