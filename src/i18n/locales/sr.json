@@ -1,14 +1,22 @@
 {
   "app": {
-    "name": "Spisak",
-    "tagline": "Vaše liste uvek pri ruci"
+    "name": "MyApp",
+    "tagline": "Liste, finansije i medicina — na jednom mestu"
   },
   "nav": {
     "lists": "Liste",
     "trash": "Korpa",
     "back": "Nazad",
     "settings": "Podešavanja",
-    "breadcrumbs": "Navigacija"
+    "breadcrumbs": "Navigacija",
+    "modules": "Moduli",
+    "module": {
+      "lists": "Liste",
+      "finances": "Finansije",
+      "medicine": "Medicina"
+    },
+    "medicines": "Lekovi",
+    "categories": "Kategorije"
   },
   "lists": {
     "title": "Liste",
@@ -82,12 +90,95 @@
     "signInGoogle": "Prijava preko Google",
     "signOut": "Odjavi se",
     "account": "Nalog",
-    "required": "Prijavite se preko Google da biste sinhronizovali liste"
+    "required": "Prijavite se preko Google-a da sinhronizujete podatke"
   },
   "common": {
     "cancel": "Otkaži",
     "confirm": "Potvrdi",
     "loading": "Učitavanje…",
-    "offline": "Offline — potrebna je veza za sinhronizaciju"
+    "offline": "Offline — potrebna je veza za sinhronizaciju",
+    "save": "Sačuvaj",
+    "delete": "Obriši",
+    "add": "Dodaj",
+    "edit": "Izmeni",
+    "total": "Ukupno"
+  },
+  "period": {
+    "day": "Danas",
+    "week": "Nedelja",
+    "month": "Mesec",
+    "year": "Godina",
+    "custom": "Period",
+    "from": "Od",
+    "to": "Do",
+    "prev": "Nazad",
+    "next": "Napred"
+  },
+  "medicine": {
+    "medicines": {
+      "title": "Lekovi",
+      "empty": "Još nema lekova",
+      "emptyHint": "Dodajte lekove da biste vodili evidenciju.",
+      "name": "Naziv",
+      "unit": "Jedinica",
+      "unitPlaceholder": "kom, mg, ml…",
+      "add": "Dodaj lek",
+      "edit": "Izmeni lek",
+      "deleteConfirm": "Obrisati ovaj lek?",
+      "new": "Novi lek"
+    },
+    "today": {
+      "title": "Danas",
+      "log": "Zabeleži unos",
+      "medicine": "Lek",
+      "quantity": "Količina",
+      "date": "Datum",
+      "submit": "Dodaj",
+      "selectMedicine": "Izaberite lek",
+      "noMedicines": "Prvo dodajte lek",
+      "chartTitle": "Potrošnja",
+      "compare": "Uporedi sa prethodnim periodom",
+      "previous": "Prethodni",
+      "current": "Trenutni",
+      "emptyChart": "Nema unosa u ovom periodu",
+      "dayMedicines": "Lekovi na taj dan",
+      "perDay": "{{qty}} {{unit}} / dan"
+    },
+    "units": {
+      "pcs": "kom",
+      "mg": "mg",
+      "ml": "ml"
+    }
+  },
+  "finances": {
+    "categories": {
+      "title": "Kategorije",
+      "empty": "Još nema kategorija",
+      "emptyHint": "Dodajte kategorije troškova da biste vodili evidenciju.",
+      "name": "Naziv",
+      "icon": "Ikona",
+      "add": "Dodaj kategoriju",
+      "edit": "Izmeni kategoriju",
+      "deleteConfirm": "Obrisati ovu kategoriju?",
+      "new": "Nova kategorija"
+    },
+    "today": {
+      "title": "Danas",
+      "log": "Zabeleži trošak",
+      "amount": "Iznos",
+      "date": "Datum",
+      "comment": "Komentar",
+      "commentPlaceholder": "Prodavnica, detalji…",
+      "submit": "Dodaj",
+      "selectCategory": "Izaberite kategoriju",
+      "noCategories": "Prvo dodajte kategoriju",
+      "chartTitle": "Troškovi",
+      "compare": "Uporedi sa prethodnim periodom",
+      "previous": "Prethodni",
+      "current": "Trenutni",
+      "emptyChart": "Nema troškova u ovom periodu",
+      "dayExpenses": "Troškovi na taj dan",
+      "perDay": "{{qty}} / dan"
+    }
   }
 }

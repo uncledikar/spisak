@@ -1,14 +1,22 @@
 {
   "app": {
-    "name": "Spisak",
-    "tagline": "Vos listes, toujours à portée de main"
+    "name": "MyApp",
+    "tagline": "Listes, finances et médecine — au même endroit"
   },
   "nav": {
     "lists": "Listes",
     "trash": "Corbeille",
     "back": "Retour",
     "settings": "Réglages",
-    "breadcrumbs": "Fil d’Ariane"
+    "breadcrumbs": "Fil d’Ariane",
+    "modules": "Modules",
+    "module": {
+      "lists": "Listes",
+      "finances": "Finances",
+      "medicine": "Médecine"
+    },
+    "medicines": "Médicaments",
+    "categories": "Catégories"
   },
   "lists": {
     "title": "Listes",
@@ -82,12 +90,95 @@
     "signInGoogle": "Se connecter avec Google",
     "signOut": "Se déconnecter",
     "account": "Compte",
-    "required": "Connectez-vous avec Google pour synchroniser vos listes"
+    "required": "Connectez-vous avec Google pour synchroniser vos données"
   },
   "common": {
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "loading": "Chargement…",
-    "offline": "Hors ligne — une connexion est nécessaire pour synchroniser"
+    "offline": "Hors ligne — une connexion est nécessaire pour synchroniser",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "total": "Total"
+  },
+  "period": {
+    "day": "Aujourd’hui",
+    "week": "Semaine",
+    "month": "Mois",
+    "year": "Année",
+    "custom": "Personnalisé",
+    "from": "Du",
+    "to": "Au",
+    "prev": "Précédent",
+    "next": "Suivant"
+  },
+  "medicine": {
+    "medicines": {
+      "title": "Médicaments",
+      "empty": "Aucun médicament pour l’instant",
+      "emptyHint": "Ajoutez les médicaments que vous prenez pour commencer.",
+      "name": "Nom",
+      "unit": "Unité",
+      "unitPlaceholder": "pcs, mg, ml…",
+      "add": "Ajouter un médicament",
+      "edit": "Modifier le médicament",
+      "deleteConfirm": "Supprimer ce médicament ?",
+      "new": "Nouveau médicament"
+    },
+    "today": {
+      "title": "Aujourd’hui",
+      "log": "Enregistrer une prise",
+      "medicine": "Médicament",
+      "quantity": "Quantité",
+      "date": "Date",
+      "submit": "Ajouter",
+      "selectMedicine": "Sélectionnez un médicament",
+      "noMedicines": "Ajoutez d’abord un médicament",
+      "chartTitle": "Consommation",
+      "compare": "Comparer avec la période précédente",
+      "previous": "Précédente",
+      "current": "Actuelle",
+      "emptyChart": "Aucune prise sur cette période",
+      "dayMedicines": "Médicaments de ce jour",
+      "perDay": "{{qty}} {{unit}} / jour"
+    },
+    "units": {
+      "pcs": "pcs",
+      "mg": "mg",
+      "ml": "ml"
+    }
+  },
+  "finances": {
+    "categories": {
+      "title": "Catégories",
+      "empty": "Aucune catégorie pour l’instant",
+      "emptyHint": "Ajoutez des catégories de dépenses pour commencer.",
+      "name": "Nom",
+      "icon": "Icône",
+      "add": "Ajouter une catégorie",
+      "edit": "Modifier la catégorie",
+      "deleteConfirm": "Supprimer cette catégorie ?",
+      "new": "Nouvelle catégorie"
+    },
+    "today": {
+      "title": "Aujourd’hui",
+      "log": "Enregistrer une dépense",
+      "amount": "Montant",
+      "date": "Date",
+      "comment": "Commentaire",
+      "commentPlaceholder": "Magasin, détails…",
+      "submit": "Ajouter",
+      "selectCategory": "Sélectionnez une catégorie",
+      "noCategories": "Ajoutez d’abord une catégorie",
+      "chartTitle": "Dépenses",
+      "compare": "Comparer avec la période précédente",
+      "previous": "Précédente",
+      "current": "Actuelle",
+      "emptyChart": "Aucune dépense sur cette période",
+      "dayExpenses": "Dépenses de ce jour",
+      "perDay": "{{qty}} / jour"
+    }
   }
 }

@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './i18n'
 import './index.css'
 import App from './App'
-import { useSettingsStore } from './store/settingsStore'
-import { useAuthStore } from './store/authStore'
+import { useSettingsStore } from './shared/store/settingsStore'
+import { useAuthStore } from './shared/store/authStore'
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return

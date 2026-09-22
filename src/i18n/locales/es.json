@@ -1,14 +1,22 @@
 {
   "app": {
-    "name": "Spisak",
-    "tagline": "Tus listas, siempre a mano"
+    "name": "MyApp",
+    "tagline": "Listas, finanzas y medicina — en un solo lugar"
   },
   "nav": {
     "lists": "Listas",
     "trash": "Papelera",
     "back": "Atrás",
     "settings": "Ajustes",
-    "breadcrumbs": "Ruta"
+    "breadcrumbs": "Ruta",
+    "modules": "Módulos",
+    "module": {
+      "lists": "Listas",
+      "finances": "Finanzas",
+      "medicine": "Medicina"
+    },
+    "medicines": "Medicamentos",
+    "categories": "Categorías"
   },
   "lists": {
     "title": "Listas",
@@ -82,12 +90,95 @@
     "signInGoogle": "Iniciar sesión con Google",
     "signOut": "Cerrar sesión",
     "account": "Cuenta",
-    "required": "Inicia sesión con Google para sincronizar tus listas"
+    "required": "Inicia sesión con Google para sincronizar tus datos"
   },
   "common": {
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "loading": "Cargando…",
-    "offline": "Sin conexión — necesitas internet para sincronizar"
+    "offline": "Sin conexión — necesitas internet para sincronizar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "add": "Añadir",
+    "edit": "Editar",
+    "total": "Total"
+  },
+  "period": {
+    "day": "Hoy",
+    "week": "Semana",
+    "month": "Mes",
+    "year": "Año",
+    "custom": "Personalizado",
+    "from": "Desde",
+    "to": "Hasta",
+    "prev": "Anterior",
+    "next": "Siguiente"
+  },
+  "medicine": {
+    "medicines": {
+      "title": "Medicamentos",
+      "empty": "Aún no hay medicamentos",
+      "emptyHint": "Añade los medicamentos que tomas para empezar el registro.",
+      "name": "Nombre",
+      "unit": "Unidad",
+      "unitPlaceholder": "uds, mg, ml…",
+      "add": "Añadir medicamento",
+      "edit": "Editar medicamento",
+      "deleteConfirm": "¿Eliminar este medicamento?",
+      "new": "Nuevo medicamento"
+    },
+    "today": {
+      "title": "Hoy",
+      "log": "Registrar toma",
+      "medicine": "Medicamento",
+      "quantity": "Cantidad",
+      "date": "Fecha",
+      "submit": "Añadir",
+      "selectMedicine": "Selecciona un medicamento",
+      "noMedicines": "Primero añade un medicamento",
+      "chartTitle": "Consumo",
+      "compare": "Comparar con el periodo anterior",
+      "previous": "Anterior",
+      "current": "Actual",
+      "emptyChart": "Sin tomas en este periodo",
+      "dayMedicines": "Medicamentos de este día",
+      "perDay": "{{qty}} {{unit}} / día"
+    },
+    "units": {
+      "pcs": "uds",
+      "mg": "mg",
+      "ml": "ml"
+    }
+  },
+  "finances": {
+    "categories": {
+      "title": "Categorías",
+      "empty": "Aún no hay categorías",
+      "emptyHint": "Añade categorías de gasto para empezar a registrar.",
+      "name": "Nombre",
+      "icon": "Icono",
+      "add": "Añadir categoría",
+      "edit": "Editar categoría",
+      "deleteConfirm": "¿Eliminar esta categoría?",
+      "new": "Nueva categoría"
+    },
+    "today": {
+      "title": "Hoy",
+      "log": "Registrar gasto",
+      "amount": "Importe",
+      "date": "Fecha",
+      "comment": "Comentario",
+      "commentPlaceholder": "Tienda, detalles…",
+      "submit": "Añadir",
+      "selectCategory": "Selecciona una categoría",
+      "noCategories": "Primero añade una categoría",
+      "chartTitle": "Gastos",
+      "compare": "Comparar con el periodo anterior",
+      "previous": "Anterior",
+      "current": "Actual",
+      "emptyChart": "Sin gastos en este periodo",
+      "dayExpenses": "Gastos de este día",
+      "perDay": "{{qty}} / día"
+    }
   }
 }

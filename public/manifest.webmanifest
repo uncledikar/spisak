@@ -1,7 +1,7 @@
 {
-  "name": "Spisak",
-  "short_name": "Spisak",
-  "description": "Lists for trips, shopping, and everyday packing",
+  "name": "MyApp",
+  "short_name": "MyApp",
+  "description": "Lists, finances, and medicine",
   "theme_color": "#2d6a4f",
   "background_color": "#f5f6f4",
   "display": "standalone",

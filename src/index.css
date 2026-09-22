@@ -425,7 +425,8 @@ button {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   min-height: var(--tap);
   border-radius: 14px;
   border: 1px solid var(--border);
@@ -1098,3 +1099,482 @@ button {
   width: 24px;
   height: 12px;
 }
+
+/* ── MyApp shell drawer ───────────────────────────────────────── */
+
+.app-header-leading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.module-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.module-drawer-root.is-open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.module-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgb(0 0 0 / 40%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.module-drawer-root.is-open .module-drawer-backdrop {
+  opacity: 1;
+}
+
+.module-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(300px, 86vw);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transform: translateX(-105%);
+  transition: transform 200ms ease;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+}
+
+.module-drawer-root.is-open .module-drawer {
+  transform: translateX(0);
+}
+
+.module-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.module-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.module-drawer-link {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border-radius: 14px;
+  color: var(--text);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.module-drawer-link.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.icon-btn-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Medicine / Finances module UI ────────────────────────────── */
+
+.page-stack {
+  gap: 16px;
+}
+
+.log-card {
+  margin-top: 4px;
+}
+
+.field-medicine {
+  width: 100%;
+}
+
+.field-medicine select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235a6b70' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.field-qty {
+  flex: 0 0 auto;
+  width: 8.5rem;
+}
+
+.field-qty input,
+.field-date input {
+  width: 100%;
+  min-height: var(--tap);
+  height: var(--tap);
+  box-sizing: border-box;
+  line-height: 1.2;
+}
+
+.field-qty input {
+  padding: 0 8px;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.field-qty input::-webkit-outer-spin-button,
+.field-qty input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.log-fields {
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.row-actions {
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.period-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 650;
+  font-size: 0.95rem;
+}
+
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.period-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+}
+
+.period-shift {
+  width: var(--tap);
+  height: var(--tap);
+  font-size: 1.6rem;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.period-anchor {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  height: var(--tap);
+  box-sizing: border-box;
+  line-height: 1.2;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  width: 100%;
+}
+
+.period-label {
+  font-weight: 650;
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+  height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-sizing: border-box;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.chart-empty {
+  text-align: center;
+  padding: 24px 8px;
+}
+
+.chart-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.chart-totals > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chart-totals .per-day {
+  font-weight: 500;
+}
+
+.histogram {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.histogram-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.histogram-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.histogram-name {
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.histogram-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.histogram-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 12px;
+}
+
+.histogram-bar {
+  height: 14px;
+  border-radius: 8px;
+  min-width: 4px;
+  transition: width 220ms ease;
+}
+
+.histogram-bar.previous {
+  opacity: 0.45;
+}
+
+.medicine-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  min-width: 0;
+}
+
+.medicine-line .card-title {
+  margin: 0;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.swatch.current {
+  background: var(--accent);
+}
+
+.swatch.previous {
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+.list-plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-row.card {
+  border-bottom: none;
+  padding: 14px 16px;
+}
+
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg, var(--surface-2, var(--surface)));
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.category-chip-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.category-chip-icon,
+.category-list-icon,
+.histogram-icon,
+.entry-icon {
+  font-style: normal;
+  line-height: 1;
+}
+
+.category-list-icon {
+  font-size: 1.25rem;
+  margin-right: 4px;
+}
+
+.icon-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.icon-picker legend {
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.icon-picker-btn {
+  min-height: var(--tap);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg, var(--surface-2, var(--surface)));
+  font-size: 1.25rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.icon-picker-btn-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+}
+
+.equal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.equal-actions > * {
+  flex: 1;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.icon-action {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 12px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.icon-action-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: transparent;
+}
+
+.grow { flex: 1; min-width: 0; }

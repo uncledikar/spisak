@@ -1,14 +1,22 @@
 {
   "app": {
-    "name": "Spisak",
-    "tagline": "Your lists, always at hand"
+    "name": "MyApp",
+    "tagline": "Lists, finances, and medicine — in one place"
   },
   "nav": {
     "lists": "Lists",
     "trash": "Trash",
     "back": "Back",
     "settings": "Settings",
-    "breadcrumbs": "Breadcrumb"
+    "breadcrumbs": "Breadcrumb",
+    "modules": "Modules",
+    "module": {
+      "lists": "Lists",
+      "finances": "Finances",
+      "medicine": "Medicine"
+    },
+    "medicines": "Medicines",
+    "categories": "Categories"
   },
   "lists": {
     "title": "Lists",
@@ -82,12 +90,95 @@
     "signInGoogle": "Sign in with Google",
     "signOut": "Sign out",
     "account": "Account",
-    "required": "Sign in with Google to sync your lists"
+    "required": "Sign in with Google to sync your data"
   },
   "common": {
     "cancel": "Cancel",
     "confirm": "Confirm",
     "loading": "Loading…",
-    "offline": "Offline — connect to the internet to sync"
+    "offline": "Offline — connect to the internet to sync",
+    "save": "Save",
+    "delete": "Delete",
+    "add": "Add",
+    "edit": "Edit",
+    "total": "Total"
+  },
+  "period": {
+    "day": "Today",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "custom": "Custom",
+    "from": "From",
+    "to": "To",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "medicine": {
+    "medicines": {
+      "title": "Medicines",
+      "empty": "No medicines yet",
+      "emptyHint": "Add medicines you take to start logging.",
+      "name": "Name",
+      "unit": "Unit",
+      "unitPlaceholder": "pcs, mg, ml…",
+      "add": "Add medicine",
+      "edit": "Edit medicine",
+      "deleteConfirm": "Delete this medicine?",
+      "new": "New medicine"
+    },
+    "today": {
+      "title": "Today",
+      "log": "Log intake",
+      "medicine": "Medicine",
+      "quantity": "Quantity",
+      "date": "Date",
+      "submit": "Add",
+      "selectMedicine": "Select a medicine",
+      "noMedicines": "Add a medicine first",
+      "chartTitle": "Consumption",
+      "compare": "Compare with previous period",
+      "previous": "Previous",
+      "current": "Current",
+      "emptyChart": "No intake in this period",
+      "dayMedicines": "Medicines on this day",
+      "perDay": "{{qty}} {{unit}} / day"
+    },
+    "units": {
+      "pcs": "pcs",
+      "mg": "mg",
+      "ml": "ml"
+    }
+  },
+  "finances": {
+    "categories": {
+      "title": "Categories",
+      "empty": "No categories yet",
+      "emptyHint": "Add spending categories to start logging expenses.",
+      "name": "Name",
+      "icon": "Icon",
+      "add": "Add category",
+      "edit": "Edit category",
+      "deleteConfirm": "Delete this category?",
+      "new": "New category"
+    },
+    "today": {
+      "title": "Today",
+      "log": "Log expense",
+      "amount": "Amount",
+      "date": "Date",
+      "comment": "Comment",
+      "commentPlaceholder": "Store, details…",
+      "submit": "Add",
+      "selectCategory": "Select a category",
+      "noCategories": "Add a category first",
+      "chartTitle": "Spending",
+      "compare": "Compare with previous period",
+      "previous": "Previous",
+      "current": "Current",
+      "emptyChart": "No expenses in this period",
+      "dayExpenses": "Expenses on this day",
+      "perDay": "{{qty}} / day"
+    }
   }
 }
