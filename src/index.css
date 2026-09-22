@@ -175,8 +175,10 @@ button {
 
 .breadcrumb-trail {
   display: block;
-  margin: 0 0 4px;
-  font-size: 0.85rem;
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   color: var(--muted);
   line-height: 1.3;
   overflow: hidden;
@@ -186,6 +188,7 @@ button {
 
 .breadcrumb-trail a {
   color: var(--muted);
+  text-decoration: none;
 }
 
 .breadcrumb-trail a:hover {

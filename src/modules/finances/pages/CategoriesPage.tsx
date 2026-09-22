@@ -14,7 +14,12 @@ export function CategoriesPage() {
   const [creating, setCreating] = useState(false)
 
   return (
-    <PageShell title={t('finances.categories.title')}>
+    <PageShell
+      crumbs={[
+        { label: t('nav.module.finances'), to: '/finances' },
+        { label: t('finances.categories.title') },
+      ]}
+    >
       {!categories ? (
         <p className="meta">{t('common.loading')}</p>
       ) : categories.length === 0 ? (

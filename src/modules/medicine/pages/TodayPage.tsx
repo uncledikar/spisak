@@ -74,7 +74,7 @@ export function TodayPage() {
   }, [kind, anchor, consumptions, medicines])
 
   return (
-    <PageShell title={pageTitle}>
+    <PageShell crumbs={[{ label: pageTitle }]}>
       <div className="stack page-stack">
         <PeriodControls
           kind={kind}

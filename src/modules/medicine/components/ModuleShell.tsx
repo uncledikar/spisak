@@ -1,11 +1,16 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppChrome } from '../../../shell/AppChrome'
 import { useOnline } from '../../../shared/hooks/useOnline'
 
+export type Crumb = {
+  label: string
+  to?: string
+}
+
 type Props = {
-  title: string
+  crumbs: Crumb[]
   pageActions?: ReactNode
   children: ReactNode
 }
@@ -20,9 +25,11 @@ function PillIcon() {
   )
 }
 
-export function ModuleShell({ title, pageActions, children }: Props) {
+export function ModuleShell({ crumbs, pageActions, children }: Props) {
   const { t } = useTranslation()
   const online = useOnline()
+  const current = crumbs[crumbs.length - 1]
+  const parents = crumbs.slice(0, -1)
 
   return (
     <div className="app-shell">
@@ -40,7 +47,24 @@ export function ModuleShell({ title, pageActions, children }: Props) {
           }
         />
         <div className="app-header-page">
-          <h1 className="page-title">{title}</h1>
+          <div className="breadcrumbs">
+            {parents.length > 0 ? (
+              <nav className="breadcrumb-trail" aria-label={t('nav.breadcrumbs')}>
+                {parents.map((crumb, index) => (
+                  <span key={`${crumb.label}-${index}`} className="breadcrumb-part">
+                    {index > 0 ? (
+                      <span className="breadcrumb-sep" aria-hidden="true">
+                        {' '}
+                        /{' '}
+                      </span>
+                    ) : null}
+                    {crumb.to ? <Link to={crumb.to}>{crumb.label}</Link> : <span>{crumb.label}</span>}
+                  </span>
+                ))}
+              </nav>
+            ) : null}
+            <h1 className="page-title">{current?.label ?? t('app.name')}</h1>
+          </div>
           {pageActions ? <div className="page-actions">{pageActions}</div> : null}
         </div>
       </header>

@@ -15,7 +15,12 @@ export function MedicinesPage() {
   const [creating, setCreating] = useState(false)
 
   return (
-    <PageShell title={t('medicine.medicines.title')}>
+    <PageShell
+      crumbs={[
+        { label: t('nav.module.medicine'), to: '/medicine' },
+        { label: t('medicine.medicines.title') },
+      ]}
+    >
       {!medicines ? (
         <p className="meta">{t('common.loading')}</p>
       ) : medicines.length === 0 ? (
