@@ -16,9 +16,10 @@ Build: `npm run build` · Preview: `npm run preview`
 
 In the **Spisak** Supabase project → SQL Editor, run:
 
-[`supabase/schema-modules.sql`](supabase/schema-modules.sql)
+1. [`supabase/schema-modules.sql`](supabase/schema-modules.sql) — medicine + finances tables  
+2. [`supabase/schema-lists-position.sql`](supabase/schema-lists-position.sql) — list reorder (`position`)
 
-This adds `medicines`, `consumptions`, `expense_categories`, `expenses` (+ RLS). Leaves `settings` / `lists` alone.
+Leaves `settings` alone.
 
 ## Features
 

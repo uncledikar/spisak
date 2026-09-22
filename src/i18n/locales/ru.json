@@ -27,7 +27,8 @@
     "noDeadline": "Без дедлайна",
     "itemsCount": "{{count}} пунктов",
     "checkedCount": "{{done}} / {{total}}",
-    "updated": "Изменён"
+    "updated": "Изменён",
+    "dragList": "Перетащить список"
   },
   "list": {
     "name": "Название списка",

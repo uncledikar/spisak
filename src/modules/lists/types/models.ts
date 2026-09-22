@@ -16,6 +16,8 @@ export interface ListRecord {
   deadline: string | null
   /** When false, quantity fields are hidden in UI. */
   trackQuantity: boolean
+  /** Order among active lists (0 = top). */
+  position: number
   items: ListItem[]
   createdAt: number
   updatedAt: number

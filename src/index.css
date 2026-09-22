@@ -626,6 +626,51 @@ button {
   -webkit-touch-callout: none;
 }
 
+.list-card-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px 14px;
+  touch-action: manipulation;
+}
+
+.list-card-row.dragging {
+  opacity: 0.92;
+  box-shadow: var(--shadow);
+  z-index: 5;
+  touch-action: none;
+}
+
+.list-card-touch-drag {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.list-card-main {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.list-card-main-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.list-card-row .drag-handle {
+  align-self: center;
+  flex-shrink: 0;
+}
+
 .drag-handle {
   width: 36px;
   height: 44px;

@@ -27,7 +27,8 @@
     "noDeadline": "Bez roka",
     "itemsCount": "{{count}} stavki",
     "checkedCount": "{{done}} / {{total}}",
-    "updated": "Ažurirano"
+    "updated": "Ažurirano",
+    "dragList": "Prevucite za promenu redosleda"
   },
   "list": {
     "name": "Naziv liste",

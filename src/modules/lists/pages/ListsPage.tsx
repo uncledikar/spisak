@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageShell } from '../components/AppHeader'
-import { ProgressBadge } from '../components/ProgressBadge'
+import { SortableListsList } from '../components/SortableListsList'
 import { getActiveLists } from '../api/lists'
 import { useAuthStore } from '../../../shared/store/authStore'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { useOnline } from '../../../shared/hooks/useOnline'
-import { formatRelative, formatDeadline } from '../utils/dates'
 
 export function ListsPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const lists = useLiveData(() => getActiveLists(), [])
   const authError = useAuthStore((s) => s.error)
   const clearAuthError = useAuthStore((s) => s.clearError)
@@ -35,26 +34,7 @@ export function ListsPage() {
           <p>{t('lists.emptyHint')}</p>
         </div>
       ) : (
-        <div className="stack">
-          {lists.map((list) => {
-            const done = list.items.filter((i) => i.checked).length
-            return (
-              <Link key={list.id} to={`/lists/${list.id}`} className="card card-button">
-                <div className="row-between">
-                  <h2 className="card-title">{list.name}</h2>
-                  <ProgressBadge done={done} total={list.items.length} variant="chip" />
-                </div>
-                <p className="meta">
-                  {list.deadline
-                    ? `${t('lists.deadline')}: ${formatDeadline(list.deadline, i18n.language)}`
-                    : t('lists.noDeadline')}
-                  {' · '}
-                  {t('lists.updated')} {formatRelative(list.updatedAt, i18n.language)}
-                </p>
-              </Link>
-            )
-          })}
-        </div>
+        <SortableListsList lists={lists} />
       )}
 
       <Link className="fab" to="/lists/new">

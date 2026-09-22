@@ -27,7 +27,8 @@
     "noDeadline": "Sans échéance",
     "itemsCount": "{{count}} éléments",
     "checkedCount": "{{done}} / {{total}}",
-    "updated": "Mis à jour"
+    "updated": "Mis à jour",
+    "dragList": "Glisser pour réordonner"
   },
   "list": {
     "name": "Nom de la liste",

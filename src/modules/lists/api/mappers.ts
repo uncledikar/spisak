@@ -7,6 +7,7 @@ export type ListRow = {
   name: string
   deadline: string | null
   track_quantity: boolean
+  position: number | null
   items: ListItem[] | null
   created_at: string
   updated_at: string
@@ -19,6 +20,7 @@ export function mapListRow(row: ListRow): ListRecord {
     name: row.name,
     deadline: row.deadline,
     trackQuantity: row.track_quantity,
+    position: typeof row.position === 'number' ? row.position : 0,
     items: Array.isArray(row.items) ? row.items : [],
     createdAt: toEpochMs(row.created_at) ?? Date.now(),
     updatedAt: toEpochMs(row.updated_at) ?? Date.now(),
@@ -33,6 +35,7 @@ export function listToRow(list: ListRecord, userId: string) {
     name: list.name,
     deadline: list.deadline,
     track_quantity: list.trackQuantity,
+    position: list.position,
     items: list.items,
     created_at: new Date(list.createdAt).toISOString(),
     updated_at: new Date(list.updatedAt).toISOString(),

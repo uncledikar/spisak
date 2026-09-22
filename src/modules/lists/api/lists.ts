@@ -1,7 +1,7 @@
 import { bumpData } from '../../../shared/store/dataStore'
 import type { ListItem, ListRecord } from '../types/models'
 import { createId } from '../../../shared/utils/id'
-import { normalizeListRecord, reindexPositions } from '../utils/positions'
+import { normalizeListRecord, reindexPositions, sortByPosition } from '../utils/positions'
 import { requireUserId } from '../../../shared/api/auth'
 import { mergeRemoteList, peekList, putList, removeList } from './listCache'
 import { listToRow, mapListRow, type ListRow } from './mappers'
@@ -31,13 +31,11 @@ export async function getActiveLists(): Promise<ListRecord[]> {
     .from('lists')
     .select('*')
     .is('deleted_at', null)
+    .order('position', { ascending: true })
     .order('updated_at', { ascending: false })
 
   if (error) throw error
-  return (data as ListRow[])
-    .map(mapListRow)
-    .map(mergeRemoteList)
-    .sort((a, b) => b.updatedAt - a.updatedAt)
+  return sortByPosition((data as ListRow[]).map(mapListRow).map(mergeRemoteList))
 }
 
 export async function getTrashLists(): Promise<ListRecord[]> {
@@ -71,23 +69,56 @@ export async function createList(input: {
 }): Promise<ListRecord> {
   const userId = await requireUserId()
   const now = Date.now()
-  const list = normalizeListRecord({
+
+  const { data: activeRows, error: activeError } = await supabase
+    .from('lists')
+    .select('*')
+    .is('deleted_at', null)
+  if (activeError) throw activeError
+
+  const existing = sortByPosition(
+    ((activeRows as ListRow[]) ?? []).map(mapListRow).map(mergeRemoteList),
+  )
+
+  const created = normalizeListRecord({
     id: createId(),
     name: input.name.trim() || 'Untitled',
     deadline: input.deadline,
     trackQuantity: input.trackQuantity,
+    position: 0,
     items: reindexPositions(input.items),
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
   })
 
-  putList(list)
+  const ordered = reindexPositions([
+    created,
+    ...existing.map((list) => normalizeListRecord({ ...list, updatedAt: now })),
+  ])
+  for (const row of ordered) putList(row)
   bumpData()
 
-  const { error } = await supabase.from('lists').insert(listToRow(list, userId))
+  const { error } = await supabase.from('lists').insert(listToRow(ordered[0], userId))
   if (error) throw error
-  return list
+
+  await Promise.all(
+    ordered.slice(1).map((row) =>
+      enqueuePersist(row.id, async () => {
+        const latest = peekList(row.id) ?? row
+        const { error: updateError } = await supabase
+          .from('lists')
+          .update({
+            position: latest.position,
+            updated_at: new Date(latest.updatedAt).toISOString(),
+          })
+          .eq('id', row.id)
+        if (updateError) throw updateError
+      }),
+    ),
+  )
+
+  return peekList(ordered[0].id) ?? ordered[0]
 }
 
 export async function copyList(id: string, name: string): Promise<ListRecord | null> {
@@ -116,7 +147,7 @@ export async function copyList(id: string, name: string): Promise<ListRecord | n
  */
 export async function updateList(
   id: string,
-  patch: Partial<Pick<ListRecord, 'name' | 'deadline' | 'items' | 'trackQuantity'>>,
+  patch: Partial<Pick<ListRecord, 'name' | 'deadline' | 'items' | 'trackQuantity' | 'position'>>,
 ): Promise<ListRecord | null> {
   let existing = peekList(id)
   if (!existing) {
@@ -140,6 +171,7 @@ export async function updateList(
     name: patch.name !== undefined ? patch.name.trim() || existing.name : existing.name,
     trackQuantity:
       patch.trackQuantity !== undefined ? patch.trackQuantity : existing.trackQuantity,
+    position: patch.position !== undefined ? patch.position : existing.position,
     items,
     updatedAt: Date.now(),
   })
@@ -158,6 +190,34 @@ export async function updateList(
   })
 
   return peekList(id) ?? updated
+}
+
+/** Optimistic reorder of active lists (0 = top). */
+export async function reorderLists(ordered: ListRecord[]): Promise<void> {
+  const now = Date.now()
+  const next = reindexPositions(
+    ordered.map((list) => normalizeListRecord({ ...list, updatedAt: now, deletedAt: null })),
+  )
+  for (const list of next) putList(list)
+  bumpData()
+
+  await Promise.all(
+    next.map((list) =>
+      enqueuePersist(list.id, async () => {
+        const latest = peekList(list.id) ?? list
+        const { error } = await supabase
+          .from('lists')
+          .update({
+            position: latest.position,
+            updated_at: new Date(latest.updatedAt).toISOString(),
+          })
+          .eq('id', list.id)
+        if (error) throw error
+      }),
+    ),
+  ).catch((error) => {
+    console.error('reorderLists persist failed', error)
+  })
 }
 
 export async function softDeleteList(id: string): Promise<void> {
@@ -184,16 +244,30 @@ export async function restoreList(id: string): Promise<void> {
   const existing = peekList(id) ?? (await fetchListFromNetwork(id))
   if (!existing) return
   const now = Date.now()
-  const updated = normalizeListRecord({ ...existing, deletedAt: null, updatedAt: now })
+
+  const { data: activeRows } = await supabase.from('lists').select('position').is('deleted_at', null)
+  const maxPos = ((activeRows as { position: number | null }[]) ?? []).reduce((max, row) => {
+    const p = typeof row.position === 'number' ? row.position : -1
+    return Math.max(max, p)
+  }, -1)
+
+  const updated = normalizeListRecord({
+    ...existing,
+    deletedAt: null,
+    updatedAt: now,
+    position: maxPos + 1,
+  })
   putList(updated)
   bumpData()
 
   await enqueuePersist(id, async () => {
+    const latest = peekList(id) ?? updated
     const { error } = await supabase
       .from('lists')
       .update({
         deleted_at: null,
-        updated_at: new Date(now).toISOString(),
+        updated_at: new Date(latest.updatedAt).toISOString(),
+        position: latest.position,
       })
       .eq('id', id)
     if (error) throw error

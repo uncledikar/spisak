@@ -27,7 +27,8 @@
     "noDeadline": "No deadline",
     "itemsCount": "{{count}} items",
     "checkedCount": "{{done}} / {{total}}",
-    "updated": "Updated"
+    "updated": "Updated",
+    "dragList": "Drag to reorder"
   },
   "list": {
     "name": "List name",

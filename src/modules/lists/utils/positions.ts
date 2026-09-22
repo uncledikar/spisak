@@ -57,11 +57,13 @@ export function normalizeItemPositions(items: ListItem[] | null | undefined): Li
 }
 
 export function normalizeListRecord(list: ListRecord): ListRecord {
+  const position = typeof list.position === 'number' && Number.isFinite(list.position) ? list.position : 0
   return {
     ...list,
     name: typeof list.name === 'string' ? list.name : '',
     deadline: list.deadline ?? null,
     trackQuantity: list.trackQuantity !== false,
+    position,
     deletedAt: list.deletedAt ?? null,
     createdAt: typeof list.createdAt === 'number' ? list.createdAt : Date.now(),
     updatedAt: typeof list.updatedAt === 'number' ? list.updatedAt : Date.now(),
