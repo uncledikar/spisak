@@ -110,7 +110,9 @@ export function TodayPage() {
 
         {kind === 'day' && dayEntries.length > 0 ? (
           <section className="stack">
-            <h2 className="section-title">{t('finances.today.dayExpenses')}</h2>
+            <h2 className="section-title">
+              {t('finances.today.dayExpenses', { date: formatDisplayDate(anchor) })}
+            </h2>
             <ul className="list-plain">
               {dayEntries.map((row) => (
                 <li key={row.id} className="list-row">

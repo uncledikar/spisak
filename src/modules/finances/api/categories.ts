@@ -12,8 +12,45 @@ import {
 import { mapCategoryRow, type CategoryRow } from './mappers'
 import { supabase } from '../../../shared/lib/supabase'
 import { enqueueSync, flushSyncQueue } from './syncQueue'
+import { DEFAULT_CATEGORY_ICON, DEFAULT_CATEGORY_SEEDS } from '../utils/categoryIcons'
+import i18n from '../../../i18n'
 
-const DEFAULT_ICON = '💳'
+let seedInFlight: Promise<void> | null = null
+
+async function ensureDefaultCategories(): Promise<void> {
+  if (seedInFlight) {
+    await seedInFlight
+    return
+  }
+
+  seedInFlight = (async () => {
+    const { count, error } = await supabase
+      .from('expense_categories')
+      .select('id', { count: 'exact', head: true })
+    if (error) throw error
+    if ((count ?? 0) > 0) return
+
+    const now = Date.now()
+    for (const seed of DEFAULT_CATEGORY_SEEDS) {
+      const category: Category = {
+        id: createId(),
+        name: i18n.t(seed.nameKey),
+        icon: seed.icon,
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: null,
+      }
+      putCategory(category)
+      enqueueSync({ kind: 'upsert_category', category })
+    }
+    bumpData()
+    await flushSyncQueue()
+  })().finally(() => {
+    seedInFlight = null
+  })
+
+  await seedInFlight
+}
 
 export async function getCategories(): Promise<Category[]> {
   hydrateEntityCache()
@@ -22,6 +59,7 @@ export async function getCategories(): Promise<Category[]> {
   if (!navigator.onLine) return cached
 
   try {
+    await requireUserId()
     const { data, error } = await supabase
       .from('expense_categories')
       .select('*')
@@ -32,6 +70,11 @@ export async function getCategories(): Promise<Category[]> {
     for (const row of (data as CategoryRow[]) ?? []) {
       mergeRemoteCategory(mapCategoryRow(row))
     }
+
+    if (((data as CategoryRow[]) ?? []).length === 0) {
+      await ensureDefaultCategories()
+    }
+
     void flushSyncQueue()
     return listCategoriesCached()
   } catch (error) {
@@ -47,7 +90,7 @@ export async function createCategory(input: { name: string; icon?: string }): Pr
   const category: Category = {
     id: createId(),
     name: input.name.trim() || 'Untitled',
-    icon: (input.icon ?? DEFAULT_ICON).trim() || DEFAULT_ICON,
+    icon: (input.icon ?? DEFAULT_CATEGORY_ICON).trim() || DEFAULT_CATEGORY_ICON,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,

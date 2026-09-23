@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Category } from '../types/models'
-
-const ICON_CHOICES = ['💳', '🛒', '🏠', '🚗', '🍔', '☕', '💊', '👕', '🎮', '✈️', '📱', '💡', '🎁', '📚', '🔧', '🐶']
+import { CATEGORY_ICONS, DEFAULT_CATEGORY_ICON } from '../utils/categoryIcons'
 
 type Props = {
   open: boolean
@@ -14,13 +13,13 @@ type Props = {
 export function CategoryEditModal({ open, category, onClose, onSave }: Props) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
-  const [icon, setIcon] = useState(ICON_CHOICES[0])
+  const [icon, setIcon] = useState<string>(DEFAULT_CATEGORY_ICON)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (!open) return
     setName(category?.name ?? '')
-    setIcon(category?.icon ?? ICON_CHOICES[0])
+    setIcon(category?.icon ?? DEFAULT_CATEGORY_ICON)
   }, [open, category])
 
   if (!open) return null
@@ -59,7 +58,7 @@ export function CategoryEditModal({ open, category, onClose, onSave }: Props) {
           <fieldset className="icon-picker">
             <legend>{t('finances.categories.icon')}</legend>
             <div className="icon-picker-grid">
-              {ICON_CHOICES.map((choice) => (
+              {CATEGORY_ICONS.map((choice) => (
                 <button
                   key={choice}
                   type="button"

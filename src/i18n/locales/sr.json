@@ -178,8 +178,21 @@
       "previous": "Prethodni",
       "current": "Trenutni",
       "emptyChart": "Nema troškova u ovom periodu",
-      "dayExpenses": "Troškovi na taj dan",
-      "perDay": "{{qty}} / dan"
+      "dayExpenses": "Troškovi za {{date}}",
+      "perDay": "{{qty}} / dan",
+      "categoryRequired": "Izaberite kategoriju"
+    },
+    "defaults": {
+      "groceries": "Namirnice",
+      "household": "Hemija",
+      "medicine": "Medicina",
+      "sport": "Sport",
+      "education": "Obrazovanje",
+      "transport": "Transport",
+      "gifts": "Pokloni",
+      "restaurants": "Restorani",
+      "home": "Dom",
+      "clothes": "Odeća"
     }
   }
 }

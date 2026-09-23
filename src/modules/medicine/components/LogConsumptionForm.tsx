@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { logConsumption } from '../api/consumptions'
 import type { Medicine } from '../types/models'
 import { todayKey } from '../utils/periods'
+import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
   medicines: Medicine[]
@@ -81,7 +82,12 @@ export function LogConsumptionForm({ medicines }: Props) {
         </label>
         <label className="field field-date grow">
           <span>{t('medicine.today.date')}</span>
-          <input type="date" value={consumedOn} onChange={(e) => setConsumedOn(e.target.value)} required />
+          <input
+            type="date"
+            value={consumedOn}
+            onChange={(e) => commitDateInput(e, setConsumedOn)}
+            required
+          />
         </label>
       </div>
 

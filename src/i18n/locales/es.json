@@ -178,8 +178,21 @@
       "previous": "Anterior",
       "current": "Actual",
       "emptyChart": "Sin gastos en este periodo",
-      "dayExpenses": "Gastos de este día",
-      "perDay": "{{qty}} / día"
+      "dayExpenses": "Gastos del {{date}}",
+      "perDay": "{{qty}} / día",
+      "categoryRequired": "Selecciona una categoría"
+    },
+    "defaults": {
+      "groceries": "Comida",
+      "household": "Limpieza",
+      "medicine": "Medicina",
+      "sport": "Deporte",
+      "education": "Educación",
+      "transport": "Transporte",
+      "gifts": "Regalos",
+      "restaurants": "Restaurantes",
+      "home": "Hogar",
+      "clothes": "Ropa"
     }
   }
 }

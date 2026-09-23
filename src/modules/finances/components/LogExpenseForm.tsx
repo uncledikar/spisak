@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { logExpense } from '../api/expenses'
 import type { Category } from '../types/models'
 import { todayKey } from '../utils/periods'
+import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
   categories: Category[]
@@ -16,6 +17,7 @@ export function LogExpenseForm({ categories }: Props) {
   const [spentOn, setSpentOn] = useState(todayKey())
   const [comment, setComment] = useState('')
   const [busy, setBusy] = useState(false)
+  const [categoryError, setCategoryError] = useState(false)
 
   if (categories.length === 0) {
     return (
@@ -33,9 +35,14 @@ export function LogExpenseForm({ categories }: Props) {
       className="card log-card stack"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!categoryId || busy) return
+        if (busy) return
+        if (!categoryId) {
+          setCategoryError(true)
+          return
+        }
         const value = Number(amount)
         if (!Number.isFinite(value) || value <= 0) return
+        setCategoryError(false)
         setBusy(true)
         void logExpense({
           categoryId,
@@ -52,26 +59,30 @@ export function LogExpenseForm({ categories }: Props) {
     >
       <h2 className="section-title">{t('finances.today.log')}</h2>
 
-      <div className="category-chips" role="listbox" aria-label={t('finances.today.selectCategory')}>
-        {categories.map((c) => {
-          const selected = categoryId === c.id
-          return (
-            <button
-              key={c.id}
-              type="button"
-              role="option"
-              aria-selected={selected}
-              className={`category-chip${selected ? ' category-chip-active' : ''}`}
-              onClick={() => setCategoryId(c.id)}
-            >
-              <span className="category-chip-icon" aria-hidden="true">
-                {c.icon}
-              </span>
-              <span className="category-chip-name">{c.name}</span>
-            </button>
-          )
-        })}
-      </div>
+      <label className={`field field-category${categoryError ? ' field-invalid' : ''}`}>
+        <span>{t('finances.today.selectCategory')}</span>
+        <select
+          value={categoryId}
+          aria-invalid={categoryError}
+          aria-label={t('finances.today.selectCategory')}
+          onChange={(e) => {
+            setCategoryId(e.target.value)
+            if (e.target.value) setCategoryError(false)
+          }}
+        >
+          <option value="" disabled>
+            {t('finances.today.selectCategory')}
+          </option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.icon} {c.name}
+            </option>
+          ))}
+        </select>
+        {categoryError ? (
+          <span className="field-error-text">{t('finances.today.categoryRequired')}</span>
+        ) : null}
+      </label>
 
       <div className="row log-fields">
         <label className="field field-qty">
@@ -89,7 +100,12 @@ export function LogExpenseForm({ categories }: Props) {
         </label>
         <label className="field field-date grow">
           <span>{t('finances.today.date')}</span>
-          <input type="date" value={spentOn} onChange={(e) => setSpentOn(e.target.value)} required />
+          <input
+            type="date"
+            value={spentOn}
+            onChange={(e) => commitDateInput(e, setSpentOn)}
+            required
+          />
         </label>
       </div>
 
@@ -102,11 +118,7 @@ export function LogExpenseForm({ categories }: Props) {
         />
       </label>
 
-      <button
-        type="submit"
-        className="btn btn-primary btn-block"
-        disabled={busy || !categoryId || !amount}
-      >
+      <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
         {t('finances.today.submit')}
       </button>
     </form>

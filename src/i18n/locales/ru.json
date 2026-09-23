@@ -178,8 +178,21 @@
       "previous": "Прошлый",
       "current": "Текущий",
       "emptyChart": "Нет расходов за период",
-      "dayExpenses": "Расходы в этот день",
-      "perDay": "{{qty}} / день"
+      "dayExpenses": "Расходы на {{date}}",
+      "perDay": "{{qty}} / день",
+      "categoryRequired": "Выберите категорию"
+    },
+    "defaults": {
+      "groceries": "Продукты",
+      "household": "Бытовая химия",
+      "medicine": "Медицина",
+      "sport": "Спорт",
+      "education": "Образование",
+      "transport": "Транспорт",
+      "gifts": "Подарки",
+      "restaurants": "Рестораны",
+      "home": "Дом",
+      "clothes": "Одежда"
     }
   }
 }

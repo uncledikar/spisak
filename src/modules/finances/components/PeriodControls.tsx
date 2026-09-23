@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { DateRange, PeriodKind } from '../types/models'
 import { formatRangeLabel } from '../utils/periods'
+import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
   kind: PeriodKind
@@ -52,7 +53,7 @@ export function PeriodControls({
             <input
               type="date"
               value={custom.start}
-              onChange={(e) => onCustom({ ...custom, start: e.target.value })}
+              onChange={(e) => commitDateInput(e, (start) => onCustom({ ...custom, start }))}
             />
           </label>
           <label className="field grow">
@@ -60,7 +61,7 @@ export function PeriodControls({
             <input
               type="date"
               value={custom.end}
-              onChange={(e) => onCustom({ ...custom, end: e.target.value })}
+              onChange={(e) => commitDateInput(e, (end) => onCustom({ ...custom, end }))}
             />
           </label>
         </div>
@@ -80,7 +81,7 @@ export function PeriodControls({
               type="date"
               className="period-anchor"
               value={anchor}
-              onChange={(e) => onAnchor(e.target.value)}
+              onChange={(e) => commitDateInput(e, onAnchor)}
             />
           ) : (
             <span className="period-label">{formatRangeLabel(range, i18n.language)}</span>
