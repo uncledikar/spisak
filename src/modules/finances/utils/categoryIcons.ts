@@ -11,6 +11,8 @@ export const CATEGORY_ICONS = [
   '👕',
   '⚽',
   '🧴',
+  '💅',
+  '👶',
   '🎮',
   '✈️',
   '📱',
