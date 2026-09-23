@@ -1206,9 +1206,21 @@ button {
 
 .module-drawer-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.module-drawer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.module-drawer-brand .meta {
+  margin: 0;
+  line-height: 1.35;
 }
 
 .module-drawer-nav {

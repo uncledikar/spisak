@@ -27,7 +27,10 @@ export function ModuleDrawer({ open, onClose }: Props) {
       <button type="button" className="module-drawer-backdrop" aria-label={t('common.cancel')} onClick={onClose} />
       <aside className="module-drawer" role="dialog" aria-modal="true" aria-label={t('nav.modules')}>
         <div className="module-drawer-header">
-          <strong>{t('app.name')}</strong>
+          <div className="module-drawer-brand">
+            <strong>{t('app.name')}</strong>
+            <p className="meta">{t('app.tagline')}</p>
+          </div>
           <button type="button" className="sheet-close" onClick={onClose} aria-label={t('common.cancel')}>
             ×
           </button>

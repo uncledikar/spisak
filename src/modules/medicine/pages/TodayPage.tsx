@@ -45,6 +45,7 @@ export function TodayPage() {
   const [anchor, setAnchor] = useState(todayKey())
   const [custom, setCustom] = useState<DateRange>({ start: todayKey(), end: todayKey() })
   const [compare, setCompare] = useState(false)
+  const [logOpen, setLogOpen] = useState(false)
 
   const range = useMemo(() => resolveRange(kind, anchor, custom), [kind, anchor, custom])
   const prev = useMemo(() => (compare ? previousRange(kind, range) : null), [compare, kind, range])
@@ -106,7 +107,15 @@ export function TodayPage() {
           <p className="meta">{t('common.loading')}</p>
         )}
 
-        <LogConsumptionForm medicines={medicines ?? []} />
+        <button type="button" className="fab" onClick={() => setLogOpen(true)}>
+          + {t('medicine.today.log')}
+        </button>
+        <LogConsumptionForm
+          open={logOpen}
+          onClose={() => setLogOpen(false)}
+          medicines={medicines ?? []}
+          defaultDate={kind === 'day' ? anchor : todayKey()}
+        />
 
         {kind === 'day' && dayEntries.length > 0 ? (
           <section className="stack">
