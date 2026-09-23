@@ -13,8 +13,8 @@ export function formatAmount(n: number): string {
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2)
 }
 
-/** e.g. "12.5 / day" */
+/** Average per day, rounded to a whole number. */
 export function formatPerDay(total: number, days: number, t: TFunction): string {
-  const perDay = total / Math.max(1, days)
-  return t('finances.today.perDay', { qty: formatAmount(perDay) })
+  const perDay = Math.round(total / Math.max(1, days))
+  return t('finances.today.perDay', { qty: String(perDay) })
 }

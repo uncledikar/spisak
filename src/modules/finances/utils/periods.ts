@@ -37,6 +37,7 @@ export function resolveRange(kind: PeriodKind, anchor: string, custom?: DateRang
   const day = parseISO(anchor)
   switch (kind) {
     case 'day':
+    case 'date':
       return { start: toDateKey(day), end: toDateKey(day) }
     case 'week': {
       const start = startOfWeek(day, { weekStartsOn: 1 })
@@ -59,7 +60,8 @@ export function previousRange(kind: PeriodKind, current: DateRange): DateRange {
   const length = differenceInCalendarDays(end, start)
 
   switch (kind) {
-    case 'day': {
+    case 'day':
+    case 'date': {
       const prev = subDays(start, 1)
       return { start: toDateKey(prev), end: toDateKey(prev) }
     }
@@ -90,6 +92,7 @@ export function shiftAnchor(kind: PeriodKind, anchor: string, direction: -1 | 1)
   const day = parseISO(anchor)
   switch (kind) {
     case 'day':
+    case 'date':
       return toDateKey(addDays(day, direction))
     case 'week':
       return toDateKey(addDays(day, direction * 7))

@@ -113,7 +113,8 @@
     "from": "С",
     "to": "По",
     "prev": "Назад",
-    "next": "Вперёд"
+    "next": "Вперёд",
+    "date": "Дата"
   },
   "medicine": {
     "medicines": {

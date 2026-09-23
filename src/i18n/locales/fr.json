@@ -113,7 +113,8 @@
     "from": "Du",
     "to": "Au",
     "prev": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "date": "Date"
   },
   "medicine": {
     "medicines": {

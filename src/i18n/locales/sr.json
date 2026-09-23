@@ -113,7 +113,8 @@
     "from": "Od",
     "to": "Do",
     "prev": "Nazad",
-    "next": "Napred"
+    "next": "Napred",
+    "date": "Datum"
   },
   "medicine": {
     "medicines": {

@@ -38,7 +38,7 @@ export function Histogram({
     <div className="chart-card">
       <div className="chart-totals">
         <div>
-          <span className="meta">{t('finances.today.current')}</span>
+          {compare ? <span className="meta">{t('finances.today.current')}</span> : null}
           <strong>
             {t('common.total')}: {formatAmount(totalCurrent)}
             {showPerDay ? (
@@ -72,7 +72,6 @@ export function Histogram({
             <div key={bar.categoryId} className="histogram-row">
               <div className="histogram-label">
                 <span className="histogram-name">
-                  <i className="histogram-dot" style={{ background: color }} aria-hidden="true" />
                   <span className="histogram-icon" aria-hidden="true">
                     {bar.icon}
                   </span>
@@ -92,7 +91,7 @@ export function Histogram({
                     width: `${(bar.current / max) * 100}%`,
                     background: color,
                   }}
-                  title={`${t('finances.today.current')}: ${formatAmount(bar.current)}`}
+                  title={formatAmount(bar.current)}
                 />
                 {compare ? (
                   <div

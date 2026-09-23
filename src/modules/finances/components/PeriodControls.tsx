@@ -29,7 +29,8 @@ export function PeriodControls({
   onShift,
 }: Props) {
   const { t, i18n } = useTranslation()
-  const kinds: PeriodKind[] = ['day', 'week', 'month', 'year', 'custom']
+  const kinds: PeriodKind[] = ['day', 'week', 'month', 'year', 'custom', 'date']
+  const singleDay = kind === 'day' || kind === 'date'
 
   return (
     <div className="period-controls stack">
@@ -76,7 +77,7 @@ export function PeriodControls({
           >
             ‹
           </button>
-          {kind === 'day' ? (
+          {singleDay ? (
             <input
               type="date"
               className="period-anchor"

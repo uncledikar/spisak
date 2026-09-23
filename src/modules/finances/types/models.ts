@@ -18,7 +18,7 @@ export type Expense = {
   updatedAt: number
 }
 
-export type PeriodKind = 'day' | 'week' | 'month' | 'year' | 'custom'
+export type PeriodKind = 'day' | 'week' | 'month' | 'year' | 'custom' | 'date'
 
 export type DateRange = {
   start: string

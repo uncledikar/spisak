@@ -28,12 +28,19 @@ function periodPageTitle(
   locale: string,
 ): string {
   if (kind === 'day') {
-    return anchor === todayKey() ? t('period.day') : formatDisplayDate(anchor)
+    return t('period.day')
+  }
+  if (kind === 'date') {
+    return formatDisplayDate(anchor)
   }
   if (kind === 'custom') {
     return formatRangeLabel(range, locale)
   }
   return t(`period.${kind}`)
+}
+
+function singleDayKindFor(anchor: string): 'day' | 'date' {
+  return anchor === todayKey() ? 'day' : 'date'
 }
 
 export function TodayPage() {
@@ -50,7 +57,8 @@ export function TodayPage() {
   const prev = useMemo(() => (compare ? previousRange(kind, range) : null), [compare, kind, range])
   const dayCount = useMemo(() => rangeDayCount(range), [range])
   const previousDayCount = useMemo(() => (prev ? rangeDayCount(prev) : dayCount), [prev, dayCount])
-  const showPerDay = kind !== 'day'
+  const showPerDay = kind !== 'day' && kind !== 'date'
+  const isSingleDay = kind === 'day' || kind === 'date'
   const pageTitle = useMemo(
     () => periodPageTitle(kind, anchor, range, t, i18n.language),
     [kind, anchor, range, t, i18n.language],
@@ -62,7 +70,7 @@ export function TodayPage() {
   }, [categories, expenses, range, prev])
 
   const dayEntries = useMemo(() => {
-    if (kind !== 'day' || !expenses || !categories) return []
+    if (!isSingleDay || !expenses || !categories) return []
     const byId = new Map(categories.map((c) => [c.id, c]))
     return expenses
       .filter((e) => e.spentOn === anchor)
@@ -71,7 +79,7 @@ export function TodayPage() {
         name: byId.get(e.categoryId)?.name ?? '—',
         icon: byId.get(e.categoryId)?.icon ?? '💳',
       }))
-  }, [kind, anchor, expenses, categories])
+  }, [isSingleDay, anchor, expenses, categories])
 
   return (
     <PageShell crumbs={[{ label: pageTitle }]}>
@@ -83,13 +91,36 @@ export function TodayPage() {
           compare={compare}
           range={range}
           onKind={(next) => {
+            if (next === 'day') {
+              setKind('day')
+              setAnchor(todayKey())
+              return
+            }
+            if (next === 'date') {
+              if (kind === 'day' || kind === 'date') {
+                setKind(singleDayKindFor(anchor))
+              } else {
+                setKind('day')
+                setAnchor(todayKey())
+              }
+              return
+            }
             setKind(next)
             if (next !== 'custom') setAnchor(todayKey())
           }}
-          onAnchor={setAnchor}
+          onAnchor={(next) => {
+            setAnchor(next)
+            setKind(singleDayKindFor(next))
+          }}
           onCustom={setCustom}
           onCompare={setCompare}
-          onShift={(dir) => setAnchor((a) => shiftAnchor(kind, a, dir))}
+          onShift={(dir) => {
+            const next = shiftAnchor(kind, anchor, dir)
+            setAnchor(next)
+            if (kind === 'day' || kind === 'date') {
+              setKind(singleDayKindFor(next))
+            }
+          }}
         />
 
         {stats ? (
@@ -108,7 +139,7 @@ export function TodayPage() {
 
         <LogExpenseForm categories={categories ?? []} />
 
-        {kind === 'day' && dayEntries.length > 0 ? (
+        {isSingleDay && dayEntries.length > 0 ? (
           <section className="stack">
             <h2 className="section-title">
               {t('finances.today.dayExpenses', { date: formatDisplayDate(anchor) })}

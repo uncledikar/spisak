@@ -113,7 +113,8 @@
     "from": "Desde",
     "to": "Hasta",
     "prev": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "date": "Fecha"
   },
   "medicine": {
     "medicines": {
