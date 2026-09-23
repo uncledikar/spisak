@@ -76,7 +76,6 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
             }}
           >
             <label className={`field field-medicine${medicineError ? ' field-invalid' : ''}`}>
-              <span>{t('medicine.today.selectMedicine')}</span>
               <select
                 value={medicineId}
                 aria-invalid={medicineError}

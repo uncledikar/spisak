@@ -81,7 +81,6 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props
             }}
           >
             <label className={`field field-category${categoryError ? ' field-invalid' : ''}`}>
-              <span>{t('finances.today.selectCategory')}</span>
               <select
                 value={categoryId}
                 aria-invalid={categoryError}
