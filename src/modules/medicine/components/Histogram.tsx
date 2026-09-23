@@ -41,7 +41,7 @@ export function Histogram({
     <div className="chart-card">
       <div className="chart-totals">
         <div>
-          <span className="meta">{t('medicine.today.current')}</span>
+          {compare ? <span className="meta">{t('medicine.today.current')}</span> : null}
           <strong>
             {t('common.total')}: {formatQty(totalCurrent)}
             {showPerDay ? (
@@ -75,10 +75,7 @@ export function Histogram({
           return (
             <div key={bar.medicineId} className="histogram-row">
               <div className="histogram-label">
-                <span className="histogram-name">
-                  <i className="histogram-dot" style={{ background: color }} aria-hidden="true" />
-                  {bar.name}
-                </span>
+                <span className="histogram-name">{bar.name}</span>
                 <span className="meta">
                   {formatQty(bar.current)} {unitLabel}
                   {showPerDay ? ` · ${formatPerDay(bar.current, dayCount, bar.unit || 'pcs', t)}` : ''}
@@ -95,7 +92,7 @@ export function Histogram({
                     width: `${(bar.current / max) * 100}%`,
                     background: color,
                   }}
-                  title={`${t('medicine.today.current')}: ${formatQty(bar.current)}`}
+                  title={`${formatQty(bar.current)}`}
                 />
                 {compare ? (
                   <div

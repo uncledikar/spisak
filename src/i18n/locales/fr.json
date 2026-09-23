@@ -143,7 +143,7 @@
       "previous": "Précédente",
       "current": "Actuelle",
       "emptyChart": "Aucune prise sur cette période",
-      "dayMedicines": "Médicaments de ce jour",
+      "dayMedicines": "Médicaments du {{date}}",
       "perDay": "{{qty}} {{unit}} / jour"
     },
     "units": {

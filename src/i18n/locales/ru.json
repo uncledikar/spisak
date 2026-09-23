@@ -143,7 +143,7 @@
       "previous": "Прошлый",
       "current": "Текущий",
       "emptyChart": "Нет приёмов за период",
-      "dayMedicines": "Лекарства в этот день",
+      "dayMedicines": "Лекарства на {{date}}",
       "perDay": "{{qty}} {{unit}} / день"
     },
     "units": {
