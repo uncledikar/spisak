@@ -144,7 +144,8 @@
       "current": "Trenutni",
       "emptyChart": "Nema unosa u ovom periodu",
       "dayMedicines": "Lekovi za {{date}}",
-      "perDay": "{{qty}} {{unit}} / dan"
+      "perDay": "{{qty}} {{unit}} / dan",
+      "medicineRequired": "Izaberite lek"
     },
     "units": {
       "pcs": "kom",

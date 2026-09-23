@@ -144,7 +144,8 @@
       "current": "Текущий",
       "emptyChart": "Нет приёмов за период",
       "dayMedicines": "Лекарства на {{date}}",
-      "perDay": "{{qty}} {{unit}} / день"
+      "perDay": "{{qty}} {{unit}} / день",
+      "medicineRequired": "Выберите лекарство"
     },
     "units": {
       "pcs": "шт",

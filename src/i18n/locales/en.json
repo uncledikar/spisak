@@ -144,7 +144,8 @@
       "current": "Current",
       "emptyChart": "No intake in this period",
       "dayMedicines": "Medicines on {{date}}",
-      "perDay": "{{qty}} {{unit}} / day"
+      "perDay": "{{qty}} {{unit}} / day",
+      "medicineRequired": "Select a medicine"
     },
     "units": {
       "pcs": "pcs",

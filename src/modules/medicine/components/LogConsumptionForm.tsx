@@ -18,12 +18,14 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
   const [quantity, setQuantity] = useState('1')
   const [consumedOn, setConsumedOn] = useState(defaultDate)
   const [busy, setBusy] = useState(false)
+  const [medicineError, setMedicineError] = useState(false)
 
   useEffect(() => {
     if (!open) return
     setMedicineId('')
     setQuantity('1')
     setConsumedOn(defaultDate)
+    setMedicineError(false)
     setBusy(false)
   }, [open, defaultDate])
 
@@ -57,7 +59,12 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
             className="stack"
             onSubmit={(e) => {
               e.preventDefault()
-              if (!medicineId || busy) return
+              if (busy) return
+              if (!medicineId) {
+                setMedicineError(true)
+                return
+              }
+              setMedicineError(false)
               setBusy(true)
               void logConsumption({
                 medicineId,
@@ -68,14 +75,16 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
                 .finally(() => setBusy(false))
             }}
           >
-            <label className="field field-medicine">
+            <label className={`field field-medicine${medicineError ? ' field-invalid' : ''}`}>
               <span>{t('medicine.today.selectMedicine')}</span>
               <select
                 value={medicineId}
-                onChange={(e) => setMedicineId(e.target.value)}
+                aria-invalid={medicineError}
                 aria-label={t('medicine.today.selectMedicine')}
-                autoFocus
-                required
+                onChange={(e) => {
+                  setMedicineId(e.target.value)
+                  if (e.target.value) setMedicineError(false)
+                }}
               >
                 <option value="" disabled>
                   {t('medicine.today.selectMedicine')}
@@ -86,6 +95,9 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
                   </option>
                 ))}
               </select>
+              {medicineError ? (
+                <span className="field-error-text">{t('medicine.today.medicineRequired')}</span>
+              ) : null}
             </label>
 
             <div className="row log-fields">
@@ -116,7 +128,7 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
               <button type="button" className="btn btn-secondary" onClick={onClose}>
                 {t('common.cancel')}
               </button>
-              <button type="submit" className="btn btn-primary" disabled={busy || !medicineId}>
+              <button type="submit" className="btn btn-primary" disabled={busy}>
                 {t('medicine.today.submit')}
               </button>
             </div>

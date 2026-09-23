@@ -144,7 +144,8 @@
       "current": "Actual",
       "emptyChart": "Sin tomas en este periodo",
       "dayMedicines": "Medicamentos del {{date}}",
-      "perDay": "{{qty}} {{unit}} / día"
+      "perDay": "{{qty}} {{unit}} / día",
+      "medicineRequired": "Selecciona un medicamento"
     },
     "units": {
       "pcs": "uds",

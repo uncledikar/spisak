@@ -86,7 +86,6 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props
                 value={categoryId}
                 aria-invalid={categoryError}
                 aria-label={t('finances.today.selectCategory')}
-                autoFocus
                 onChange={(e) => {
                   setCategoryId(e.target.value)
                   if (e.target.value) setCategoryError(false)
