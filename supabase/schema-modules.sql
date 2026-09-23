@@ -1,7 +1,7 @@
--- MyApp module tables for the Spisak Supabase project.
+-- SmartLife module tables for the Spisak Supabase project.
 -- Run in SQL Editor. Does NOT recreate settings or lists.
 
--- ── Medicine (Tabletka) ──────────────────────────────────────────
+-- ── Medicine ───────────────────────────────────────────────────
 
 create table if not exists public.medicines (
   id uuid primary key,

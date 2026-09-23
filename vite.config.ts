@@ -38,7 +38,7 @@ function spisakServiceWorker(): Plugin {
       const cacheId = assets.map((a) => a.split('/').pop()).join('|').slice(0, 48) || 'shell'
       const cacheName = `spisak-static-${Buffer.from(cacheId).toString('base64url').slice(0, 16)}`
 
-      const sw = `/* Spisak service worker — generated at build time */
+      const sw = `/* SmartLife service worker — generated at build time */
 const CACHE = ${JSON.stringify(cacheName)};
 const PRECACHE = ${JSON.stringify(precache, null, 2)};
 

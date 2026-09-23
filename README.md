@@ -1,4 +1,4 @@
-# Spisak / MyApp
+# SmartLife
 
 Unified PWA: **Lists**, **Finances**, and **Medicine** in one app (`/spisak/` on GitHub Pages).
 

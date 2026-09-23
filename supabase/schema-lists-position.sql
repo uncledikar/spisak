@@ -1,4 +1,4 @@
--- Add list ordering for Spisak / MyApp.
+-- Add list ordering for SmartLife.
 -- Run in Supabase SQL Editor (Spisak project).
 
 alter table public.lists
