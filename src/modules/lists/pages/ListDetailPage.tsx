@@ -168,7 +168,7 @@ export function ListDetailPage() {
   }
 
   function openNewItem() {
-    setItemModal({ mode: 'create', draft: emptyItem(current.items.length) })
+    setItemModal({ mode: 'create', draft: emptyItem(0) })
   }
 
   function enterEdit() {
@@ -184,7 +184,7 @@ export function ListDetailPage() {
 
   function saveItem(updated: ListItem) {
     if (itemModal?.mode === 'create') {
-      applyItems([...current.items, updated])
+      applyItems([updated, ...current.items])
       return
     }
     applyItems(current.items.map((item) => (item.id === updated.id ? updated : item)))

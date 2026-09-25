@@ -71,6 +71,41 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.boot-splash {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg, #f3f5f2);
+  color: var(--text, #1a211c);
+}
+
+.boot-brand {
+  margin: 0;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  font-size: 1.35rem;
+}
+
+.boot-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, var(--accent, #2d6a4f) 22%, transparent);
+  border-top-color: var(--accent, #2d6a4f);
+  animation: boot-spin 0.7s linear infinite;
+}
+
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 button,
 input,
 textarea,

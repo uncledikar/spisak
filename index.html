@@ -13,30 +13,81 @@
     <link rel="apple-touch-icon" href="/spisak/icons/icon-192.png" />
     <title>SmartLife</title>
     <style>
-      /* Instant shell before JS — avoids blank white screen on cold start */
-      html, body, #root { min-height: 100%; margin: 0; }
-      body {
-        font-family: 'Segoe UI', 'SF Pro Text', 'Roboto', 'Helvetica Neue', sans-serif;
+      /* Instant shell — painted before any JS; never leave a white void */
+      html, body {
+        min-height: 100%;
+        margin: 0;
         background: #f3f5f2;
         color: #1a211c;
       }
-      #root:empty::before {
-        content: 'SmartLife';
-        display: grid;
-        place-items: center;
+      html[data-theme='dark'], html[data-theme='dark'] body {
+        background: #121512;
+        color: #e8ebe9;
+      }
+      #root {
         min-height: 100dvh;
+      }
+      .boot-splash {
+        box-sizing: border-box;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 24px;
+        font-family: 'Segoe UI', 'SF Pro Text', 'Roboto', 'Helvetica Neue', sans-serif;
+        background: inherit;
+        color: inherit;
+      }
+      .boot-brand {
+        margin: 0;
         font-weight: 750;
         letter-spacing: -0.02em;
-        font-size: 1.25rem;
-        opacity: 0.55;
+        font-size: 1.35rem;
       }
-      @media (prefers-color-scheme: dark) {
-        body { background: #121512; color: #e8ebe9; }
+      .boot-spinner {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2.5px solid rgba(45, 106, 79, 0.22);
+        border-top-color: #2d6a4f;
+        animation: boot-spin 0.7s linear infinite;
+      }
+      html[data-theme='dark'] .boot-spinner {
+        border-color: rgba(232, 235, 233, 0.18);
+        border-top-color: #7dcea0;
+      }
+      @keyframes boot-spin {
+        to { transform: rotate(360deg); }
       }
     </style>
+    <script>
+      (function () {
+        try {
+          var theme
+          var raw = localStorage.getItem('spisak.settings')
+          if (raw) {
+            var parsed = JSON.parse(raw)
+            if (parsed && (parsed.theme === 'light' || parsed.theme === 'dark')) theme = parsed.theme
+          }
+          if (!theme) {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
+          document.documentElement.dataset.theme = theme
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#121512' : '#2d6a4f')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-splash" role="status" aria-live="polite" aria-label="SmartLife">
+        <p class="boot-brand">SmartLife</p>
+        <div class="boot-spinner" aria-hidden="true"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

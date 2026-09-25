@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './i18n'
 import './index.css'
 import App from './App'
+import { BootSplash } from './shared/components/BootSplash'
 import { useSettingsStore } from './shared/store/settingsStore'
 import { useAuthStore } from './shared/store/authStore'
 
@@ -45,7 +46,9 @@ function Root() {
     useSettingsStore.setState({ ready: true })
   }, [authReady, user, initSettings])
 
-  if (!authReady || (user && !settingsReady)) return null
+  if (!authReady || (user && !settingsReady)) {
+    return <BootSplash />
+  }
   return <App />
 }
 

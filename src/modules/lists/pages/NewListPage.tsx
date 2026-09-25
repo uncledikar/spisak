@@ -35,8 +35,8 @@ export function NewListPage() {
   }
 
   function addItem() {
-    const item = emptyItem()
-    setItems((prev) => reindexPositions([...prev, item]))
+    const item = emptyItem(0)
+    setItems((prev) => reindexPositions([item, ...prev]))
     scrollItemIntoView(item.id)
   }
 
