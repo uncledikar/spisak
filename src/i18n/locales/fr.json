@@ -30,6 +30,7 @@
     "updated": "Mis à jour",
     "dragList": "Glisser pour réordonner",
     "mark": "Sélectionner",
+    "selectAll": "Tout sélectionner",
     "doneMarking": "Terminé",
     "markList": "Sélectionner {{name}}",
     "deleteSelected": "Supprimer",

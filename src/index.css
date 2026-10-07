@@ -245,9 +245,12 @@ button {
 
 .page-actions {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
   flex-shrink: 0;
   padding-top: 2px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .icon-btn {

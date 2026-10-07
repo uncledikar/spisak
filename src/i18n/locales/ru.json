@@ -30,6 +30,7 @@
     "updated": "Изменён",
     "dragList": "Перетащить список",
     "mark": "Отметить",
+    "selectAll": "Выбрать все",
     "doneMarking": "Готово",
     "markList": "Выбрать {{name}}",
     "deleteSelected": "Удалить",

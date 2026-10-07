@@ -36,6 +36,13 @@ export function ListsPage() {
     })
   }
 
+  function toggleSelectAll() {
+    if (!lists || lists.length === 0) return
+    const allSelected = lists.every((list) => selectedIds.has(list.id))
+    setSelectMode(true)
+    setSelectedIds(allSelected ? new Set() : new Set(lists.map((list) => list.id)))
+  }
+
   async function deleteSelected() {
     if (busy || selectedCount === 0) return
     setBusy(true)
@@ -50,23 +57,33 @@ export function ListsPage() {
   }
 
   const hasLists = Boolean(lists && lists.length > 0)
+  const allSelected = Boolean(lists && lists.length > 0 && lists.every((list) => selectedIds.has(list.id)))
   const markLabel = selectMode ? t('lists.doneMarking') : t('lists.mark')
 
   const pageActions = useMemo(() => {
     if (!hasLists) return null
     return (
-      <button
-        type="button"
-        className={`page-action-link${selectMode ? ' is-active' : ''}`}
-        onClick={toggleSelectMode}
-      >
-        <span className="page-action-check" aria-hidden="true">
-          {selectMode ? '☑' : '☐'}
-        </span>
-        {markLabel}
-      </button>
+      <>
+        <button
+          type="button"
+          className={`page-action-link${selectMode ? ' is-active' : ''}`}
+          onClick={toggleSelectMode}
+        >
+          <span className="page-action-check" aria-hidden="true">
+            {selectMode ? '☑' : '☐'}
+          </span>
+          {markLabel}
+        </button>
+        <button
+          type="button"
+          className={`page-action-link${allSelected ? ' is-active' : ''}`}
+          onClick={toggleSelectAll}
+        >
+          {t('lists.selectAll')}
+        </button>
+      </>
     )
-  }, [hasLists, selectMode, markLabel])
+  }, [hasLists, selectMode, markLabel, allSelected, t])
 
   return (
     <PageShell crumbs={[{ label: t('lists.title') }]} pageActions={pageActions}>

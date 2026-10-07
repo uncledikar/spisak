@@ -30,6 +30,7 @@
     "updated": "Updated",
     "dragList": "Drag to reorder",
     "mark": "Select",
+    "selectAll": "Select all",
     "doneMarking": "Done",
     "markList": "Select {{name}}",
     "deleteSelected": "Delete",
