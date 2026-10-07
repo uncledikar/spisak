@@ -110,7 +110,13 @@ export function TrashPage() {
   }, [hasLists, markArmed, markLabel, allSelected, selectAllLabel])
 
   return (
-    <PageShell crumbs={[{ label: t('trash.title') }]} pageActions={pageActions}>
+    <PageShell
+      crumbs={[
+        { label: t('lists.title'), to: '/lists' },
+        { label: t('trash.title') },
+      ]}
+      pageActions={pageActions}
+    >
       {!lists ? (
         <p className="meta">{t('common.loading')}</p>
       ) : lists.length === 0 ? (
