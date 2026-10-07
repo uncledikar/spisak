@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getConsumptions, deleteConsumption } from '../api/consumptions'
 import { getMedicines } from '../api/medicines'
@@ -8,36 +9,18 @@ import { IconActionButton } from '../components/IconActionButton'
 import { LogConsumptionForm } from '../components/LogConsumptionForm'
 import { PeriodControls } from '../components/PeriodControls'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
-import type { DateRange, PeriodKind } from '../types/models'
+import type { Consumption, PeriodKind } from '../types/models'
 import { formatDisplayDate, formatUnitLabel } from '../utils/format'
 import {
   formatCompareLabel,
-  formatRangeLabel,
   previousRange,
   resolveRange,
   shiftAnchor,
   todayKey,
 } from '../utils/periods'
+import { parsePeriodSearch, periodHref, periodSearchString } from '../utils/periodQuery'
+import { periodPageTitle } from '../utils/periodTitle'
 import { aggregateByMedicine } from '../utils/stats'
-
-function periodPageTitle(
-  kind: PeriodKind,
-  anchor: string,
-  range: DateRange,
-  t: (key: string) => string,
-  locale: string,
-): string {
-  if (kind === 'day') {
-    return t('period.day')
-  }
-  if (kind === 'date') {
-    return formatDisplayDate(anchor)
-  }
-  if (kind === 'custom') {
-    return formatRangeLabel(range, locale)
-  }
-  return t(`period.${kind}`)
-}
 
 function singleDayKindFor(anchor: string): 'day' | 'date' {
   return anchor === todayKey() ? 'day' : 'date'
@@ -45,14 +28,33 @@ function singleDayKindFor(anchor: string): 'day' | 'date' {
 
 export function TodayPage() {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const medicines = useLiveData(() => getMedicines(), [])
   const consumptions = useLiveData(() => getConsumptions(), [])
 
-  const [kind, setKind] = useState<PeriodKind>('day')
-  const [anchor, setAnchor] = useState(todayKey())
-  const [custom, setCustom] = useState<DateRange>({ start: todayKey(), end: todayKey() })
-  const [compare, setCompare] = useState(false)
+  const initial = useMemo(() => parsePeriodSearch(searchParams), [searchParams])
+  const [kind, setKind] = useState<PeriodKind>(initial.kind)
+  const [anchor, setAnchor] = useState(initial.anchor)
+  const [custom, setCustom] = useState(initial.custom)
+  const [compare, setCompare] = useState(initial.compare)
   const [logOpen, setLogOpen] = useState(false)
+  const [editing, setEditing] = useState<Consumption | null>(null)
+
+  useEffect(() => {
+    const next = parsePeriodSearch(searchParams)
+    setKind(next.kind)
+    setAnchor(next.anchor)
+    setCustom(next.custom)
+    setCompare(next.compare)
+  }, [searchParams])
+
+  useEffect(() => {
+    const qs = periodSearchString({ kind, anchor, custom, compare })
+    if (qs !== searchParams.toString()) {
+      setSearchParams(qs, { replace: true })
+    }
+  }, [kind, anchor, custom, compare, searchParams, setSearchParams])
 
   const range = useMemo(() => resolveRange(kind, anchor, custom), [kind, anchor, custom])
   const compareEnabled = compare && kind !== 'custom'
@@ -73,6 +75,10 @@ export function TodayPage() {
     () => (prev ? formatCompareLabel(kind, prev, i18n.language) : ''),
     [kind, prev, i18n.language],
   )
+  const periodState = useMemo(
+    () => ({ kind, anchor, custom, compare }),
+    [kind, anchor, custom, compare],
+  )
 
   const stats = useMemo(() => {
     if (!medicines || !consumptions) return null
@@ -92,9 +98,7 @@ export function TodayPage() {
   }, [isSingleDay, anchor, consumptions, medicines])
 
   return (
-    <PageShell
-      crumbs={[{ label: t('nav.module.medicine') }, { label: pageTitle }]}
-    >
+    <PageShell crumbs={[{ label: t('nav.module.medicine') }, { label: pageTitle }]}>
       <div className="stack page-stack">
         <PeriodControls
           kind={kind}
@@ -144,6 +148,9 @@ export function TodayPage() {
             totalPrevious={stats.totalPrevious}
             currentLabel={currentLabel}
             previousLabel={previousLabel}
+            onSelectBar={(medicineId) => {
+              navigate(periodHref(`/medicine/medicine/${medicineId}`, periodState))
+            }}
           />
         ) : (
           <p className="meta">{t('common.loading')}</p>
@@ -157,6 +164,13 @@ export function TodayPage() {
           onClose={() => setLogOpen(false)}
           medicines={medicines ?? []}
           defaultDate={isSingleDay ? anchor : todayKey()}
+        />
+        <LogConsumptionForm
+          open={Boolean(editing)}
+          onClose={() => setEditing(null)}
+          medicines={medicines ?? []}
+          defaultDate={editing?.consumedOn ?? (isSingleDay ? anchor : todayKey())}
+          consumption={editing}
         />
 
         {isSingleDay && dayEntries.length > 0 ? (
@@ -174,11 +188,17 @@ export function TodayPage() {
                       {row.unit ? ` ${formatUnitLabel(row.unit, t)}` : ''}
                     </p>
                   </div>
-                  <IconActionButton
-                    label={t('common.delete')}
-                    variant="danger"
-                    onClick={() => void deleteConsumption(row.id)}
-                  />
+                  <div className="row row-actions">
+                    <IconActionButton
+                      label={t('common.edit')}
+                      onClick={() => setEditing(row)}
+                    />
+                    <IconActionButton
+                      label={t('common.delete')}
+                      variant="danger"
+                      onClick={() => void deleteConsumption(row.id)}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>

@@ -10,6 +10,7 @@ type Props = {
   totalPrevious: number
   currentLabel?: string
   previousLabel?: string
+  onSelectBar?: (categoryId: string) => void
 }
 
 export function Histogram({
@@ -19,6 +20,7 @@ export function Histogram({
   totalPrevious,
   currentLabel,
   previousLabel,
+  onSelectBar,
 }: Props) {
   const { t } = useTranslation()
   const max = Math.max(1, ...bars.map((b) => Math.max(b.current, compare ? b.previous : 0)))
@@ -63,18 +65,31 @@ export function Histogram({
         ) : null}
       </div>
 
-      <div className="histogram" role="img" aria-label={t('finances.today.chartTitle')}>
+      <div className="histogram" role="list" aria-label={t('finances.today.chartTitle')}>
         {bars.map((bar, index) => {
           const color = rainbowColor(index, bars.length)
           return (
-            <div key={bar.categoryId} className="histogram-row">
+            <div key={bar.categoryId} className="histogram-row" role="listitem">
               <div className="histogram-label">
-                <span className="histogram-name">
-                  <span className="histogram-icon" aria-hidden="true">
-                    {bar.icon}
+                {onSelectBar ? (
+                  <button
+                    type="button"
+                    className="histogram-name histogram-name-btn"
+                    onClick={() => onSelectBar(bar.categoryId)}
+                  >
+                    <span className="histogram-icon" aria-hidden="true">
+                      {bar.icon}
+                    </span>
+                    {bar.name}
+                  </button>
+                ) : (
+                  <span className="histogram-name">
+                    <span className="histogram-icon" aria-hidden="true">
+                      {bar.icon}
+                    </span>
+                    {bar.name}
                   </span>
-                  {bar.name}
-                </span>
+                )}
                 <span className="meta">
                   {formatAmount(bar.current)}
                   {compare ? ` / ${formatAmount(bar.previous)}` : ''}

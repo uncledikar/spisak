@@ -148,7 +148,10 @@
       "emptyChart": "Aucune prise sur cette période",
       "dayMedicines": "Médicaments du {{date}}",
       "perDay": "{{qty}} {{unit}} / jour",
-      "medicineRequired": "Sélectionnez un médicament"
+      "medicineRequired": "Sélectionnez un médicament",
+      "edit": "Modifier la prise",
+      "unknownMedicine": "Médicament",
+      "medicineEmpty": "Aucune prise de ce médicament pour la période sélectionnée"
     },
     "units": {
       "pcs": "pcs",
@@ -185,7 +188,10 @@
       "emptyChart": "Aucune dépense sur cette période",
       "dayExpenses": "Dépenses du {{date}}",
       "perDay": "{{qty}} / jour",
-      "categoryRequired": "Sélectionnez une catégorie"
+      "categoryRequired": "Sélectionnez une catégorie",
+      "edit": "Modifier la dépense",
+      "unknownCategory": "Catégorie",
+      "categoryEmpty": "Aucune dépense dans cette catégorie pour la période sélectionnée"
     },
     "defaults": {
       "groceries": "Courses",

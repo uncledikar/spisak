@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { logExpense } from '../api/expenses'
-import type { Category } from '../types/models'
+import { logExpense, updateExpense } from '../api/expenses'
+import type { Category, Expense } from '../types/models'
 import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
@@ -10,10 +10,12 @@ type Props = {
   onClose: () => void
   categories: Category[]
   defaultDate: string
+  expense?: Expense | null
 }
 
-export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props) {
+export function LogExpenseForm({ open, onClose, categories, defaultDate, expense = null }: Props) {
   const { t } = useTranslation()
+  const editing = Boolean(expense)
   const [categoryId, setCategoryId] = useState('')
   const [amount, setAmount] = useState('')
   const [spentOn, setSpentOn] = useState(defaultDate)
@@ -23,27 +25,30 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props
 
   useEffect(() => {
     if (!open) return
-    setCategoryId('')
-    setAmount('')
-    setSpentOn(defaultDate)
-    setComment('')
+    if (expense) {
+      setCategoryId(expense.categoryId)
+      setAmount(String(expense.amount))
+      setSpentOn(expense.spentOn)
+      setComment(expense.comment ?? '')
+    } else {
+      setCategoryId('')
+      setAmount('')
+      setSpentOn(defaultDate)
+      setComment('')
+    }
     setCategoryError(false)
     setBusy(false)
-  }, [open, defaultDate])
+  }, [open, defaultDate, expense])
 
   if (!open) return null
 
+  const title = editing ? t('finances.today.edit') : t('finances.today.log')
+
   return (
-    <div
-      className="sheet"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('finances.today.log')}
-      onClick={onClose}
-    >
+    <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
       <div className="sheet-panel" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-header">
-          <h2 className="section-title">{t('finances.today.log')}</h2>
+          <h2 className="section-title">{title}</h2>
           <button type="button" className="sheet-close" onClick={onClose} aria-label={t('common.cancel')}>
             ×
           </button>
@@ -70,14 +75,20 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props
               if (!Number.isFinite(value) || value <= 0) return
               setCategoryError(false)
               setBusy(true)
-              void logExpense({
-                categoryId,
-                amount: value,
-                spentOn,
-                comment,
-              })
-                .then(onClose)
-                .finally(() => setBusy(false))
+              const task = expense
+                ? updateExpense(expense.id, {
+                    categoryId,
+                    amount: value,
+                    spentOn,
+                    comment,
+                  })
+                : logExpense({
+                    categoryId,
+                    amount: value,
+                    spentOn,
+                    comment,
+                  })
+              void task.then(onClose).finally(() => setBusy(false))
             }}
           >
             <label className={`field field-category${categoryError ? ' field-invalid' : ''}`}>
@@ -143,7 +154,7 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate }: Props
                 {t('common.cancel')}
               </button>
               <button type="submit" className="btn btn-primary" disabled={busy}>
-                {t('finances.today.submit')}
+                {editing ? t('common.save') : t('finances.today.submit')}
               </button>
             </div>
           </form>

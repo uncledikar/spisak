@@ -148,7 +148,10 @@
       "emptyChart": "Нет приёмов за период",
       "dayMedicines": "Лекарства на {{date}}",
       "perDay": "{{qty}} {{unit}} / день",
-      "medicineRequired": "Выберите лекарство"
+      "medicineRequired": "Выберите лекарство",
+      "edit": "Изменить приём",
+      "unknownMedicine": "Лекарство",
+      "medicineEmpty": "Нет приёмов этого лекарства за выбранный период"
     },
     "units": {
       "pcs": "шт",
@@ -185,7 +188,10 @@
       "emptyChart": "Нет расходов за период",
       "dayExpenses": "Расходы на {{date}}",
       "perDay": "{{qty}} / день",
-      "categoryRequired": "Выберите категорию"
+      "categoryRequired": "Выберите категорию",
+      "edit": "Изменить расход",
+      "unknownCategory": "Категория",
+      "categoryEmpty": "Нет расходов по этой категории за выбранный период"
     },
     "defaults": {
       "groceries": "Продукты",

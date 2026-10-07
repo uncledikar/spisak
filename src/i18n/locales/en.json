@@ -148,7 +148,10 @@
       "emptyChart": "No intake in this period",
       "dayMedicines": "Medicines on {{date}}",
       "perDay": "{{qty}} {{unit}} / day",
-      "medicineRequired": "Select a medicine"
+      "medicineRequired": "Select a medicine",
+      "edit": "Edit intake",
+      "unknownMedicine": "Medicine",
+      "medicineEmpty": "No intakes for this medicine in the selected period"
     },
     "units": {
       "pcs": "pcs",
@@ -185,7 +188,10 @@
       "emptyChart": "No expenses in this period",
       "dayExpenses": "Expenses on {{date}}",
       "perDay": "{{qty}} / day",
-      "categoryRequired": "Select a category"
+      "categoryRequired": "Select a category",
+      "edit": "Edit expense",
+      "unknownCategory": "Category",
+      "categoryEmpty": "No expenses in this category for the selected period"
     },
     "defaults": {
       "groceries": "Groceries",

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { logConsumption } from '../api/consumptions'
-import type { Medicine } from '../types/models'
+import { logConsumption, updateConsumption } from '../api/consumptions'
+import type { Consumption, Medicine } from '../types/models'
 import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
@@ -10,10 +10,18 @@ type Props = {
   onClose: () => void
   medicines: Medicine[]
   defaultDate: string
+  consumption?: Consumption | null
 }
 
-export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Props) {
+export function LogConsumptionForm({
+  open,
+  onClose,
+  medicines,
+  defaultDate,
+  consumption = null,
+}: Props) {
   const { t } = useTranslation()
+  const editing = Boolean(consumption)
   const [medicineId, setMedicineId] = useState('')
   const [quantity, setQuantity] = useState('1')
   const [consumedOn, setConsumedOn] = useState(defaultDate)
@@ -22,26 +30,28 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
 
   useEffect(() => {
     if (!open) return
-    setMedicineId('')
-    setQuantity('1')
-    setConsumedOn(defaultDate)
+    if (consumption) {
+      setMedicineId(consumption.medicineId)
+      setQuantity(String(consumption.quantity))
+      setConsumedOn(consumption.consumedOn)
+    } else {
+      setMedicineId('')
+      setQuantity('1')
+      setConsumedOn(defaultDate)
+    }
     setMedicineError(false)
     setBusy(false)
-  }, [open, defaultDate])
+  }, [open, defaultDate, consumption])
 
   if (!open) return null
 
+  const title = editing ? t('medicine.today.edit') : t('medicine.today.log')
+
   return (
-    <div
-      className="sheet"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('medicine.today.log')}
-      onClick={onClose}
-    >
+    <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
       <div className="sheet-panel" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-header">
-          <h2 className="section-title">{t('medicine.today.log')}</h2>
+          <h2 className="section-title">{title}</h2>
           <button type="button" className="sheet-close" onClick={onClose} aria-label={t('common.cancel')}>
             ×
           </button>
@@ -66,13 +76,18 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
               }
               setMedicineError(false)
               setBusy(true)
-              void logConsumption({
-                medicineId,
-                quantity: Number(quantity) || 1,
-                consumedOn,
-              })
-                .then(onClose)
-                .finally(() => setBusy(false))
+              const task = consumption
+                ? updateConsumption(consumption.id, {
+                    medicineId,
+                    quantity: Number(quantity) || 1,
+                    consumedOn,
+                  })
+                : logConsumption({
+                    medicineId,
+                    quantity: Number(quantity) || 1,
+                    consumedOn,
+                  })
+              void task.then(onClose).finally(() => setBusy(false))
             }}
           >
             <label className={`field field-medicine${medicineError ? ' field-invalid' : ''}`}>
@@ -128,7 +143,7 @@ export function LogConsumptionForm({ open, onClose, medicines, defaultDate }: Pr
                 {t('common.cancel')}
               </button>
               <button type="submit" className="btn btn-primary" disabled={busy}>
-                {t('medicine.today.submit')}
+                {editing ? t('common.save') : t('medicine.today.submit')}
               </button>
             </div>
           </form>

@@ -31,11 +31,21 @@ const MedicineTodayPage = lazy(() =>
 const MedicinesPage = lazy(() =>
   import('./modules/medicine/pages/MedicinesPage').then((m) => ({ default: m.MedicinesPage })),
 )
+const MedicineDetailPage = lazy(() =>
+  import('./modules/medicine/pages/MedicineDetailPage').then((m) => ({
+    default: m.MedicineDetailPage,
+  })),
+)
 const FinancesTodayPage = lazy(() =>
   import('./modules/finances/pages/TodayPage').then((m) => ({ default: m.TodayPage })),
 )
 const CategoriesPage = lazy(() =>
   import('./modules/finances/pages/CategoriesPage').then((m) => ({ default: m.CategoriesPage })),
+)
+const CategoryDetailPage = lazy(() =>
+  import('./modules/finances/pages/CategoryDetailPage').then((m) => ({
+    default: m.CategoryDetailPage,
+  })),
 )
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
@@ -74,8 +84,10 @@ function AppRoutes() {
           <Route path="/trash" element={<TrashPage />} />
           <Route path="/medicine" element={<MedicineTodayPage />} />
           <Route path="/medicine/medicines" element={<MedicinesPage />} />
+          <Route path="/medicine/medicine/:medicineId" element={<MedicineDetailPage />} />
           <Route path="/finances" element={<FinancesTodayPage />} />
           <Route path="/finances/categories" element={<CategoriesPage />} />
+          <Route path="/finances/category/:categoryId" element={<CategoryDetailPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

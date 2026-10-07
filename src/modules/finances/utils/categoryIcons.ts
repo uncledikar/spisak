@@ -6,6 +6,7 @@ export const CATEGORY_ICONS = [
   '🏠',
   '🚗',
   '🍔',
+  '🍝',
   '🍽️',
   '☕',
   '💊',
@@ -42,7 +43,7 @@ export const DEFAULT_CATEGORY_SEEDS: { nameKey: string; icon: CategoryIcon }[] =
   { nameKey: 'finances.defaults.education', icon: '📚' },
   { nameKey: 'finances.defaults.transport', icon: '🚗' },
   { nameKey: 'finances.defaults.gifts', icon: '🎁' },
-  { nameKey: 'finances.defaults.restaurants', icon: '🍽️' },
+  { nameKey: 'finances.defaults.restaurants', icon: '🍝' },
   { nameKey: 'finances.defaults.home', icon: '🏠' },
   { nameKey: 'finances.defaults.clothes', icon: '👕' },
 ]

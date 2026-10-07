@@ -41,6 +41,7 @@ export function ListDetailPage() {
   const [trackQuantity, setTrackQuantity] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
   const [itemModal, setItemModal] = useState<ItemModal>(null)
+  const [highlightId, setHighlightId] = useState<string | null>(null)
 
   useEffect(() => {
     setList(undefined)
@@ -76,6 +77,26 @@ export function ListDetailPage() {
     const timer = window.setTimeout(() => setToast(null), 2200)
     return () => window.clearTimeout(timer)
   }, [toast])
+
+  useEffect(() => {
+    if (!highlightId) return
+    const timer = window.setTimeout(() => setHighlightId(null), 2000)
+    return () => window.clearTimeout(timer)
+  }, [highlightId])
+
+  useEffect(() => {
+    if (!highlightId) return
+    const reveal = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      document
+        .getElementById(`list-item-${highlightId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(reveal)
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [highlightId, list?.items.length])
 
   if (list === undefined) {
     return (
@@ -178,6 +199,7 @@ export function ListDetailPage() {
   function saveItem(updated: ListItem) {
     if (itemModal?.mode === 'create') {
       applyItems([updated, ...current.items])
+      setHighlightId(updated.id)
       return
     }
     applyItems(current.items.map((item) => (item.id === updated.id ? updated : item)))
@@ -335,6 +357,7 @@ export function ListDetailPage() {
               onReorder={reorderItems}
               onToggle={toggleChecked}
               onOpenItem={(itemId) => setItemModal({ mode: 'edit', itemId })}
+              highlightId={highlightId}
             />
           )}
 

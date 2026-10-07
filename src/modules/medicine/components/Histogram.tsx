@@ -10,6 +10,7 @@ type Props = {
   totalPrevious: number
   currentLabel?: string
   previousLabel?: string
+  onSelectBar?: (medicineId: string) => void
 }
 
 export function Histogram({
@@ -19,6 +20,7 @@ export function Histogram({
   totalPrevious,
   currentLabel,
   previousLabel,
+  onSelectBar,
 }: Props) {
   const { t } = useTranslation()
   const max = Math.max(1, ...bars.map((b) => Math.max(b.current, compare ? b.previous : 0)))
@@ -64,14 +66,24 @@ export function Histogram({
         ) : null}
       </div>
 
-      <div className="histogram" role="img" aria-label={t('medicine.today.chartTitle')}>
+      <div className="histogram" role="list" aria-label={t('medicine.today.chartTitle')}>
         {bars.map((bar, index) => {
           const unitLabel = bar.unit ? formatUnitLabel(bar.unit, t) : defaultUnit
           const color = rainbowColor(index, bars.length)
           return (
-            <div key={bar.medicineId} className="histogram-row">
+            <div key={bar.medicineId} className="histogram-row" role="listitem">
               <div className="histogram-label">
-                <span className="histogram-name">{bar.name}</span>
+                {onSelectBar ? (
+                  <button
+                    type="button"
+                    className="histogram-name histogram-name-btn"
+                    onClick={() => onSelectBar(bar.medicineId)}
+                  >
+                    {bar.name}
+                  </button>
+                ) : (
+                  <span className="histogram-name">{bar.name}</span>
+                )}
                 <span className="meta">
                   {formatQty(bar.current)} {unitLabel}
                   {compare ? ` / ${formatQty(bar.previous)}` : ''}

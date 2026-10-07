@@ -55,12 +55,14 @@ interface Props {
   onToggle: (itemId: string) => void | Promise<void>
   onOpenItem: (itemId: string) => void
   listRef?: Ref<HTMLDivElement>
+  highlightId?: string | null
 }
 
 function SortableRow({
   item,
   trackQuantity,
   mobileDrag,
+  highlighted,
   suppressOpenClick,
   onToggle,
   onOpenItem,
@@ -68,6 +70,7 @@ function SortableRow({
   item: ListItem
   trackQuantity: boolean
   mobileDrag: boolean
+  highlighted: boolean
   suppressOpenClick: () => boolean
   onToggle: (itemId: string) => void | Promise<void>
   onOpenItem: (itemId: string) => void
@@ -90,9 +93,10 @@ function SortableRow({
 
   return (
     <div
+      id={`list-item-${item.id}`}
       ref={setNodeRef}
       style={style}
-      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}${mobileDrag ? ' item-row-touch-drag' : ''}`}
+      className={`item-row${trackQuantity ? '' : ' no-qty'}${item.checked ? ' checked' : ''}${isDragging ? ' dragging' : ''}${mobileDrag ? ' item-row-touch-drag' : ''}${highlighted ? ' item-row-highlight' : ''}`}
       {...(mobileDrag ? { ...attributes, ...listeners } : {})}
       onContextMenu={mobileDrag ? (e) => e.preventDefault() : undefined}
     >
@@ -194,6 +198,7 @@ export function SortableItemsList({
   onToggle,
   onOpenItem,
   listRef,
+  highlightId = null,
 }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const mobileDrag = useMobileDragLayout()
@@ -252,6 +257,7 @@ export function SortableItemsList({
               item={item}
               trackQuantity={trackQuantity}
               mobileDrag={mobileDrag}
+              highlighted={highlightId === item.id}
               suppressOpenClick={() => Date.now() < suppressClickUntil.current}
               onToggle={onToggle}
               onOpenItem={onOpenItem}
