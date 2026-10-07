@@ -31,6 +31,7 @@
     "dragList": "Перетащить список",
     "mark": "Отметить",
     "selectAll": "Выбрать все",
+    "deselectAll": "Снять всё",
     "doneMarking": "Готово",
     "markList": "Выбрать {{name}}",
     "deleteSelected": "Удалить",

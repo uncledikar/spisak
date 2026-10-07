@@ -31,6 +31,7 @@
     "dragList": "Glisser pour réordonner",
     "mark": "Sélectionner",
     "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
     "doneMarking": "Terminé",
     "markList": "Sélectionner {{name}}",
     "deleteSelected": "Supprimer",

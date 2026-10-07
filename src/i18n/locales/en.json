@@ -31,6 +31,7 @@
     "dragList": "Drag to reorder",
     "mark": "Select",
     "selectAll": "Select all",
+    "deselectAll": "Deselect all",
     "doneMarking": "Done",
     "markList": "Select {{name}}",
     "deleteSelected": "Delete",

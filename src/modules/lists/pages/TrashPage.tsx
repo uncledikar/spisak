@@ -9,6 +9,8 @@ export function TrashPage() {
   const { t } = useTranslation()
   const lists = useLiveData(() => getTrashLists(), [])
   const [selectMode, setSelectMode] = useState(false)
+  /** Done label only after user entered mark mode via Select, not Select all. */
+  const [markArmed, setMarkArmed] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set())
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmSingleId, setConfirmSingleId] = useState<string | null>(null)
@@ -17,13 +19,22 @@ export function TrashPage() {
   const selectedCount = selectedIds.size
   const hasLists = Boolean(lists && lists.length > 0)
   const allSelected = Boolean(lists && lists.length > 0 && lists.every((list) => selectedIds.has(list.id)))
-  const markLabel = selectMode ? t('lists.doneMarking') : t('lists.mark')
+  const markLabel = markArmed ? t('lists.doneMarking') : t('lists.mark')
+  const selectAllLabel = allSelected ? t('lists.deselectAll') : t('lists.selectAll')
+
+  function exitSelectMode() {
+    setSelectMode(false)
+    setMarkArmed(false)
+    setSelectedIds(new Set())
+  }
 
   function toggleSelectMode() {
-    setSelectMode((prev) => {
-      if (prev) setSelectedIds(new Set())
-      return !prev
-    })
+    if (selectMode) {
+      exitSelectMode()
+      return
+    }
+    setSelectMode(true)
+    setMarkArmed(true)
   }
 
   function toggleSelect(id: string) {
@@ -37,9 +48,17 @@ export function TrashPage() {
 
   function toggleSelectAll() {
     if (!lists || lists.length === 0) return
-    const allSelected = lists.every((list) => selectedIds.has(list.id))
+    const allSelectedNow = lists.every((list) => selectedIds.has(list.id))
+    if (allSelectedNow) {
+      if (markArmed) {
+        setSelectedIds(new Set())
+      } else {
+        exitSelectMode()
+      }
+      return
+    }
     setSelectMode(true)
-    setSelectedIds(allSelected ? new Set() : new Set(lists.map((list) => list.id)))
+    setSelectedIds(new Set(lists.map((list) => list.id)))
   }
 
   async function purgeSelected() {
@@ -47,8 +66,7 @@ export function TrashPage() {
     setBusy(true)
     try {
       await Promise.all([...selectedIds].map((id) => purgeList(id)))
-      setSelectedIds(new Set())
-      setSelectMode(false)
+      exitSelectMode()
       setConfirmOpen(false)
     } finally {
       setBusy(false)
@@ -72,11 +90,11 @@ export function TrashPage() {
       <>
         <button
           type="button"
-          className={`page-action-link${selectMode ? ' is-active' : ''}`}
+          className={`page-action-link${markArmed ? ' is-active' : ''}`}
           onClick={toggleSelectMode}
         >
           <span className="page-action-check" aria-hidden="true">
-            {selectMode ? '☑' : '☐'}
+            {markArmed ? '☑' : '☐'}
           </span>
           {markLabel}
         </button>
@@ -85,11 +103,11 @@ export function TrashPage() {
           className={`page-action-link${allSelected ? ' is-active' : ''}`}
           onClick={toggleSelectAll}
         >
-          {t('lists.selectAll')}
+          {selectAllLabel}
         </button>
       </>
     )
-  }, [hasLists, selectMode, markLabel, allSelected, t])
+  }, [hasLists, markArmed, markLabel, allSelected, selectAllLabel])
 
   return (
     <PageShell crumbs={[{ label: t('trash.title') }]} pageActions={pageActions}>
