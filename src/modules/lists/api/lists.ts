@@ -14,7 +14,7 @@ import {
 } from './listCache'
 import { mapListRow, type ListRow } from './mappers'
 import { supabase } from '../../../shared/lib/supabase'
-import { enqueueSync, flushSyncQueue } from './syncQueue'
+import { enqueueSync, flushSyncQueue, hasPendingDelete } from './syncQueue'
 
 function queueUpsert(list: ListRecord): void {
   enqueueSync({ kind: 'upsert_list', list })
@@ -60,6 +60,8 @@ export async function getTrashLists(): Promise<ListRecord[]> {
   if (!navigator.onLine) return cached
 
   try {
+    // Apply pending hard-deletes before GET so purged rows are not re-fetched.
+    await flushSyncQueue()
     const { data, error } = await supabase
       .from('lists')
       .select('*')
@@ -68,9 +70,11 @@ export async function getTrashLists(): Promise<ListRecord[]> {
 
     if (error) throw error
     for (const row of (data as ListRow[]) ?? []) {
-      mergeRemoteList(mapListRow(row))
+      const mapped = mapListRow(row)
+      // Local purge already removed the row; ignore until server DELETE finishes.
+      if (hasPendingDelete(mapped.id)) continue
+      mergeRemoteList(mapped)
     }
-    void flushSyncQueue()
     return listTrashCached()
   } catch (error) {
     console.error('getTrashLists failed', error)
@@ -241,8 +245,9 @@ export async function restoreList(id: string): Promise<void> {
 
 export async function purgeList(id: string): Promise<void> {
   removeList(id)
-  bumpData()
+  // Enqueue before bump so the live reload sees the pending delete tombstone.
   enqueueSync({ kind: 'delete_list', id })
+  bumpData()
 }
 
 export function emptyItem(position = 0): ListItem {

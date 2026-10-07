@@ -44,6 +44,11 @@ export function enqueueSync(op: SyncOp): void {
   void flushSyncQueue()
 }
 
+/** True while a hard-delete is queued — remote GETs must not resurrect the row. */
+export function hasPendingDelete(id: string): boolean {
+  return readQueue().some((op) => op.kind === 'delete_list' && op.id === id)
+}
+
 function enqueuePersist(key: string, task: () => Promise<void>): Promise<void> {
   const previous = chain.get(key) ?? Promise.resolve()
   const next = previous.then(task, task).finally(() => {
