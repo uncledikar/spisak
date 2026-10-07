@@ -59,11 +59,11 @@ export function MedicineDetailPage() {
       <div className="stack page-stack">
         <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
           <h2 className="section-title" style={{ margin: 0 }}>
-            {periodLabel}
-          </h2>
-          <p className="meta" style={{ margin: 0, flexShrink: 0 }}>
             {t('common.total')}: {formatQty(total)}
             {unitLabel ? ` ${unitLabel}` : ''}
+          </h2>
+          <p className="meta" style={{ margin: 0, flexShrink: 0, textAlign: 'right' }}>
+            {periodLabel}
           </p>
         </div>
 
