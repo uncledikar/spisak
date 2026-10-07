@@ -51,23 +51,79 @@ function stopDragActivation(e: SyntheticEvent) {
 
 type Props = {
   lists: ListRecord[]
+  selectMode?: boolean
+  selectedIds?: Set<string>
+  onToggleSelect?: (id: string) => void
+}
+
+function ListCardBody({
+  list,
+  selectMode,
+  selected,
+  onToggleSelect,
+}: {
+  list: ListRecord
+  selectMode: boolean
+  selected: boolean
+  onToggleSelect?: (id: string) => void
+}) {
+  const { t, i18n } = useTranslation()
+  const done = list.items.filter((i) => i.checked).length
+
+  return (
+    <>
+      <div className="row-between">
+        <div className="list-card-title-row">
+          {selectMode ? (
+            <input
+              type="checkbox"
+              className="list-select-check"
+              checked={selected}
+              onChange={() => onToggleSelect?.(list.id)}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={stopDragActivation}
+              onTouchStart={stopDragActivation}
+              aria-label={t('lists.markList', { name: list.name })}
+            />
+          ) : null}
+          <h2 className="card-title">{list.name}</h2>
+        </div>
+        <span onPointerDown={stopDragActivation} onTouchStart={stopDragActivation}>
+          <ProgressBadge done={done} total={list.items.length} variant="chip" />
+        </span>
+      </div>
+      <p className="meta">
+        {list.deadline
+          ? `${t('lists.deadline')}: ${formatDeadline(list.deadline, i18n.language)}`
+          : t('lists.noDeadline')}
+        {' · '}
+        {t('lists.updated')} {formatRelative(list.updatedAt, i18n.language)}
+      </p>
+    </>
+  )
 }
 
 function SortableListCard({
   list,
   mobileDrag,
+  selectMode,
+  selected,
+  onToggleSelect,
   suppressOpenClick,
 }: {
   list: ListRecord
   mobileDrag: boolean
+  selectMode: boolean
+  selected: boolean
+  onToggleSelect?: (id: string) => void
   suppressOpenClick: () => boolean
 }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: list.id,
+    disabled: selectMode,
   })
-  const done = list.items.filter((i) => i.checked).length
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -79,15 +135,32 @@ function SortableListCard({
     navigate(`/lists/${list.id}`)
   }
 
+  function activate() {
+    if (selectMode) {
+      onToggleSelect?.(list.id)
+      return
+    }
+    openList()
+  }
+
+  const body = (
+    <ListCardBody
+      list={list}
+      selectMode={selectMode}
+      selected={selected}
+      onToggleSelect={onToggleSelect}
+    />
+  )
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`card list-card-row${isDragging ? ' dragging' : ''}${mobileDrag ? ' list-card-touch-drag' : ''}`}
-      {...(mobileDrag ? { ...attributes, ...listeners } : {})}
-      onContextMenu={mobileDrag ? (e) => e.preventDefault() : undefined}
+      className={`card list-card-row${isDragging ? ' dragging' : ''}${mobileDrag && !selectMode ? ' list-card-touch-drag' : ''}${selected ? ' list-card-selected' : ''}`}
+      {...(mobileDrag && !selectMode ? { ...attributes, ...listeners } : {})}
+      onContextMenu={mobileDrag && !selectMode ? (e) => e.preventDefault() : undefined}
     >
-      {!mobileDrag ? (
+      {!mobileDrag && !selectMode ? (
         <button
           type="button"
           className="drag-handle"
@@ -100,57 +173,41 @@ function SortableListCard({
         </button>
       ) : null}
 
-      {mobileDrag ? (
+      {mobileDrag || selectMode ? (
         <div
           className="list-card-main"
           role="button"
           tabIndex={0}
-          onClick={openList}
+          onClick={activate}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
-              openList()
+              activate()
             }
           }}
         >
-          <div className="row-between">
-            <h2 className="card-title">{list.name}</h2>
-            <span onPointerDown={stopDragActivation} onTouchStart={stopDragActivation}>
-              <ProgressBadge done={done} total={list.items.length} variant="chip" />
-            </span>
-          </div>
-          <p className="meta">
-            {list.deadline
-              ? `${t('lists.deadline')}: ${formatDeadline(list.deadline, i18n.language)}`
-              : t('lists.noDeadline')}
-            {' · '}
-            {t('lists.updated')} {formatRelative(list.updatedAt, i18n.language)}
-          </p>
+          {body}
         </div>
       ) : (
-        <button type="button" className="list-card-main list-card-main-btn" onClick={openList}>
-          <div className="row-between">
-            <h2 className="card-title">{list.name}</h2>
-            <ProgressBadge done={done} total={list.items.length} variant="chip" />
-          </div>
-          <p className="meta">
-            {list.deadline
-              ? `${t('lists.deadline')}: ${formatDeadline(list.deadline, i18n.language)}`
-              : t('lists.noDeadline')}
-            {' · '}
-            {t('lists.updated')} {formatRelative(list.updatedAt, i18n.language)}
-          </p>
+        <button type="button" className="list-card-main list-card-main-btn" onClick={activate}>
+          {body}
         </button>
       )}
     </div>
   )
 }
 
-export function SortableListsList({ lists }: Props) {
+export function SortableListsList({
+  lists,
+  selectMode = false,
+  selectedIds,
+  onToggleSelect,
+}: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const mobileDrag = useMobileDragLayout()
   const ids = useMemo(() => lists.map((list) => list.id), [lists])
   const suppressClickUntil = useRef(0)
+  const selected = selectedIds ?? new Set<string>()
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -182,6 +239,22 @@ export function SortableListsList({ lists }: Props) {
     suppressClickUntil.current = Date.now() + 400
   }
 
+  const cards = lists.map((list) => (
+    <SortableListCard
+      key={list.id}
+      list={list}
+      mobileDrag={mobileDrag}
+      selectMode={selectMode}
+      selected={selected.has(list.id)}
+      onToggleSelect={onToggleSelect}
+      suppressOpenClick={() => Date.now() < suppressClickUntil.current}
+    />
+  ))
+
+  if (selectMode) {
+    return <div className="stack">{cards}</div>
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -191,16 +264,7 @@ export function SortableListsList({ lists }: Props) {
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        <div className={`stack${activeId ? ' sorting' : ''}`}>
-          {lists.map((list) => (
-            <SortableListCard
-              key={list.id}
-              list={list}
-              mobileDrag={mobileDrag}
-              suppressOpenClick={() => Date.now() < suppressClickUntil.current}
-            />
-          ))}
-        </div>
+        <div className={`stack${activeId ? ' sorting' : ''}`}>{cards}</div>
       </SortableContext>
     </DndContext>
   )

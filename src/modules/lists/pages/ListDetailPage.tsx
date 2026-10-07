@@ -13,6 +13,7 @@ import {
 import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { formatDeadline } from '../utils/dates'
 import { reindexPositions } from '../utils/positions'
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
 import { PageShell } from '../components/AppHeader'
 import { ItemEditModal } from '../components/ItemEditModal'
 import { ProgressBadge } from '../components/ProgressBadge'
@@ -42,6 +43,8 @@ export function ListDetailPage() {
   const [toast, setToast] = useState<string | null>(null)
   const [itemModal, setItemModal] = useState<ItemModal>(null)
   const [highlightId, setHighlightId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     setList(undefined)
@@ -175,10 +178,16 @@ export function ListDetailPage() {
     }
   }
 
-  async function onDelete() {
-    if (!window.confirm(t('list.deleteConfirm'))) return
-    await softDeleteList(current.id)
-    navigate('/lists', { replace: true })
+  async function onDeleteConfirmed() {
+    if (deleting) return
+    setDeleting(true)
+    try {
+      await softDeleteList(current.id)
+      navigate('/lists', { replace: true })
+    } finally {
+      setDeleting(false)
+      setConfirmDelete(false)
+    }
   }
 
   function openNewItem() {
@@ -224,12 +233,12 @@ export function ListDetailPage() {
         { label: t('lists.title'), to: '/lists' },
         { label: current.name },
       ]}
-          pageActions={
+      pageActions={
         <>
           <button
             type="button"
             className="icon-btn icon-btn-accent"
-            disabled={saving}
+            disabled={saving || deleting}
             onClick={() => {
               if (editing) {
                 void commitListMeta()
@@ -246,7 +255,7 @@ export function ListDetailPage() {
             <button
               type="button"
               className="icon-btn"
-              disabled={copying}
+              disabled={copying || deleting}
               onClick={() => void onCopyList()}
               aria-label={t('list.copy')}
               title={t('list.copy')}
@@ -254,6 +263,16 @@ export function ListDetailPage() {
               ⧉
             </button>
           ) : null}
+          <button
+            type="button"
+            className="icon-btn icon-action-danger"
+            disabled={saving || deleting}
+            onClick={() => setConfirmDelete(true)}
+            aria-label={t('list.delete')}
+            title={t('list.delete')}
+          >
+            🗑
+          </button>
         </>
       }
     >
@@ -334,14 +353,6 @@ export function ListDetailPage() {
             >
               {t('common.cancel')}
             </button>
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => void onDelete()}
-              disabled={saving}
-            >
-              {t('list.delete')}
-            </button>
           </div>
         </form>
       ) : (
@@ -383,6 +394,16 @@ export function ListDetailPage() {
       ) : null}
 
       {toast ? <div className="toast">{toast}</div> : null}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={t('list.deleteConfirm')}
+        confirmLabel={t('list.delete')}
+        danger
+        busy={deleting}
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={() => void onDeleteConfirmed()}
+      />
     </PageShell>
   )
 }

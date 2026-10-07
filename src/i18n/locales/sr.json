@@ -28,7 +28,12 @@
     "itemsCount": "{{count}} stavki",
     "checkedCount": "{{done}} / {{total}}",
     "updated": "Ažurirano",
-    "dragList": "Prevucite za promenu redosleda"
+    "dragList": "Prevucite za promenu redosleda",
+    "mark": "Označi",
+    "doneMarking": "Gotovo",
+    "markList": "Izaberi {{name}}",
+    "deleteSelected": "Obriši",
+    "deleteSelectedConfirm": "Obrisati {{count}} izabranih lista? Biće premeštene u korpu."
   },
   "list": {
     "name": "Naziv liste",
@@ -67,7 +72,7 @@
     "deleteItem": "Obriši stavku",
     "deleteItemConfirm": "Obrisati ovu stavku?",
     "done": "Gotovo",
-    "deleteConfirm": "Premestiti listu u korpu?",
+    "deleteConfirm": "Da li zaista želite da obrišete listu?",
     "emptyItems": "Dodajte što vam treba",
     "dragItem": "Prevucite za promenu redosleda"
   },
@@ -76,7 +81,8 @@
     "empty": "Korpa je prazna",
     "restore": "Vrati",
     "purge": "Obriši zauvek",
-    "purgeConfirm": "Obrisati zauvek? Ovo se ne može poništiti."
+    "purgeConfirm": "Obrisati zauvek? Ovo se ne može poništiti.",
+    "purgeSelectedConfirm": "Obrisati zauvek {{count}} izabranih lista? Ovo se ne može poništiti."
   },
   "theme": {
     "light": "Svetla",

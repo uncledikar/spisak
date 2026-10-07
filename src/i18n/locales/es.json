@@ -28,7 +28,12 @@
     "itemsCount": "{{count}} elementos",
     "checkedCount": "{{done}} / {{total}}",
     "updated": "Actualizado",
-    "dragList": "Arrastrar para reordenar"
+    "dragList": "Arrastrar para reordenar",
+    "mark": "Seleccionar",
+    "doneMarking": "Listo",
+    "markList": "Seleccionar {{name}}",
+    "deleteSelected": "Eliminar",
+    "deleteSelectedConfirm": "¿Eliminar {{count}} lista(s) seleccionada(s)? Se moverán a la papelera."
   },
   "list": {
     "name": "Nombre de la lista",
@@ -67,7 +72,7 @@
     "deleteItem": "Eliminar elemento",
     "deleteItemConfirm": "¿Eliminar este elemento?",
     "done": "Listo",
-    "deleteConfirm": "¿Mover esta lista a la papelera?",
+    "deleteConfirm": "¿Seguro que quieres eliminar esta lista?",
     "emptyItems": "Añade lo que necesites",
     "dragItem": "Arrastrar para reordenar"
   },
@@ -76,7 +81,8 @@
     "empty": "La papelera está vacía",
     "restore": "Restaurar",
     "purge": "Eliminar para siempre",
-    "purgeConfirm": "¿Eliminar para siempre? No se puede deshacer."
+    "purgeConfirm": "¿Eliminar para siempre? No se puede deshacer.",
+    "purgeSelectedConfirm": "¿Eliminar para siempre {{count}} lista(s) seleccionada(s)? No se puede deshacer."
   },
   "theme": {
     "light": "Claro",

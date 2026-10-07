@@ -391,8 +391,86 @@ button {
   z-index: 20;
 }
 
+.fab-stack {
+  position: fixed;
+  right: max(16px, calc(50% - 360px + 16px));
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 20;
+}
+
+.fab-stack .fab {
+  position: static;
+}
+
+.fab-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
 .fab:active {
   transform: scale(0.98);
+}
+
+.page-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 650;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.page-action-link.is-active {
+  color: var(--text);
+}
+
+.page-action-check {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.list-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.list-card-title-row .card-title {
+  margin: 0;
+  min-width: 0;
+}
+
+.list-select-check {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+.list-card-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.trash-card {
+  cursor: default;
+}
+
+.trash-card[role='button'] {
+  cursor: pointer;
 }
 
 .btn {
