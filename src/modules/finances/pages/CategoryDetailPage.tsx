@@ -6,7 +6,7 @@ import { getExpenses } from '../api/expenses'
 import { ModuleShell as PageShell } from '../components/ModuleShell'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { formatAmount, formatDisplayDate } from '../utils/format'
-import { inRange, resolveRange } from '../utils/periods'
+import { formatCompareLabel, inRange, resolveRange } from '../utils/periods'
 import { parsePeriodSearch, periodHref } from '../utils/periodQuery'
 import { periodPageTitle } from '../utils/periodTitle'
 
@@ -42,9 +42,12 @@ export function CategoryDetailPage() {
 
   const total = useMemo(() => rows.reduce((sum, row) => sum + row.amount, 0), [rows])
 
-  const categoryLabel = category
-    ? `${category.icon} ${category.name}`
-    : t('finances.today.unknownCategory')
+  const periodLabel = useMemo(
+    () => formatCompareLabel(period.kind, range, i18n.language),
+    [period.kind, range, i18n.language],
+  )
+
+  const icon = category?.icon ?? '💳'
 
   return (
     <PageShell
@@ -55,10 +58,12 @@ export function CategoryDetailPage() {
       ]}
     >
       <div className="stack page-stack">
-        <div>
-          <h2 className="section-title">{categoryLabel}</h2>
-          <p className="meta" style={{ margin: '6px 0 0' }}>
-            {pageTitle} · {t('common.total')}: {formatAmount(total)}
+        <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
+          <h2 className="section-title" style={{ margin: 0 }}>
+            <span aria-hidden="true">{icon}</span> {periodLabel}
+          </h2>
+          <p className="meta" style={{ margin: 0, flexShrink: 0 }}>
+            {t('common.total')}: {formatAmount(total)}
           </p>
         </div>
 

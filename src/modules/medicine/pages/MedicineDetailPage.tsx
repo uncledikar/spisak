@@ -6,7 +6,7 @@ import { getMedicines } from '../api/medicines'
 import { ModuleShell as PageShell } from '../components/ModuleShell'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { formatDisplayDate, formatQty, formatUnitLabel } from '../utils/format'
-import { inRange, resolveRange } from '../utils/periods'
+import { formatCompareLabel, inRange, resolveRange } from '../utils/periods'
 import { parsePeriodSearch, periodHref } from '../utils/periodQuery'
 import { periodPageTitle } from '../utils/periodTitle'
 
@@ -43,6 +43,11 @@ export function MedicineDetailPage() {
   const total = useMemo(() => rows.reduce((sum, row) => sum + row.quantity, 0), [rows])
   const unitLabel = medicine?.unit ? formatUnitLabel(medicine.unit, t) : ''
 
+  const periodLabel = useMemo(
+    () => formatCompareLabel(period.kind, range, i18n.language),
+    [period.kind, range, i18n.language],
+  )
+
   return (
     <PageShell
       crumbs={[
@@ -52,12 +57,12 @@ export function MedicineDetailPage() {
       ]}
     >
       <div className="stack page-stack">
-        <div>
-          <h2 className="section-title">
-            {medicine?.name ?? t('medicine.today.unknownMedicine')}
+        <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
+          <h2 className="section-title" style={{ margin: 0 }}>
+            {periodLabel}
           </h2>
-          <p className="meta" style={{ margin: '6px 0 0' }}>
-            {pageTitle} · {t('common.total')}: {formatQty(total)}
+          <p className="meta" style={{ margin: 0, flexShrink: 0 }}>
+            {t('common.total')}: {formatQty(total)}
             {unitLabel ? ` ${unitLabel}` : ''}
           </p>
         </div>
