@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import i18n, { detectLanguage, type AppLanguage, SUPPORTED_LANGUAGES } from '../../i18n'
 import { getSettings, upsertSettings } from '../api/settings'
-import { supabase } from '../lib/supabase'
+import { useAuthStore } from './authStore'
 
 type Theme = 'light' | 'dark'
 
@@ -112,11 +112,8 @@ function systemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-async function isSignedIn(): Promise<boolean> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  return !!session
+function isSignedIn(): boolean {
+  return !!useAuthStore.getState().user
 }
 
 async function saveToDb(prefs: Prefs): Promise<void> {
@@ -196,7 +193,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     applyTheme(theme)
     const prefs: Prefs = { theme, language: get().language }
     set({ theme })
-    if (await isSignedIn()) {
+    if (isSignedIn()) {
       clearPending()
       writeCache(prefs)
       await saveToDb(prefs)
@@ -214,7 +211,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await applyLanguage(language)
     const prefs: Prefs = { theme: get().theme, language }
     set({ language })
-    if (await isSignedIn()) {
+    if (isSignedIn()) {
       clearPending()
       writeCache(prefs)
       await saveToDb(prefs)

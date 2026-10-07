@@ -102,7 +102,10 @@
     "delete": "Supprimer",
     "add": "Ajouter",
     "edit": "Modifier",
-    "total": "Total"
+    "total": "Total",
+    "ok": "Compris",
+    "offlineTitle": "Pas de connexion Internet",
+    "offlineBody": "Vous êtes hors ligne. Vous pouvez continuer à utiliser l’application ; les modifications seront synchronisées dès le retour du réseau."
   },
   "period": {
     "day": "Aujourd’hui",

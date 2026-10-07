@@ -61,12 +61,19 @@ self.addEventListener('activate', (event) => {
 async function cacheFirst(request) {
   const cached = await caches.match(request);
   if (cached) return cached;
-  const response = await fetch(request);
-  if (response.ok) {
-    const cache = await caches.open(CACHE);
-    void cache.put(request, response.clone());
+  try {
+    const response = await fetch(request);
+    // Opaque (no-cors) avatar responses are ok:false but still cacheable for offline <img>.
+    if (response.ok || response.type === 'opaque') {
+      const cache = await caches.open(CACHE);
+      void cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const fallback = await caches.match(request);
+    if (fallback) return fallback;
+    throw error;
   }
-  return response;
 }
 
 async function networkFirst(request) {
@@ -90,8 +97,17 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) {
-    if (url.hostname.endsWith('googleusercontent.com')) {
-      event.respondWith(cacheFirst(request));
+    if (
+      url.hostname.endsWith('googleusercontent.com') ||
+      url.hostname.endsWith('google.com')
+    ) {
+      event.respondWith(
+        caches.open('spisak-avatars').then(async (avatarCache) => {
+          const warm = await avatarCache.match(request);
+          if (warm) return warm;
+          return cacheFirst(request);
+        }),
+      );
     }
     return;
   }

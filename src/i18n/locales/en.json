@@ -102,7 +102,10 @@
     "delete": "Delete",
     "add": "Add",
     "edit": "Edit",
-    "total": "Total"
+    "total": "Total",
+    "ok": "OK",
+    "offlineTitle": "No internet connection",
+    "offlineBody": "You are offline. You can keep using the app; changes will sync when you are back online."
   },
   "period": {
     "day": "Today",

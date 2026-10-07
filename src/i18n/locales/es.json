@@ -102,7 +102,10 @@
     "delete": "Eliminar",
     "add": "Añadir",
     "edit": "Editar",
-    "total": "Total"
+    "total": "Total",
+    "ok": "Entendido",
+    "offlineTitle": "Sin conexión a internet",
+    "offlineBody": "Estás sin conexión. Puedes seguir usando la app; los cambios se sincronizarán cuando vuelva la red."
   },
   "period": {
     "day": "Hoy",

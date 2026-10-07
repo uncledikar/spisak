@@ -1383,6 +1383,21 @@ button {
   gap: 8px;
 }
 
+.period-custom {
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.period-custom .field {
+  min-width: 0;
+}
+
+.period-custom .field input[type='date'] {
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 0.95rem;
+}
+
 .chip {
   min-height: 40px;
   padding: 0 14px;
@@ -1476,10 +1491,14 @@ button {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
-.chart-totals .per-day {
-  font-weight: 500;
+.chart-period-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .histogram {
@@ -1562,16 +1581,11 @@ button {
   width: 12px;
   height: 12px;
   border-radius: 4px;
-  margin-right: 6px;
+  flex-shrink: 0;
   vertical-align: middle;
 }
 
-.swatch.current {
-  background: var(--accent);
-}
-
-.swatch.previous {
-  background: var(--accent);
+.swatch-faded {
   opacity: 0.45;
 }
 

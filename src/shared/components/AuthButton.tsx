@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../store/authStore'
+import { profileFromUser, readCachedProfile, rememberUserProfile } from '../utils/profileCache'
 
 function displayName(email: string | undefined, fullName: string | undefined): string {
   if (fullName?.trim()) return fullName.trim()
@@ -24,12 +25,23 @@ export function AuthButton() {
   const signOut = useAuthStore((s) => s.signOut)
   const clearError = useAuthStore((s) => s.clearError)
   const [open, setOpen] = useState(false)
+  const [avatarBroken, setAvatarBroken] = useState(false)
 
-  const meta = user?.user_metadata as
-    | { full_name?: string; name?: string; avatar_url?: string; picture?: string }
-    | undefined
-  const name = displayName(user?.email, meta?.full_name ?? meta?.name)
-  const avatarUrl = meta?.avatar_url ?? meta?.picture
+  useEffect(() => {
+    if (user) rememberUserProfile(user)
+  }, [user])
+
+  useEffect(() => {
+    setAvatarBroken(false)
+  }, [user?.id])
+
+  const cached = user ? readCachedProfile(user.id) : readCachedProfile()
+  const live = user ? profileFromUser(user) : null
+  const name = displayName(
+    live?.email || cached?.email,
+    live?.name || cached?.name,
+  )
+  const avatarUrl = live?.avatarUrl || cached?.avatarUrl || ''
 
   if (!user) {
     return (
@@ -55,8 +67,14 @@ export function AuthButton() {
         title={t('auth.account')}
         aria-label={t('auth.account')}
       >
-        {avatarUrl ? (
-          <img className="auth-avatar" src={avatarUrl} alt="" referrerPolicy="no-referrer" />
+        {avatarUrl && !avatarBroken ? (
+          <img
+            className="auth-avatar"
+            src={avatarUrl}
+            alt=""
+            referrerPolicy="no-referrer"
+            onError={() => setAvatarBroken(true)}
+          />
         ) : (
           <span className="auth-initials">{initials(name)}</span>
         )}
@@ -88,14 +106,22 @@ export function AuthButton() {
               </button>
             </div>
             <div className="auth-profile">
-              {avatarUrl ? (
-                <img className="auth-avatar auth-avatar-lg" src={avatarUrl} alt="" referrerPolicy="no-referrer" />
+              {avatarUrl && !avatarBroken ? (
+                <img
+                  className="auth-avatar auth-avatar-lg"
+                  src={avatarUrl}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarBroken(true)}
+                />
               ) : (
                 <span className="auth-initials auth-initials-lg">{initials(name)}</span>
               )}
               <div>
                 <p className="auth-name">{name}</p>
-                {user.email && name !== user.email ? <p className="meta">{user.email}</p> : null}
+                {(live?.email || cached?.email) && name !== (live?.email || cached?.email) ? (
+                  <p className="meta">{live?.email || cached?.email}</p>
+                ) : null}
               </div>
             </div>
             {error ? (

@@ -123,6 +123,31 @@ export function formatRangeLabel(range: DateRange, locale: string): string {
   return `${format(parseISO(range.start), 'dd.MM.yyyy')} – ${format(parseISO(range.end), 'dd.MM.yyyy')}`
 }
 
+function capitalizeLabel(value: string): string {
+  if (!value) return value
+  return value.charAt(0).toLocaleUpperCase() + value.slice(1)
+}
+
+/** Human label for a period when comparing (date, week range, month name, year). */
+export function formatCompareLabel(kind: PeriodKind, range: DateRange, locale: string): string {
+  const start = parseISO(range.start)
+  switch (kind) {
+    case 'day':
+    case 'date':
+      return format(start, 'dd.MM.yyyy')
+    case 'week':
+      return formatRangeLabel(range, locale)
+    case 'month':
+      return capitalizeLabel(
+        new Intl.DateTimeFormat(locale || undefined, { month: 'long', year: 'numeric' }).format(start),
+      )
+    case 'year':
+      return format(start, 'yyyy')
+    case 'custom':
+      return formatRangeLabel(range, locale)
+  }
+}
+
 export function startOfLocalDay(dateKey: string): Date {
   return startOfDay(parseISO(dateKey))
 }

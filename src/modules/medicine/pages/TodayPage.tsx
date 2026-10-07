@@ -11,9 +11,9 @@ import { useLiveData } from '../../../shared/hooks/useLiveData'
 import type { DateRange, PeriodKind } from '../types/models'
 import { formatDisplayDate, formatUnitLabel } from '../utils/format'
 import {
+  formatCompareLabel,
   formatRangeLabel,
   previousRange,
-  rangeDayCount,
   resolveRange,
   shiftAnchor,
   todayKey,
@@ -55,14 +55,23 @@ export function TodayPage() {
   const [logOpen, setLogOpen] = useState(false)
 
   const range = useMemo(() => resolveRange(kind, anchor, custom), [kind, anchor, custom])
-  const prev = useMemo(() => (compare ? previousRange(kind, range) : null), [compare, kind, range])
-  const dayCount = useMemo(() => rangeDayCount(range), [range])
-  const previousDayCount = useMemo(() => (prev ? rangeDayCount(prev) : dayCount), [prev, dayCount])
-  const showPerDay = kind !== 'day' && kind !== 'date'
+  const compareEnabled = compare && kind !== 'custom'
+  const prev = useMemo(
+    () => (compareEnabled ? previousRange(kind, range) : null),
+    [compareEnabled, kind, range],
+  )
   const isSingleDay = kind === 'day' || kind === 'date'
   const pageTitle = useMemo(
     () => periodPageTitle(kind, anchor, range, t, i18n.language),
     [kind, anchor, range, t, i18n.language],
+  )
+  const currentLabel = useMemo(
+    () => formatCompareLabel(kind, range, i18n.language),
+    [kind, range, i18n.language],
+  )
+  const previousLabel = useMemo(
+    () => (prev ? formatCompareLabel(kind, prev, i18n.language) : ''),
+    [kind, prev, i18n.language],
   )
 
   const stats = useMemo(() => {
@@ -83,7 +92,9 @@ export function TodayPage() {
   }, [isSingleDay, anchor, consumptions, medicines])
 
   return (
-    <PageShell crumbs={[{ label: pageTitle }]}>
+    <PageShell
+      crumbs={[{ label: t('nav.module.medicine') }, { label: pageTitle }]}
+    >
       <div className="stack page-stack">
         <PeriodControls
           kind={kind}
@@ -92,6 +103,7 @@ export function TodayPage() {
           compare={compare}
           range={range}
           onKind={(next) => {
+            if (next === 'custom') setCompare(false)
             if (next === 'day') {
               setKind('day')
               setAnchor(todayKey())
@@ -127,12 +139,11 @@ export function TodayPage() {
         {stats ? (
           <Histogram
             bars={stats.bars}
-            compare={compare}
+            compare={compareEnabled}
             totalCurrent={stats.totalCurrent}
             totalPrevious={stats.totalPrevious}
-            dayCount={dayCount}
-            previousDayCount={previousDayCount}
-            showPerDay={showPerDay}
+            currentLabel={currentLabel}
+            previousLabel={previousLabel}
           />
         ) : (
           <p className="meta">{t('common.loading')}</p>

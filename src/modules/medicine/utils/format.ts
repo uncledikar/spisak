@@ -30,12 +30,3 @@ export function formatQty(n: number): string {
   const rounded = Math.round(n * 10) / 10
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)
 }
-
-/** e.g. "2 шт / день" */
-export function formatPerDay(total: number, days: number, unit: string, t: TFunction): string {
-  const perDay = total / Math.max(1, days)
-  return t('medicine.today.perDay', {
-    qty: formatQty(perDay),
-    unit: formatUnitLabel(unit || 'pcs', t),
-  })
-}

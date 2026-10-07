@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { formatPerDay, formatQty, formatUnitLabel } from '../utils/format'
+import { formatQty, formatUnitLabel } from '../utils/format'
 import { rainbowColor } from '../utils/colors'
 import type { MedicineBar } from '../utils/stats'
 
@@ -8,11 +8,8 @@ type Props = {
   compare: boolean
   totalCurrent: number
   totalPrevious: number
-  /** Inclusive days in the current range. */
-  dayCount: number
-  /** Inclusive days in the compared range (when compare is on). */
-  previousDayCount?: number
-  showPerDay: boolean
+  currentLabel?: string
+  previousLabel?: string
 }
 
 export function Histogram({
@@ -20,14 +17,13 @@ export function Histogram({
   compare,
   totalCurrent,
   totalPrevious,
-  dayCount,
-  previousDayCount,
-  showPerDay,
+  currentLabel,
+  previousLabel,
 }: Props) {
   const { t } = useTranslation()
   const max = Math.max(1, ...bars.map((b) => Math.max(b.current, compare ? b.previous : 0)))
   const defaultUnit = formatUnitLabel('pcs', t)
-  const prevDays = previousDayCount ?? dayCount
+  const legendColor = rainbowColor(0, Math.max(1, bars.length))
 
   if (bars.length === 0) {
     return (
@@ -41,28 +37,28 @@ export function Histogram({
     <div className="chart-card">
       <div className="chart-totals">
         <div>
-          {compare ? <span className="meta">{t('medicine.today.current')}</span> : null}
+          {compare ? (
+            <span className="meta chart-period-label">
+              <i className="swatch" style={{ background: legendColor }} aria-hidden="true" />
+              {currentLabel}
+            </span>
+          ) : null}
           <strong>
             {t('common.total')}: {formatQty(totalCurrent)}
-            {showPerDay ? (
-              <span className="meta per-day">
-                {' '}
-                · {formatPerDay(totalCurrent, dayCount, 'pcs', t)}
-              </span>
-            ) : null}
           </strong>
         </div>
         {compare ? (
           <div>
-            <span className="meta">{t('medicine.today.previous')}</span>
+            <span className="meta chart-period-label">
+              <i
+                className="swatch swatch-faded"
+                style={{ background: legendColor }}
+                aria-hidden="true"
+              />
+              {previousLabel}
+            </span>
             <strong>
               {t('common.total')}: {formatQty(totalPrevious)}
-              {showPerDay ? (
-                <span className="meta per-day">
-                  {' '}
-                  · {formatPerDay(totalPrevious, prevDays, 'pcs', t)}
-                </span>
-              ) : null}
             </strong>
           </div>
         ) : null}
@@ -78,11 +74,7 @@ export function Histogram({
                 <span className="histogram-name">{bar.name}</span>
                 <span className="meta">
                   {formatQty(bar.current)} {unitLabel}
-                  {showPerDay ? ` · ${formatPerDay(bar.current, dayCount, bar.unit || 'pcs', t)}` : ''}
                   {compare ? ` / ${formatQty(bar.previous)}` : ''}
-                  {compare && showPerDay
-                    ? ` · ${formatPerDay(bar.previous, prevDays, bar.unit || 'pcs', t)}`
-                    : ''}
                 </span>
               </div>
               <div className="histogram-tracks">
@@ -101,7 +93,7 @@ export function Histogram({
                       width: `${(bar.previous / max) * 100}%`,
                       background: color,
                     }}
-                    title={`${t('medicine.today.previous')}: ${formatQty(bar.previous)}`}
+                    title={`${previousLabel}: ${formatQty(bar.previous)}`}
                   />
                 ) : null}
               </div>
@@ -109,17 +101,6 @@ export function Histogram({
           )
         })}
       </div>
-
-      {compare ? (
-        <div className="chart-legend">
-          <span>
-            <i className="swatch current" /> {t('medicine.today.current')}
-          </span>
-          <span>
-            <i className="swatch previous" /> {t('medicine.today.previous')}
-          </span>
-        </div>
-      ) : null}
     </div>
   )
 }

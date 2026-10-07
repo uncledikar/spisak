@@ -1,22 +1,23 @@
 import { bumpData } from '../../../shared/store/dataStore'
 import type { ListItem, ListRecord } from '../types/models'
 import { createId } from '../../../shared/utils/id'
-import { normalizeListRecord, reindexPositions, sortByPosition } from '../utils/positions'
+import { normalizeListRecord, reindexPositions } from '../utils/positions'
 import { requireUserId } from '../../../shared/api/auth'
-import { mergeRemoteList, peekList, putList, removeList } from './listCache'
-import { listToRow, mapListRow, type ListRow } from './mappers'
+import {
+  hydrateListCache,
+  listActiveCached,
+  listTrashCached,
+  mergeRemoteList,
+  peekList,
+  putList,
+  removeList,
+} from './listCache'
+import { mapListRow, type ListRow } from './mappers'
 import { supabase } from '../../../shared/lib/supabase'
+import { enqueueSync, flushSyncQueue } from './syncQueue'
 
-/** Serialize persists per list so rapid toggles/DnD don't clobber each other. */
-const persistChain = new Map<string, Promise<void>>()
-
-function enqueuePersist(id: string, task: () => Promise<void>): Promise<void> {
-  const previous = persistChain.get(id) ?? Promise.resolve()
-  const next = previous.then(task, task).finally(() => {
-    if (persistChain.get(id) === next) persistChain.delete(id)
-  })
-  persistChain.set(id, next)
-  return next
+function queueUpsert(list: ListRecord): void {
+  enqueueSync({ kind: 'upsert_list', list })
 }
 
 async function fetchListFromNetwork(id: string): Promise<ListRecord | null> {
@@ -27,31 +28,68 @@ async function fetchListFromNetwork(id: string): Promise<ListRecord | null> {
 }
 
 export async function getActiveLists(): Promise<ListRecord[]> {
-  const { data, error } = await supabase
-    .from('lists')
-    .select('*')
-    .is('deleted_at', null)
-    .order('position', { ascending: true })
-    .order('updated_at', { ascending: false })
+  hydrateListCache()
+  const cached = listActiveCached()
 
-  if (error) throw error
-  return sortByPosition((data as ListRow[]).map(mapListRow).map(mergeRemoteList))
+  if (!navigator.onLine) return cached
+
+  try {
+    const { data, error } = await supabase
+      .from('lists')
+      .select('*')
+      .is('deleted_at', null)
+      .order('position', { ascending: true })
+      .order('updated_at', { ascending: false })
+
+    if (error) throw error
+    for (const row of (data as ListRow[]) ?? []) {
+      mergeRemoteList(mapListRow(row))
+    }
+    void flushSyncQueue()
+    return listActiveCached()
+  } catch (error) {
+    console.error('getActiveLists failed', error)
+    return cached
+  }
 }
 
 export async function getTrashLists(): Promise<ListRecord[]> {
-  const { data, error } = await supabase
-    .from('lists')
-    .select('*')
-    .not('deleted_at', 'is', null)
-    .order('deleted_at', { ascending: false })
+  hydrateListCache()
+  const cached = listTrashCached()
 
-  if (error) throw error
-  return (data as ListRow[]).map(mapListRow).map(mergeRemoteList)
+  if (!navigator.onLine) return cached
+
+  try {
+    const { data, error } = await supabase
+      .from('lists')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false })
+
+    if (error) throw error
+    for (const row of (data as ListRow[]) ?? []) {
+      mergeRemoteList(mapListRow(row))
+    }
+    void flushSyncQueue()
+    return listTrashCached()
+  } catch (error) {
+    console.error('getTrashLists failed', error)
+    return cached
+  }
 }
 
 export async function getList(id: string): Promise<ListRecord | null> {
+  hydrateListCache()
   const cached = peekList(id)
-  if (cached) return cached
+  if (cached) {
+    if (!navigator.onLine) return cached
+    void fetchListFromNetwork(id).catch((error) => {
+      console.error('getList refresh failed', id, error)
+    })
+    return cached
+  }
+
+  if (!navigator.onLine) return null
 
   try {
     return await fetchListFromNetwork(id)
@@ -67,18 +105,10 @@ export async function createList(input: {
   trackQuantity: boolean
   items: ListItem[]
 }): Promise<ListRecord> {
-  const userId = await requireUserId()
+  await requireUserId()
+  hydrateListCache()
   const now = Date.now()
-
-  const { data: activeRows, error: activeError } = await supabase
-    .from('lists')
-    .select('*')
-    .is('deleted_at', null)
-  if (activeError) throw activeError
-
-  const existing = sortByPosition(
-    ((activeRows as ListRow[]) ?? []).map(mapListRow).map(mergeRemoteList),
-  )
+  const existing = listActiveCached()
 
   const created = normalizeListRecord({
     id: createId(),
@@ -96,28 +126,11 @@ export async function createList(input: {
     created,
     ...existing.map((list) => normalizeListRecord({ ...list, updatedAt: now })),
   ])
-  for (const row of ordered) putList(row)
+  for (const row of ordered) {
+    putList(row)
+    queueUpsert(row)
+  }
   bumpData()
-
-  const { error } = await supabase.from('lists').insert(listToRow(ordered[0], userId))
-  if (error) throw error
-
-  await Promise.all(
-    ordered.slice(1).map((row) =>
-      enqueuePersist(row.id, async () => {
-        const latest = peekList(row.id) ?? row
-        const { error: updateError } = await supabase
-          .from('lists')
-          .update({
-            position: latest.position,
-            updated_at: new Date(latest.updatedAt).toISOString(),
-          })
-          .eq('id', row.id)
-        if (updateError) throw updateError
-      }),
-    ),
-  )
-
   return peekList(ordered[0].id) ?? ordered[0]
 }
 
@@ -142,15 +155,16 @@ export async function copyList(id: string, name: string): Promise<ListRecord | n
 }
 
 /**
- * Optimistic update: patch the in-memory list + notify UI immediately,
- * then persist to Supabase (queued; always writes the latest cached snapshot).
+ * Optimistic update: patch the local cache + notify UI immediately,
+ * then enqueue sync (flushed when online).
  */
 export async function updateList(
   id: string,
   patch: Partial<Pick<ListRecord, 'name' | 'deadline' | 'items' | 'trackQuantity' | 'position'>>,
 ): Promise<ListRecord | null> {
+  hydrateListCache()
   let existing = peekList(id)
-  if (!existing) {
+  if (!existing && navigator.onLine) {
     existing = (await fetchListFromNetwork(id)) ?? undefined
   }
   if (!existing || existing.deletedAt !== null) return null
@@ -178,78 +192,41 @@ export async function updateList(
 
   putList(updated)
   bumpData()
-
-  await enqueuePersist(id, async () => {
-    const latest = peekList(id) ?? updated
-    const userId = await requireUserId()
-    const { error } = await supabase.from('lists').update(listToRow(latest, userId)).eq('id', id)
-    if (error) throw error
-  }).catch((error) => {
-    console.error('updateList persist failed', id, error)
-    throw error
-  })
-
+  queueUpsert(updated)
   return peekList(id) ?? updated
 }
 
 /** Optimistic reorder of active lists (0 = top). */
 export async function reorderLists(ordered: ListRecord[]): Promise<void> {
+  hydrateListCache()
   const now = Date.now()
   const next = reindexPositions(
     ordered.map((list) => normalizeListRecord({ ...list, updatedAt: now, deletedAt: null })),
   )
-  for (const list of next) putList(list)
+  for (const list of next) {
+    putList(list)
+    queueUpsert(list)
+  }
   bumpData()
-
-  await Promise.all(
-    next.map((list) =>
-      enqueuePersist(list.id, async () => {
-        const latest = peekList(list.id) ?? list
-        const { error } = await supabase
-          .from('lists')
-          .update({
-            position: latest.position,
-            updated_at: new Date(latest.updatedAt).toISOString(),
-          })
-          .eq('id', list.id)
-        if (error) throw error
-      }),
-    ),
-  ).catch((error) => {
-    console.error('reorderLists persist failed', error)
-  })
 }
 
 export async function softDeleteList(id: string): Promise<void> {
-  const existing = peekList(id) ?? (await fetchListFromNetwork(id))
+  hydrateListCache()
+  const existing = peekList(id) ?? (navigator.onLine ? await fetchListFromNetwork(id) : null)
   if (!existing) return
   const now = Date.now()
   const updated = normalizeListRecord({ ...existing, deletedAt: now, updatedAt: now })
   putList(updated)
   bumpData()
-
-  await enqueuePersist(id, async () => {
-    const { error } = await supabase
-      .from('lists')
-      .update({
-        deleted_at: new Date(now).toISOString(),
-        updated_at: new Date(now).toISOString(),
-      })
-      .eq('id', id)
-    if (error) throw error
-  })
+  queueUpsert(updated)
 }
 
 export async function restoreList(id: string): Promise<void> {
-  const existing = peekList(id) ?? (await fetchListFromNetwork(id))
+  hydrateListCache()
+  const existing = peekList(id) ?? (navigator.onLine ? await fetchListFromNetwork(id) : null)
   if (!existing) return
   const now = Date.now()
-
-  const { data: activeRows } = await supabase.from('lists').select('position').is('deleted_at', null)
-  const maxPos = ((activeRows as { position: number | null }[]) ?? []).reduce((max, row) => {
-    const p = typeof row.position === 'number' ? row.position : -1
-    return Math.max(max, p)
-  }, -1)
+  const maxPos = listActiveCached().reduce((max, list) => Math.max(max, list.position), -1)
 
   const updated = normalizeListRecord({
     ...existing,
@@ -259,26 +236,13 @@ export async function restoreList(id: string): Promise<void> {
   })
   putList(updated)
   bumpData()
-
-  await enqueuePersist(id, async () => {
-    const latest = peekList(id) ?? updated
-    const { error } = await supabase
-      .from('lists')
-      .update({
-        deleted_at: null,
-        updated_at: new Date(latest.updatedAt).toISOString(),
-        position: latest.position,
-      })
-      .eq('id', id)
-    if (error) throw error
-  })
+  queueUpsert(updated)
 }
 
 export async function purgeList(id: string): Promise<void> {
   removeList(id)
   bumpData()
-  const { error } = await supabase.from('lists').delete().eq('id', id)
-  if (error) throw error
+  enqueueSync({ kind: 'delete_list', id })
 }
 
 export function emptyItem(position = 0): ListItem {

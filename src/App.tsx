@@ -2,9 +2,12 @@ import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthGate } from './shared/components/AuthGate'
 import { BootSplash } from './shared/components/BootSplash'
+import { OfflineNotice } from './shared/components/OfflineNotice'
 import { RouteErrorBoundary } from './shared/components/RouteErrorBoundary'
 import { useAuthStore } from './shared/store/authStore'
 import { MODULE_HOME, moduleFromPath, readActiveModule, writeActiveModule } from './shell/modules'
+import { startSyncListeners as startListsSync } from './modules/lists/api/syncQueue'
+import { hydrateListCache } from './modules/lists/api/listCache'
 import { startSyncListeners as startMedicineSync } from './modules/medicine/api/syncQueue'
 import { startSyncListeners as startFinancesSync } from './modules/finances/api/syncQueue'
 import { hydrateEntityCache as hydrateMedicineCache } from './modules/medicine/api/entityCache'
@@ -37,8 +40,10 @@ const CategoriesPage = lazy(() =>
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
+hydrateListCache()
 hydrateMedicineCache()
 hydrateFinancesCache()
+startListsSync()
 startMedicineSync()
 startFinancesSync()
 
@@ -87,6 +92,7 @@ export default function App() {
 
   return (
     <BrowserRouter basename={basename}>
+      <OfflineNotice />
       <AppRoutes />
     </BrowserRouter>
   )

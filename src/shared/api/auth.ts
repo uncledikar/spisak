@@ -1,6 +1,12 @@
 import { supabase } from '../lib/supabase'
 
+/** Prefer local session so offline writes still work. */
 export async function requireUserId(): Promise<string> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (session?.user?.id) return session.user.id
+
   const {
     data: { user },
     error,

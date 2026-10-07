@@ -17,7 +17,6 @@ import { PageShell } from '../components/AppHeader'
 import { ItemEditModal } from '../components/ItemEditModal'
 import { ProgressBadge } from '../components/ProgressBadge'
 import { SortableItemsList } from '../components/SortableItemsList'
-import { useOverflowAddButton } from '../hooks/useOverflowAddButton'
 
 type ItemModal =
   | { mode: 'edit'; itemId: string }
@@ -42,12 +41,6 @@ export function ListDetailPage() {
   const [trackQuantity, setTrackQuantity] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
   const [itemModal, setItemModal] = useState<ItemModal>(null)
-
-  const { itemsRef, showBottomAdd } = useOverflowAddButton([
-    list?.items.length ?? 0,
-    list?.trackQuantity,
-    editing,
-  ])
 
   useEffect(() => {
     setList(undefined)
@@ -331,15 +324,6 @@ export function ListDetailPage() {
         </form>
       ) : (
         <>
-          <button
-            type="button"
-            className="btn btn-ghost btn-block"
-            style={{ marginBottom: 12 }}
-            onClick={openNewItem}
-          >
-            + {t('list.addItem')}
-          </button>
-
           {current.items.length === 0 ? (
             <div className="empty">
               <h2>{t('list.emptyItems')}</h2>
@@ -351,20 +335,12 @@ export function ListDetailPage() {
               onReorder={reorderItems}
               onToggle={toggleChecked}
               onOpenItem={(itemId) => setItemModal({ mode: 'edit', itemId })}
-              listRef={itemsRef}
             />
           )}
 
-          {showBottomAdd ? (
-            <button
-              type="button"
-              className="btn btn-ghost btn-block"
-              style={{ marginTop: 12 }}
-              onClick={openNewItem}
-            >
-              + {t('list.addItem')}
-            </button>
-          ) : null}
+          <button type="button" className="fab" onClick={openNewItem}>
+            + {t('list.addItem')}
+          </button>
         </>
       )}
 

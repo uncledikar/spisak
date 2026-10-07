@@ -31,6 +31,7 @@ export function PeriodControls({
   const { t, i18n } = useTranslation()
   const kinds: PeriodKind[] = ['day', 'week', 'month', 'year', 'custom', 'date']
   const singleDay = kind === 'day' || kind === 'date'
+  const canCompare = kind !== 'custom'
 
   return (
     <div className="period-controls stack">
@@ -99,10 +100,12 @@ export function PeriodControls({
         </div>
       )}
 
-      <label className="check-row">
-        <input type="checkbox" checked={compare} onChange={(e) => onCompare(e.target.checked)} />
-        <span>{t('finances.today.compare')}</span>
-      </label>
+      {canCompare ? (
+        <label className="check-row">
+          <input type="checkbox" checked={compare} onChange={(e) => onCompare(e.target.checked)} />
+          <span>{t('finances.today.compare')}</span>
+        </label>
+      ) : null}
     </div>
   )
 }
