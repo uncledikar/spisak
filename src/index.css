@@ -246,7 +246,7 @@ button {
 .page-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   flex-shrink: 0;
   padding-top: 2px;
   flex-wrap: wrap;

@@ -271,7 +271,7 @@ export function ListDetailPage() {
             aria-label={t('list.delete')}
             title={t('list.delete')}
           >
-            🗑
+            <DeleteListIcon />
           </button>
         </>
       }
@@ -405,5 +405,34 @@ export function ListDetailPage() {
         onConfirm={() => void onDeleteConfirmed()}
       />
     </PageShell>
+  )
+}
+
+/** List card with a strike — distinct from trash nav and window-close ×. */
+function DeleteListIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+      <rect
+        x="4.5"
+        y="3.5"
+        width="15"
+        height="17"
+        rx="2.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M8 9h8M8 12.5h8M8 16h5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 18.5L18 5.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   )
 }

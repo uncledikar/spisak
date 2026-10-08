@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { logConsumption, updateConsumption } from '../api/consumptions'
 import type { Consumption, Medicine } from '../types/models'
+import { parseQtyInput } from '../utils/format'
 import { commitDateInput } from '../../../shared/utils/dateInput'
 
 type Props = {
@@ -74,17 +75,19 @@ export function LogConsumptionForm({
                 setMedicineError(true)
                 return
               }
+              const qty = parseQtyInput(quantity)
+              if (qty == null) return
               setMedicineError(false)
               setBusy(true)
               const task = consumption
                 ? updateConsumption(consumption.id, {
                     medicineId,
-                    quantity: Number(quantity) || 1,
+                    quantity: qty,
                     consumedOn,
                   })
                 : logConsumption({
                     medicineId,
-                    quantity: Number(quantity) || 1,
+                    quantity: qty,
                     consumedOn,
                   })
               void task.then(onClose).finally(() => setBusy(false))
@@ -118,12 +121,15 @@ export function LogConsumptionForm({
               <label className="field field-qty">
                 <span>{t('medicine.today.quantity')}</span>
                 <input
-                  type="number"
-                  min={0.01}
-                  step="any"
+                  type="text"
                   inputMode="decimal"
+                  autoComplete="off"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
+                  onBlur={() => {
+                    const qty = parseQtyInput(quantity)
+                    if (qty != null) setQuantity(String(qty))
+                  }}
                   required
                 />
               </label>
