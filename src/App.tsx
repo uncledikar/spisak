@@ -8,7 +8,6 @@ import { useAuthStore } from './shared/store/authStore'
 import { MODULE_HOME, moduleFromPath, readActiveModule, writeActiveModule } from './shell/modules'
 import { startSyncListeners as startListsSync } from './modules/lists/api/syncQueue'
 import { hydrateListCache } from './modules/lists/api/listCache'
-import { migrateCheckedItemOrder } from './modules/lists/api/lists'
 import { startSyncListeners as startMedicineSync } from './modules/medicine/api/syncQueue'
 import { startSyncListeners as startFinancesSync } from './modules/finances/api/syncQueue'
 import { hydrateEntityCache as hydrateMedicineCache } from './modules/medicine/api/entityCache'
@@ -57,7 +56,6 @@ const PeriodExpensesPage = lazy(() =>
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
 hydrateListCache()
-migrateCheckedItemOrder()
 hydrateMedicineCache()
 hydrateFinancesCache()
 startListsSync()

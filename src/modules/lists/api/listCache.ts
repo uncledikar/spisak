@@ -64,11 +64,6 @@ export function listTrashCached(): ListRecord[] {
     .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0))
 }
 
-export function listAllCached(): ListRecord[] {
-  hydrateListCache()
-  return [...cache.values()]
-}
-
 export function clearListCache(): void {
   cache.clear()
   localStorage.removeItem(STORAGE_KEY)

@@ -6,7 +6,6 @@ import { requireUserId } from '../../../shared/api/auth'
 import {
   hydrateListCache,
   listActiveCached,
-  listAllCached,
   listTrashCached,
   mergeRemoteList,
   peekList,
@@ -263,23 +262,3 @@ export function emptyItem(position = 0): ListItem {
   }
 }
 
-/**
- * One-shot local migration: unchecked items above checked, keep relative
- * order within each group, persist + sync when order changes.
- */
-export function migrateCheckedItemOrder(): void {
-  hydrateListCache()
-  const now = Date.now()
-  let changed = false
-  for (const list of listAllCached()) {
-    const next = normalizeListRecord(list)
-    const before = list.items.map((item) => `${item.id}:${item.position}:${item.checked}`).join('|')
-    const after = next.items.map((item) => `${item.id}:${item.position}:${item.checked}`).join('|')
-    if (before === after) continue
-    changed = true
-    const updated = { ...next, updatedAt: now }
-    putList(updated)
-    queueUpsert(updated)
-  }
-  if (changed) bumpData()
-}
