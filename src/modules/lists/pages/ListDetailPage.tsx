@@ -167,7 +167,7 @@ export function ListDetailPage() {
     if (copying) return
     setCopying(true)
     try {
-      const copied = await copyList(current.id, t('list.copyName', { name: current.name }))
+      const copied = await copyList(current.id, t('list.copyLabel'))
       if (copied) {
         setToast(t('list.copied'))
         navigate(`/lists/${copied.id}`)

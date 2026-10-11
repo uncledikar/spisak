@@ -66,6 +66,7 @@
     "create": "Create",
     "delete": "Delete",
     "copy": "Copy list",
+    "copyLabel": "copy",
     "copyName": "{{name}} (copy)",
     "copied": "List copied",
     "edit": "Edit",

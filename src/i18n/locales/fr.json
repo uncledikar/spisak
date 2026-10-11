@@ -66,6 +66,7 @@
     "create": "Créer",
     "delete": "Supprimer",
     "copy": "Copier la liste",
+    "copyLabel": "copie",
     "copyName": "{{name}} (copie)",
     "copied": "Liste copiée",
     "edit": "Modifier",

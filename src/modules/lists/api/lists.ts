@@ -1,6 +1,7 @@
 import { bumpData } from '../../../shared/store/dataStore'
 import type { ListItem, ListRecord } from '../types/models'
 import { createId } from '../../../shared/utils/id'
+import { nextCopyListName } from '../utils/copyName'
 import { normalizeListRecord, reindexPositions } from '../utils/positions'
 import { requireUserId } from '../../../shared/api/auth'
 import {
@@ -138,9 +139,16 @@ export async function createList(input: {
   return peekList(ordered[0].id) ?? ordered[0]
 }
 
-export async function copyList(id: string, name: string): Promise<ListRecord | null> {
+export async function copyList(id: string, copyLabel: string): Promise<ListRecord | null> {
   const source = await getList(id)
   if (!source || source.deletedAt !== null) return null
+
+  hydrateListCache()
+  const name = nextCopyListName(
+    source.name,
+    listActiveCached().map((list) => list.name),
+    copyLabel,
+  )
 
   return createList({
     name,

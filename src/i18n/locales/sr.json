@@ -66,6 +66,7 @@
     "create": "Napravi",
     "delete": "Obriši",
     "copy": "Kopiraj listu",
+    "copyLabel": "kopija",
     "copyName": "{{name}} (kopija)",
     "copied": "Lista kopirana",
     "edit": "Izmeni",
