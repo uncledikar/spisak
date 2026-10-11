@@ -12,7 +12,7 @@ import {
 } from '../api/lists'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { formatDeadline } from '../utils/dates'
-import { reindexPositions } from '../utils/positions'
+import { moveItemToCheckedGroup, orderItemsByChecked } from '../utils/positions'
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
 import { PageShell } from '../components/AppHeader'
 import { ItemEditModal } from '../components/ItemEditModal'
@@ -126,7 +126,7 @@ export function ListDetailPage() {
     if (!base || base.deletedAt !== null) return
     const next = {
       ...base,
-      items: reindexPositions(nextItems),
+      items: orderItemsByChecked(nextItems),
       updatedAt: Date.now(),
     }
     listRef.current = next
@@ -137,11 +137,9 @@ export function ListDetailPage() {
   function toggleChecked(itemId: string) {
     const base = listRef.current
     if (!base || base.deletedAt !== null) return
-    applyItems(
-      base.items.map((item) =>
-        item.id === itemId ? { ...item, checked: !item.checked } : item,
-      ),
-    )
+    const currentItem = base.items.find((item) => item.id === itemId)
+    if (!currentItem) return
+    applyItems(moveItemToCheckedGroup(base.items, itemId, !currentItem.checked))
   }
 
   async function commitListMeta() {
@@ -207,7 +205,8 @@ export function ListDetailPage() {
 
   function saveItem(updated: ListItem) {
     if (itemModal?.mode === 'create') {
-      applyItems([updated, ...current.items])
+      // New items are unchecked — place at top of the open group.
+      applyItems([{ ...updated, checked: false }, ...current.items])
       setHighlightId(updated.id)
       return
     }

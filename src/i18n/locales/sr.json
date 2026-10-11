@@ -199,7 +199,9 @@
       "categoryRequired": "Izaberite kategoriju",
       "edit": "Izmeni trošak",
       "unknownCategory": "Kategorija",
-      "categoryEmpty": "Nema troškova u ovoj kategoriji za izabrani period"
+      "categoryEmpty": "Nema troškova u ovoj kategoriji za izabrani period",
+      "periodEmpty": "Nema troškova za izabrani period",
+      "allExpenses": "Svi troškovi"
     },
     "defaults": {
       "groceries": "Namirnice",

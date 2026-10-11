@@ -1628,6 +1628,52 @@ button {
   min-width: 0;
 }
 
+.chart-total-btn {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chart-total-btn:hover,
+.chart-total-btn:focus-visible {
+  color: var(--accent);
+}
+
+.chart-total-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.expense-row-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.expense-row-btn:hover strong,
+.expense-row-btn:focus-visible strong {
+  color: var(--accent);
+}
+
+.expense-row-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 .histogram-name-btn {
   max-width: 100%;
   margin: 0;

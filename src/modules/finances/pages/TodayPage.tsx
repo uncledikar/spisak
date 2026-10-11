@@ -151,6 +151,9 @@ export function TodayPage() {
             onSelectBar={(categoryId) => {
               navigate(periodHref(`/finances/category/${categoryId}`, periodState))
             }}
+            onSelectTotal={() => {
+              navigate(periodHref('/finances/expenses', periodState))
+            }}
           />
         ) : (
           <p className="meta">{t('common.loading')}</p>

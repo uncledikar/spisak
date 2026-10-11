@@ -8,6 +8,7 @@ import { useAuthStore } from './shared/store/authStore'
 import { MODULE_HOME, moduleFromPath, readActiveModule, writeActiveModule } from './shell/modules'
 import { startSyncListeners as startListsSync } from './modules/lists/api/syncQueue'
 import { hydrateListCache } from './modules/lists/api/listCache'
+import { migrateCheckedItemOrder } from './modules/lists/api/lists'
 import { startSyncListeners as startMedicineSync } from './modules/medicine/api/syncQueue'
 import { startSyncListeners as startFinancesSync } from './modules/finances/api/syncQueue'
 import { hydrateEntityCache as hydrateMedicineCache } from './modules/medicine/api/entityCache'
@@ -43,14 +44,20 @@ const CategoriesPage = lazy(() =>
   import('./modules/finances/pages/CategoriesPage').then((m) => ({ default: m.CategoriesPage })),
 )
 const CategoryDetailPage = lazy(() =>
-  import('./modules/finances/pages/CategoryDetailPage').then((m) => ({
+  import('./modules/finances/pages/ExpensesDetailPage').then((m) => ({
     default: m.CategoryDetailPage,
+  })),
+)
+const PeriodExpensesPage = lazy(() =>
+  import('./modules/finances/pages/ExpensesDetailPage').then((m) => ({
+    default: m.PeriodExpensesPage,
   })),
 )
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
 hydrateListCache()
+migrateCheckedItemOrder()
 hydrateMedicineCache()
 hydrateFinancesCache()
 startListsSync()
@@ -87,6 +94,7 @@ function AppRoutes() {
           <Route path="/medicine/medicine/:medicineId" element={<MedicineDetailPage />} />
           <Route path="/finances" element={<FinancesTodayPage />} />
           <Route path="/finances/categories" element={<CategoriesPage />} />
+          <Route path="/finances/expenses" element={<PeriodExpensesPage />} />
           <Route path="/finances/category/:categoryId" element={<CategoryDetailPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -11,6 +11,7 @@ type Props = {
   currentLabel?: string
   previousLabel?: string
   onSelectBar?: (categoryId: string) => void
+  onSelectTotal?: () => void
 }
 
 export function Histogram({
@@ -21,6 +22,7 @@ export function Histogram({
   currentLabel,
   previousLabel,
   onSelectBar,
+  onSelectTotal,
 }: Props) {
   const { t } = useTranslation()
   const max = Math.max(1, ...bars.map((b) => Math.max(b.current, compare ? b.previous : 0)))
@@ -44,9 +46,15 @@ export function Histogram({
               {currentLabel}
             </span>
           ) : null}
-          <strong>
-            {t('common.total')}: {formatAmount(totalCurrent)}
-          </strong>
+          {onSelectTotal ? (
+            <button type="button" className="chart-total-btn" onClick={onSelectTotal}>
+              {t('common.total')}: {formatAmount(totalCurrent)}
+            </button>
+          ) : (
+            <strong>
+              {t('common.total')}: {formatAmount(totalCurrent)}
+            </strong>
+          )}
         </div>
         {compare ? (
           <div>

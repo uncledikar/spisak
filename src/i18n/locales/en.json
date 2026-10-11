@@ -199,7 +199,9 @@
       "categoryRequired": "Select a category",
       "edit": "Edit expense",
       "unknownCategory": "Category",
-      "categoryEmpty": "No expenses in this category for the selected period"
+      "categoryEmpty": "No expenses in this category for the selected period",
+      "periodEmpty": "No expenses for the selected period",
+      "allExpenses": "All expenses"
     },
     "defaults": {
       "groceries": "Groceries",

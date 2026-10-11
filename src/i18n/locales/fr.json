@@ -199,7 +199,9 @@
       "categoryRequired": "Sélectionnez une catégorie",
       "edit": "Modifier la dépense",
       "unknownCategory": "Catégorie",
-      "categoryEmpty": "Aucune dépense dans cette catégorie pour la période sélectionnée"
+      "categoryEmpty": "Aucune dépense dans cette catégorie pour la période sélectionnée",
+      "periodEmpty": "Aucune dépense pour la période sélectionnée",
+      "allExpenses": "Toutes les dépenses"
     },
     "defaults": {
       "groceries": "Courses",

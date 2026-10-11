@@ -199,7 +199,9 @@
       "categoryRequired": "Selecciona una categoría",
       "edit": "Editar gasto",
       "unknownCategory": "Categoría",
-      "categoryEmpty": "No hay gastos en esta categoría para el periodo seleccionado"
+      "categoryEmpty": "No hay gastos en esta categoría para el periodo seleccionado",
+      "periodEmpty": "No hay gastos para el periodo seleccionado",
+      "allExpenses": "Todos los gastos"
     },
     "defaults": {
       "groceries": "Comida",

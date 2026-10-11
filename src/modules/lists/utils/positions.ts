@@ -17,6 +17,34 @@ export function reindexPositions<T extends Positioned>(items: T[]): (T & { posit
   return items.map((item, index) => ({ ...item, position: index }))
 }
 
+/**
+ * Unchecked items first, then checked — relative order within each group kept
+ * (by current position). Used for display, DnD commits, and one-shot migration.
+ */
+export function orderItemsByChecked(items: ListItem[]): ListItem[] {
+  const sorted = sortByPosition(items)
+  return reindexPositions([
+    ...sorted.filter((item) => !item.checked),
+    ...sorted.filter((item) => item.checked),
+  ])
+}
+
+/** Move item into the target checked state at the top of that group. */
+export function moveItemToCheckedGroup(
+  items: ListItem[],
+  itemId: string,
+  checked: boolean,
+): ListItem[] {
+  const target = items.find((item) => item.id === itemId)
+  if (!target) return orderItemsByChecked(items)
+  const rest = items.filter((item) => item.id !== itemId)
+  const open = sortByPosition(rest.filter((item) => !item.checked))
+  const done = sortByPosition(rest.filter((item) => item.checked))
+  const next = { ...target, checked }
+  if (checked) return reindexPositions([...open, next, ...done])
+  return reindexPositions([next, ...open, ...done])
+}
+
 function uniqueId(candidate: unknown, used: Set<string>): string {
   if (typeof candidate === 'string' && candidate.length > 0 && !used.has(candidate)) {
     used.add(candidate)
@@ -53,7 +81,7 @@ export function normalizeItemPositions(items: ListItem[] | null | undefined): Li
   const raw = Array.isArray(items) ? items : []
   const usedIds = new Set<string>()
   const normalized = raw.map((item, index) => normalizeListItem(item, index, usedIds))
-  return reindexPositions(sortByPosition(normalized))
+  return orderItemsByChecked(normalized)
 }
 
 export function normalizeListRecord(list: ListRecord): ListRecord {
