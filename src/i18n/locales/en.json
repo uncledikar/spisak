@@ -125,7 +125,8 @@
     "to": "To",
     "prev": "Previous",
     "next": "Next",
-    "date": "Date"
+    "date": "Date",
+    "datePlaceholder": "DD.MM.YYYY"
   },
   "medicine": {
     "medicines": {

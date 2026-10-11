@@ -125,7 +125,8 @@
     "to": "Do",
     "prev": "Nazad",
     "next": "Napred",
-    "date": "Datum"
+    "date": "Datum",
+    "datePlaceholder": "DD.MM.GGGG"
   },
   "medicine": {
     "medicines": {

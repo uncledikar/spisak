@@ -125,7 +125,8 @@
     "to": "По",
     "prev": "Назад",
     "next": "Вперёд",
-    "date": "Дата"
+    "date": "Дата",
+    "datePlaceholder": "ДД.ММ.ГГГГ"
   },
   "medicine": {
     "medicines": {

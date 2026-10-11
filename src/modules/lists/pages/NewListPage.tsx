@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { createList } from '../api/lists'
 import { PageShell } from '../components/AppHeader'
+import { DateField } from '../../../shared/components/DateField'
 
 export function NewListPage() {
   const { t } = useTranslation()
@@ -46,12 +47,12 @@ export function NewListPage() {
         <div className="field">
           <label htmlFor="deadline">{t('list.deadline')}</label>
           <div className="row">
-            <input
+            <DateField
               id="deadline"
-              type="date"
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              style={{ flex: 1 }}
+              onChange={setDeadline}
+              title={t('list.deadline')}
+              className="grow"
             />
             {deadline ? (
               <button

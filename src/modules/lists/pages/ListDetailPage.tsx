@@ -14,6 +14,7 @@ import { useLiveData } from '../../../shared/hooks/useLiveData'
 import { formatDeadline } from '../utils/dates'
 import { moveItemToCheckedGroup, orderItemsByChecked } from '../utils/positions'
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
+import { DateField } from '../../../shared/components/DateField'
 import { PageShell } from '../components/AppHeader'
 import { ItemEditModal } from '../components/ItemEditModal'
 import { ProgressBadge } from '../components/ProgressBadge'
@@ -295,12 +296,12 @@ export function ListDetailPage() {
           <div className="field">
             <label htmlFor="edit-deadline">{t('list.deadline')}</label>
             <div className="row">
-              <input
+              <DateField
                 id="edit-deadline"
-                type="date"
                 value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                style={{ flex: 1 }}
+                onChange={setDeadline}
+                title={t('list.deadline')}
+                className="grow"
               />
               {deadline ? (
                 <button

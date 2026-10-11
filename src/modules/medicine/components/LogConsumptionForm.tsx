@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { logConsumption, updateConsumption } from '../api/consumptions'
 import type { Consumption, Medicine } from '../types/models'
 import { parseQtyInput } from '../utils/format'
-import { commitDateInput } from '../../../shared/utils/dateInput'
+import { DateField } from '../../../shared/components/DateField'
 
 type Props = {
   open: boolean
@@ -135,10 +135,10 @@ export function LogConsumptionForm({
               </label>
               <label className="field field-date grow">
                 <span>{t('medicine.today.date')}</span>
-                <input
-                  type="date"
+                <DateField
                   value={consumedOn}
-                  onChange={(e) => commitDateInput(e, setConsumedOn)}
+                  onChange={setConsumedOn}
+                  title={t('medicine.today.date')}
                   required
                 />
               </label>

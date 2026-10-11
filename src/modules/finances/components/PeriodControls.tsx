@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { DateRange, PeriodKind } from '../types/models'
 import { formatRangeLabel } from '../utils/periods'
-import { commitDateInput } from '../../../shared/utils/dateInput'
+import { DateField } from '../../../shared/components/DateField'
 
 type Props = {
   kind: PeriodKind
@@ -52,18 +52,18 @@ export function PeriodControls({
         <div className="row period-custom">
           <label className="field grow">
             <span>{t('period.from')}</span>
-            <input
-              type="date"
+            <DateField
               value={custom.start}
-              onChange={(e) => commitDateInput(e, (start) => onCustom({ ...custom, start }))}
+              onChange={(start) => onCustom({ ...custom, start })}
+              title={t('period.from')}
             />
           </label>
           <label className="field grow">
             <span>{t('period.to')}</span>
-            <input
-              type="date"
+            <DateField
               value={custom.end}
-              onChange={(e) => commitDateInput(e, (end) => onCustom({ ...custom, end }))}
+              onChange={(end) => onCustom({ ...custom, end })}
+              title={t('period.to')}
             />
           </label>
         </div>
@@ -79,11 +79,11 @@ export function PeriodControls({
             ‹
           </button>
           {singleDay ? (
-            <input
-              type="date"
+            <DateField
               className="period-anchor"
               value={anchor}
-              onChange={(e) => commitDateInput(e, onAnchor)}
+              onChange={onAnchor}
+              title={t('period.date')}
             />
           ) : (
             <span className="period-label">{formatRangeLabel(range, i18n.language)}</span>

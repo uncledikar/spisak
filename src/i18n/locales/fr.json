@@ -125,7 +125,8 @@
     "to": "Au",
     "prev": "Précédent",
     "next": "Suivant",
-    "date": "Date"
+    "date": "Date",
+    "datePlaceholder": "JJ.MM.AAAA"
   },
   "medicine": {
     "medicines": {

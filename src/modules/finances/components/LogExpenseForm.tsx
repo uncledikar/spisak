@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { logExpense, updateExpense } from '../api/expenses'
 import type { Category, Expense } from '../types/models'
-import { commitDateInput } from '../../../shared/utils/dateInput'
+import { DateField } from '../../../shared/components/DateField'
 
 type Props = {
   open: boolean
@@ -131,10 +131,10 @@ export function LogExpenseForm({ open, onClose, categories, defaultDate, expense
               </label>
               <label className="field field-date grow">
                 <span>{t('finances.today.date')}</span>
-                <input
-                  type="date"
+                <DateField
                   value={spentOn}
-                  onChange={(e) => commitDateInput(e, setSpentOn)}
+                  onChange={setSpentOn}
+                  title={t('finances.today.date')}
                   required
                 />
               </label>
