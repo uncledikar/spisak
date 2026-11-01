@@ -114,12 +114,7 @@ export function TodayPage() {
               return
             }
             if (next === 'date') {
-              if (kind === 'day' || kind === 'date') {
-                setKind(singleDayKindFor(anchor))
-              } else {
-                setKind('day')
-                setAnchor(todayKey())
-              }
+              setKind('date')
               return
             }
             setKind(next)

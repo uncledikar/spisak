@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDisplayDate } from '../utils/dates'
 import { DatePickerSheet } from './DatePickerSheet'
@@ -12,6 +12,9 @@ type Props = {
   title?: string
   required?: boolean
   placeholder?: string
+  /** Increment to open the calendar (e.g. after tapping the Date filter chip). */
+  openSignal?: number
+  emphasized?: boolean
 }
 
 /**
@@ -28,6 +31,8 @@ export function DateField({
   title,
   required = false,
   placeholder,
+  openSignal = 0,
+  emphasized = false,
 }: Props) {
   const { t } = useTranslation()
   const autoId = useId()
@@ -36,12 +41,16 @@ export function DateField({
   const label = ariaLabel ?? title ?? t('period.date')
   const display = value ? formatDisplayDate(value) : (placeholder ?? t('period.datePlaceholder'))
 
+  useEffect(() => {
+    if (openSignal > 0) setOpen(true)
+  }, [openSignal])
+
   return (
     <>
       <button
         type="button"
         id={fieldId}
-        className={`date-field${className ? ` ${className}` : ''}${!value ? ' is-empty' : ''}`}
+        className={`date-field${className ? ` ${className}` : ''}${!value ? ' is-empty' : ''}${emphasized ? ' is-emphasized' : ''}`}
         aria-label={label}
         aria-haspopup="dialog"
         aria-expanded={open}

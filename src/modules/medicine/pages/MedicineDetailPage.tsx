@@ -58,7 +58,7 @@ export function MedicineDetailPage() {
     >
       <div className="stack page-stack">
         <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
+          <h2 className="section-title detail-total" style={{ margin: 0 }}>
             {t('common.total')}: {formatQty(total)}
             {unitLabel ? ` ${unitLabel}` : ''}
           </h2>

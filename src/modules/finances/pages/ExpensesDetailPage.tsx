@@ -79,7 +79,7 @@ function ExpensesDetail({ scope }: Props) {
     >
       <div className="stack page-stack">
         <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
+          <h2 className="section-title detail-total" style={{ margin: 0 }}>
             <span aria-hidden="true">{icon}</span>{' '}
             {t('common.total')}: {formatAmount(total)}
           </h2>

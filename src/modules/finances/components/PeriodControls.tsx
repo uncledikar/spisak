@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { DateRange, PeriodKind } from '../types/models'
 import { formatRangeLabel } from '../utils/periods'
@@ -32,6 +33,7 @@ export function PeriodControls({
   const kinds: PeriodKind[] = ['day', 'week', 'month', 'year', 'custom', 'date']
   const singleDay = kind === 'day' || kind === 'date'
   const canCompare = kind !== 'custom'
+  const [dateOpenSignal, setDateOpenSignal] = useState(0)
 
   return (
     <div className="period-controls stack">
@@ -41,7 +43,10 @@ export function PeriodControls({
             key={k}
             type="button"
             className={`chip${kind === k ? ' active' : ''}`}
-            onClick={() => onKind(k)}
+            onClick={() => {
+              onKind(k)
+              if (k === 'date') setDateOpenSignal((n) => n + 1)
+            }}
           >
             {t(`period.${k}`)}
           </button>
@@ -84,6 +89,8 @@ export function PeriodControls({
               value={anchor}
               onChange={onAnchor}
               title={t('period.date')}
+              openSignal={dateOpenSignal}
+              emphasized={kind === 'date'}
             />
           ) : (
             <span className="period-label">{formatRangeLabel(range, i18n.language)}</span>

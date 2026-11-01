@@ -118,9 +118,6 @@ export function ItemEditModal({
           </div>
 
           <div className="btn-row">
-            <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
-              {t('list.save')}
-            </button>
             <button type="button" className="btn btn-ghost" onClick={onClose} disabled={saving}>
               {t('common.cancel')}
             </button>
@@ -134,6 +131,9 @@ export function ItemEditModal({
                 {t('list.deleteItem')}
               </button>
             ) : null}
+            <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
+              {t('list.save')}
+            </button>
           </div>
         </form>
       </div>

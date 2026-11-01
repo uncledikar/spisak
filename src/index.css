@@ -1745,6 +1745,21 @@ button {
   min-width: 0;
 }
 
+.chart-totals strong,
+.chart-total-btn {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.detail-total {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
 .chart-total-btn {
   margin: 0;
   padding: 0;
@@ -1752,9 +1767,18 @@ button {
   background: none;
   color: inherit;
   font: inherit;
-  font-weight: 700;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   text-align: left;
   cursor: pointer;
+}
+
+.date-field.is-emphasized {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
 }
 
 .chart-total-btn:hover,
