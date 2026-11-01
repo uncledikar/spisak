@@ -1791,14 +1791,55 @@ button {
   outline-offset: 2px;
 }
 
+.detail-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.detail-period {
+  margin: 0;
+}
+
 .detail-view-toggle {
-  margin-top: -4px;
+  margin-top: 2px;
 }
 
 .expense-timeline {
+  position: relative;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
+}
+
+.expense-timeline-selection {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+.expense-timeline-selection strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.expense-timeline-selection span {
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--muted);
 }
 
 .expense-timeline-svg {
@@ -1821,12 +1862,17 @@ button {
   font-weight: 650;
 }
 
+.expense-timeline-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
 .expense-timeline-bar {
   fill: var(--accent);
 }
 
-.expense-timeline-peak {
-  margin: 8px 0 0;
+.expense-timeline-bar.is-selected {
+  fill: #95d5b2;
 }
 
 .expense-row-btn {

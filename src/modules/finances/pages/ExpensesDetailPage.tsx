@@ -85,34 +85,31 @@ function ExpensesDetail({ scope }: Props) {
       ]}
     >
       <div className="stack page-stack">
-        <div className="row-between" style={{ alignItems: 'baseline', gap: 12 }}>
+        <div className="detail-summary">
           <h2 className="section-title detail-total" style={{ margin: 0 }}>
             <span aria-hidden="true">{icon}</span>{' '}
             {t('common.total')}: {formatAmount(total)}
           </h2>
-          <p className="meta" style={{ margin: 0, flexShrink: 0, textAlign: 'right' }}>
-            {periodLabel}
-          </p>
+          <p className="meta detail-period">{periodLabel}</p>
+          {chartAvailable ? (
+            <div className="period-kinds detail-view-toggle" role="group" aria-label={t('finances.today.viewMode')}>
+              <button
+                type="button"
+                className={`chip${activeView === 'list' ? ' active' : ''}`}
+                onClick={() => setView('list')}
+              >
+                {t('finances.today.viewList')}
+              </button>
+              <button
+                type="button"
+                className={`chip${activeView === 'chart' ? ' active' : ''}`}
+                onClick={() => setView('chart')}
+              >
+                {t('finances.today.viewChart')}
+              </button>
+            </div>
+          ) : null}
         </div>
-
-        {chartAvailable ? (
-          <div className="period-kinds detail-view-toggle" role="group" aria-label={t('finances.today.viewMode')}>
-            <button
-              type="button"
-              className={`chip${activeView === 'list' ? ' active' : ''}`}
-              onClick={() => setView('list')}
-            >
-              {t('finances.today.viewList')}
-            </button>
-            <button
-              type="button"
-              className={`chip${activeView === 'chart' ? ' active' : ''}`}
-              onClick={() => setView('chart')}
-            >
-              {t('finances.today.viewChart')}
-            </button>
-          </div>
-        ) : null}
 
         {!expenses || !categories ? (
           <p className="meta">{t('common.loading')}</p>

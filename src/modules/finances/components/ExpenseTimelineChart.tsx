@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatAmount, formatDisplayDate } from '../utils/format'
-import { aggregateDailyTotals, niceAmountTicks, type DayTotal } from '../utils/dailyTotals'
+import { formatAmount } from '../utils/format'
+import { aggregateDailyTotals, niceAmountTicks } from '../utils/dailyTotals'
 import type { DateRange } from '../types/models'
 
 type Props = {
@@ -9,17 +9,26 @@ type Props = {
   range: DateRange
 }
 
-function xLabel(date: string, dayCount: number): string {
-  // Short label for dense charts; full day.month for short ranges.
+/** DD.MM without year — for week/month axis labels. */
+function shortDateLabel(date: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
   if (!m) return date
+  return `${m[3]}.${m[2]}`
+}
+
+function xLabel(date: string, dayCount: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!m) return date
+  // Year-long / custom dense ranges: day-of-month only.
   if (dayCount > 45) return `${Number(m[3])}`
-  if (dayCount > 14) return `${m[3]}.${m[2]}`
-  return formatDisplayDate(date)
+  // Week & month: DD.MM, never year.
+  return shortDateLabel(date)
 }
 
 export function ExpenseTimelineChart({ expenses, range }: Props) {
   const { t } = useTranslation()
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
   const series = useMemo(() => aggregateDailyTotals(expenses, range), [expenses, range])
   const maxAmount = useMemo(
     () => series.reduce((max, day) => Math.max(max, day.amount), 0),
@@ -27,6 +36,7 @@ export function ExpenseTimelineChart({ expenses, range }: Props) {
   )
   const yTicks = useMemo(() => niceAmountTicks(maxAmount), [maxAmount])
   const yMax = yTicks[yTicks.length - 1] ?? 1
+  const selected = selectedDate ? series.find((d) => d.date === selectedDate) : null
 
   const width = 360
   const height = 220
@@ -46,6 +56,13 @@ export function ExpenseTimelineChart({ expenses, range }: Props) {
 
   return (
     <div className="expense-timeline chart-card">
+      {selected ? (
+        <div className="expense-timeline-selection" aria-live="polite">
+          <strong>{formatAmount(selected.amount)}</strong>
+          <span>{shortDateLabel(selected.date)}</span>
+        </div>
+      ) : null}
+
       <svg
         className="expense-timeline-svg"
         viewBox={`0 0 ${width} ${height}`}
@@ -74,19 +91,30 @@ export function ExpenseTimelineChart({ expenses, range }: Props) {
           const h = yMax > 0 ? (day.amount / yMax) * plotH : 0
           const x = pad.left + i * slot + (slot - barW) / 2
           const y = pad.top + plotH - h
+          const barH = Math.max(h, day.amount > 0 ? 1.5 : 0)
+          const isSelected = selectedDate === day.date
+          // Invisible hit target for zero/short bars.
+          const hitY = pad.top
+          const hitH = plotH
           return (
-            <rect
-              key={day.date}
-              x={x}
-              y={y}
-              width={barW}
-              height={Math.max(h, day.amount > 0 ? 1.5 : 0)}
-              className="expense-timeline-bar"
-            >
-              <title>
-                {formatDisplayDate(day.date)}: {formatAmount(day.amount)}
-              </title>
-            </rect>
+            <g key={day.date}>
+              <rect
+                x={pad.left + i * slot}
+                y={hitY}
+                width={slot}
+                height={hitH}
+                className="expense-timeline-hit"
+                onClick={() => setSelectedDate((prev) => (prev === day.date ? null : day.date))}
+              />
+              <rect
+                x={x}
+                y={y}
+                width={barW}
+                height={barH}
+                className={`expense-timeline-bar${isSelected ? ' is-selected' : ''}`}
+                pointerEvents="none"
+              />
+            </g>
           )
         })}
 
@@ -107,36 +135,16 @@ export function ExpenseTimelineChart({ expenses, range }: Props) {
           )
         })}
       </svg>
-      <PeakCaption series={series} />
     </div>
   )
 }
 
-function PeakCaption({ series }: { series: DayTotal[] }) {
-  const { t } = useTranslation()
-  const peak = useMemo(() => {
-    let best: DayTotal | null = null
-    for (const day of series) {
-      if (!best || day.amount > best.amount) best = day
-    }
-    return best && best.amount > 0 ? best : null
-  }, [series])
-
-  if (!peak) return null
-  return (
-    <p className="meta expense-timeline-peak">
-      {t('finances.today.timelinePeak', {
-        date: formatDisplayDate(peak.date),
-        amount: formatAmount(peak.amount),
-      })}
-    </p>
-  )
-}
-
+/** Sparse labels so week dates do not collide. */
 function pickLabelIndexes(n: number): number[] {
   if (n <= 1) return [0]
-  if (n <= 8) return Array.from({ length: n }, (_, i) => i)
-  if (n <= 16) return [0, Math.floor(n / 2), n - 1]
+  if (n <= 3) return Array.from({ length: n }, (_, i) => i)
+  if (n <= 10) return [0, Math.floor((n - 1) / 2), n - 1]
+  if (n <= 16) return [0, Math.floor((n - 1) / 3), Math.floor((2 * (n - 1)) / 3), n - 1]
   const mid = Math.floor((n - 1) / 2)
   const q1 = Math.floor((n - 1) / 4)
   const q3 = Math.floor((3 * (n - 1)) / 4)
