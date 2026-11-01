@@ -203,7 +203,12 @@
       "unknownCategory": "Категория",
       "categoryEmpty": "Нет расходов по этой категории за выбранный период",
       "periodEmpty": "Нет расходов за выбранный период",
-      "allExpenses": "Все расходы"
+      "allExpenses": "Все расходы",
+      "viewMode": "Вид",
+      "viewList": "Список",
+      "viewChart": "График",
+      "timelineChart": "Расходы по дням",
+      "timelinePeak": "Пик: {{amount}} · {{date}}"
     },
     "defaults": {
       "groceries": "Продукты",

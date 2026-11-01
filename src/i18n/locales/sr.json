@@ -203,7 +203,12 @@
       "unknownCategory": "Kategorija",
       "categoryEmpty": "Nema troškova u ovoj kategoriji za izabrani period",
       "periodEmpty": "Nema troškova za izabrani period",
-      "allExpenses": "Svi troškovi"
+      "allExpenses": "Svi troškovi",
+      "viewMode": "Prikaz",
+      "viewList": "Lista",
+      "viewChart": "Grafikon",
+      "timelineChart": "Troškovi po danima",
+      "timelinePeak": "Vrh: {{amount}} · {{date}}"
     },
     "defaults": {
       "groceries": "Namirnice",

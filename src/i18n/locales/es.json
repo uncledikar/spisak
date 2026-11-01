@@ -203,7 +203,12 @@
       "unknownCategory": "Categoría",
       "categoryEmpty": "No hay gastos en esta categoría para el periodo seleccionado",
       "periodEmpty": "No hay gastos para el periodo seleccionado",
-      "allExpenses": "Todos los gastos"
+      "allExpenses": "Todos los gastos",
+      "viewMode": "Vista",
+      "viewList": "Lista",
+      "viewChart": "Gráfico",
+      "timelineChart": "Gastos por día",
+      "timelinePeak": "Pico: {{amount}} · {{date}}"
     },
     "defaults": {
       "groceries": "Comida",

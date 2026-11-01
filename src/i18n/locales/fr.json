@@ -203,7 +203,12 @@
       "unknownCategory": "Catégorie",
       "categoryEmpty": "Aucune dépense dans cette catégorie pour la période sélectionnée",
       "periodEmpty": "Aucune dépense pour la période sélectionnée",
-      "allExpenses": "Toutes les dépenses"
+      "allExpenses": "Toutes les dépenses",
+      "viewMode": "Affichage",
+      "viewList": "Liste",
+      "viewChart": "Graphique",
+      "timelineChart": "Dépenses par jour",
+      "timelinePeak": "Pic : {{amount}} · {{date}}"
     },
     "defaults": {
       "groceries": "Courses",

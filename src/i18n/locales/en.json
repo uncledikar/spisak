@@ -203,7 +203,12 @@
       "unknownCategory": "Category",
       "categoryEmpty": "No expenses in this category for the selected period",
       "periodEmpty": "No expenses for the selected period",
-      "allExpenses": "All expenses"
+      "allExpenses": "All expenses",
+      "viewMode": "View",
+      "viewList": "List",
+      "viewChart": "Chart",
+      "timelineChart": "Spending by day",
+      "timelinePeak": "Peak: {{amount}} · {{date}}"
     },
     "defaults": {
       "groceries": "Groceries",

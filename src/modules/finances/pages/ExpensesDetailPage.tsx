@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getCategories } from '../api/categories'
 import { getExpenses } from '../api/expenses'
+import { ExpenseTimelineChart } from '../components/ExpenseTimelineChart'
 import { LogExpenseForm } from '../components/LogExpenseForm'
 import { ModuleShell as PageShell } from '../components/ModuleShell'
 import { useLiveData } from '../../../shared/hooks/useLiveData'
@@ -17,6 +18,8 @@ type Props = {
   scope: 'category' | 'all'
 }
 
+type DetailView = 'list' | 'chart'
+
 function ExpensesDetail({ scope }: Props) {
   const { categoryId = '' } = useParams()
   const [searchParams] = useSearchParams()
@@ -24,6 +27,7 @@ function ExpensesDetail({ scope }: Props) {
   const categories = useLiveData(() => getCategories(), [])
   const expenses = useLiveData(() => getExpenses(), [])
   const [editing, setEditing] = useState<Expense | null>(null)
+  const [view, setView] = useState<DetailView>('list')
 
   const period = useMemo(() => parsePeriodSearch(searchParams), [searchParams])
   const range = useMemo(
@@ -38,6 +42,9 @@ function ExpensesDetail({ scope }: Props) {
     () => formatCompareLabel(period.kind, range, i18n.language),
     [period.kind, range, i18n.language],
   )
+
+  const chartAvailable = period.kind !== 'day' && period.kind !== 'date'
+  const activeView: DetailView = chartAvailable ? view : 'list'
 
   const category =
     scope === 'category' ? (categories?.find((c) => c.id === categoryId) ?? null) : null
@@ -88,6 +95,25 @@ function ExpensesDetail({ scope }: Props) {
           </p>
         </div>
 
+        {chartAvailable ? (
+          <div className="period-kinds detail-view-toggle" role="group" aria-label={t('finances.today.viewMode')}>
+            <button
+              type="button"
+              className={`chip${activeView === 'list' ? ' active' : ''}`}
+              onClick={() => setView('list')}
+            >
+              {t('finances.today.viewList')}
+            </button>
+            <button
+              type="button"
+              className={`chip${activeView === 'chart' ? ' active' : ''}`}
+              onClick={() => setView('chart')}
+            >
+              {t('finances.today.viewChart')}
+            </button>
+          </div>
+        ) : null}
+
         {!expenses || !categories ? (
           <p className="meta">{t('common.loading')}</p>
         ) : rows.length === 0 ? (
@@ -98,6 +124,8 @@ function ExpensesDetail({ scope }: Props) {
                 : t('finances.today.periodEmpty')}
             </h2>
           </div>
+        ) : activeView === 'chart' ? (
+          <ExpenseTimelineChart expenses={rows} range={range} />
         ) : (
           <ul className="list-plain">
             {rows.map((row) => {

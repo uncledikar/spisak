@@ -1791,6 +1791,44 @@ button {
   outline-offset: 2px;
 }
 
+.detail-view-toggle {
+  margin-top: -4px;
+}
+
+.expense-timeline {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.expense-timeline-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(42vh, 280px);
+}
+
+.expense-timeline-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.expense-timeline-ylabel,
+.expense-timeline-xlabel {
+  fill: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.expense-timeline-bar {
+  fill: var(--accent);
+}
+
+.expense-timeline-peak {
+  margin: 8px 0 0;
+}
+
 .expense-row-btn {
   display: block;
   width: 100%;
