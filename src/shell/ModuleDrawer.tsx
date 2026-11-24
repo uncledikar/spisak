@@ -8,7 +8,7 @@ type Props = {
   onClose: () => void
 }
 
-const MODULES: AppModule[] = ['lists', 'finances', 'medicine']
+const MODULES: AppModule[] = ['lists', 'finances']
 
 export function ModuleDrawer({ open, onClose }: Props) {
   const { t } = useTranslation()

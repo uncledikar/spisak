@@ -1,6 +1,6 @@
 # SmartLife
 
-Unified PWA: **Lists**, **Finances**, and **Medicine** in one app (`/spisak/` on GitHub Pages).
+Unified PWA: **Lists** and **Finances** in one app (`/spisak/` on GitHub Pages).
 
 ## Run
 
@@ -16,7 +16,7 @@ Build: `npm run build` · Preview: `npm run preview`
 
 In the **Spisak** Supabase project → SQL Editor, run:
 
-1. [`supabase/schema-modules.sql`](supabase/schema-modules.sql) — medicine + finances tables  
+1. [`supabase/schema-modules.sql`](supabase/schema-modules.sql) — finances tables  
 2. [`supabase/schema-lists-position.sql`](supabase/schema-lists-position.sql) — list reorder (`position`)
 
 Leaves `settings` alone.
@@ -24,7 +24,7 @@ Leaves `settings` alone.
 ## Features
 
 - Google OAuth (shared)
-- Module drawer: Lists / Finances / Medicine
+- Module drawer: Lists / Finances
 - i18n: EN / ES / FR / RU / SR
 - Light / dark theme
-- Offline-tolerant writes for medicine & finances queues
+- Offline-tolerant writes for the finances queue

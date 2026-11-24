@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "SmartLife",
-    "tagline": "Listas de tareas y compras, control de finanzas personales y medicina — en un solo lugar"
+    "tagline": "Listas de tareas y compras y control de finanzas personales — en un solo lugar"
   },
   "nav": {
     "lists": "Listas",
@@ -12,10 +12,8 @@
     "modules": "Módulos",
     "module": {
       "lists": "Listas",
-      "finances": "Finanzas",
-      "medicine": "Medicina"
+      "finances": "Finanzas"
     },
-    "medicines": "Medicamentos",
     "categories": "Categorías"
   },
   "lists": {
@@ -128,46 +126,6 @@
     "next": "Siguiente",
     "date": "Fecha",
     "datePlaceholder": "DD.MM.AAAA"
-  },
-  "medicine": {
-    "medicines": {
-      "title": "Medicamentos",
-      "empty": "Aún no hay medicamentos",
-      "emptyHint": "Añade los medicamentos que tomas para empezar el registro.",
-      "name": "Nombre",
-      "unit": "Unidad",
-      "unitPlaceholder": "uds, mg, ml…",
-      "add": "Añadir medicamento",
-      "edit": "Editar medicamento",
-      "deleteConfirm": "¿Eliminar este medicamento?",
-      "new": "Nuevo medicamento"
-    },
-    "today": {
-      "title": "Hoy",
-      "log": "Registrar toma",
-      "medicine": "Medicamento",
-      "quantity": "Cantidad",
-      "date": "Fecha",
-      "submit": "Añadir",
-      "selectMedicine": "Selecciona un medicamento",
-      "noMedicines": "Primero añade un medicamento",
-      "chartTitle": "Consumo",
-      "compare": "Comparar con el periodo anterior",
-      "previous": "Anterior",
-      "current": "Actual",
-      "emptyChart": "Sin tomas en este periodo",
-      "dayMedicines": "Medicamentos del {{date}}",
-      "perDay": "{{qty}} {{unit}} / día",
-      "medicineRequired": "Selecciona un medicamento",
-      "edit": "Editar toma",
-      "unknownMedicine": "Medicamento",
-      "medicineEmpty": "No hay tomas de este medicamento en el periodo seleccionado"
-    },
-    "units": {
-      "pcs": "uds",
-      "mg": "mg",
-      "ml": "ml"
-    }
   },
   "finances": {
     "categories": {

@@ -8,9 +8,7 @@ import { useAuthStore } from './shared/store/authStore'
 import { MODULE_HOME, moduleFromPath, readActiveModule, writeActiveModule } from './shell/modules'
 import { startSyncListeners as startListsSync } from './modules/lists/api/syncQueue'
 import { hydrateListCache } from './modules/lists/api/listCache'
-import { startSyncListeners as startMedicineSync } from './modules/medicine/api/syncQueue'
 import { startSyncListeners as startFinancesSync } from './modules/finances/api/syncQueue'
-import { hydrateEntityCache as hydrateMedicineCache } from './modules/medicine/api/entityCache'
 import { hydrateEntityCache as hydrateFinancesCache } from './modules/finances/api/entityCache'
 
 const ListsPage = lazy(() =>
@@ -24,17 +22,6 @@ const ListDetailPage = lazy(() =>
 )
 const TrashPage = lazy(() =>
   import('./modules/lists/pages/TrashPage').then((m) => ({ default: m.TrashPage })),
-)
-const MedicineTodayPage = lazy(() =>
-  import('./modules/medicine/pages/TodayPage').then((m) => ({ default: m.TodayPage })),
-)
-const MedicinesPage = lazy(() =>
-  import('./modules/medicine/pages/MedicinesPage').then((m) => ({ default: m.MedicinesPage })),
-)
-const MedicineDetailPage = lazy(() =>
-  import('./modules/medicine/pages/MedicineDetailPage').then((m) => ({
-    default: m.MedicineDetailPage,
-  })),
 )
 const FinancesTodayPage = lazy(() =>
   import('./modules/finances/pages/TodayPage').then((m) => ({ default: m.TodayPage })),
@@ -56,10 +43,8 @@ const PeriodExpensesPage = lazy(() =>
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
 hydrateListCache()
-hydrateMedicineCache()
 hydrateFinancesCache()
 startListsSync()
-startMedicineSync()
 startFinancesSync()
 
 function HomeRedirect() {
@@ -87,9 +72,6 @@ function AppRoutes() {
           <Route path="/lists/new" element={<NewListPage />} />
           <Route path="/lists/:id" element={<ListDetailPage />} />
           <Route path="/trash" element={<TrashPage />} />
-          <Route path="/medicine" element={<MedicineTodayPage />} />
-          <Route path="/medicine/medicines" element={<MedicinesPage />} />
-          <Route path="/medicine/medicine/:medicineId" element={<MedicineDetailPage />} />
           <Route path="/finances" element={<FinancesTodayPage />} />
           <Route path="/finances/categories" element={<CategoriesPage />} />
           <Route path="/finances/expenses" element={<PeriodExpensesPage />} />

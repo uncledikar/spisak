@@ -1,66 +1,9 @@
--- SmartLife module tables for the Spisak Supabase project.
--- Run in SQL Editor. Does NOT recreate settings or lists.
+-- SmartLife finances tables for the Spisak Supabase project.
+-- Run in SQL Editor. Does NOT recreate or alter settings or lists.
+-- Medicine tables were removed; these drops are idempotent and do not touch other tables.
 
--- ── Medicine ───────────────────────────────────────────────────
-
-create table if not exists public.medicines (
-  id uuid primary key,
-  user_id uuid not null references auth.users on delete cascade,
-  name text not null,
-  unit text not null default 'pcs',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  deleted_at timestamptz
-);
-
-create index if not exists medicines_user_id_idx on public.medicines (user_id);
-create index if not exists medicines_user_updated_idx on public.medicines (user_id, updated_at desc);
-
-alter table public.medicines enable row level security;
-
-drop policy if exists "medicines_select_own" on public.medicines;
-drop policy if exists "medicines_insert_own" on public.medicines;
-drop policy if exists "medicines_update_own" on public.medicines;
-drop policy if exists "medicines_delete_own" on public.medicines;
-
-create policy "medicines_select_own" on public.medicines
-  for select using (auth.uid() = user_id);
-create policy "medicines_insert_own" on public.medicines
-  for insert with check (auth.uid() = user_id);
-create policy "medicines_update_own" on public.medicines
-  for update using (auth.uid() = user_id);
-create policy "medicines_delete_own" on public.medicines
-  for delete using (auth.uid() = user_id);
-
-create table if not exists public.consumptions (
-  id uuid primary key,
-  user_id uuid not null references auth.users on delete cascade,
-  medicine_id uuid not null references public.medicines (id) on delete cascade,
-  quantity numeric not null check (quantity > 0),
-  consumed_on date not null,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists consumptions_user_id_idx on public.consumptions (user_id);
-create index if not exists consumptions_user_date_idx on public.consumptions (user_id, consumed_on desc);
-create index if not exists consumptions_medicine_idx on public.consumptions (medicine_id);
-
-alter table public.consumptions enable row level security;
-
-drop policy if exists "consumptions_select_own" on public.consumptions;
-drop policy if exists "consumptions_insert_own" on public.consumptions;
-drop policy if exists "consumptions_update_own" on public.consumptions;
-drop policy if exists "consumptions_delete_own" on public.consumptions;
-
-create policy "consumptions_select_own" on public.consumptions
-  for select using (auth.uid() = user_id);
-create policy "consumptions_insert_own" on public.consumptions
-  for insert with check (auth.uid() = user_id);
-create policy "consumptions_update_own" on public.consumptions
-  for update using (auth.uid() = user_id);
-create policy "consumptions_delete_own" on public.consumptions
-  for delete using (auth.uid() = user_id);
+drop table if exists public.consumptions;
+drop table if exists public.medicines;
 
 -- ── Finances ─────────────────────────────────────────────────────
 

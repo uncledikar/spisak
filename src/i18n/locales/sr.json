@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "SmartLife",
-    "tagline": "Liste obaveza i kupovina, kontrola ličnih finansija i medicina — na jednom mestu"
+    "tagline": "Liste obaveza i kupovina i kontrola ličnih finansija — na jednom mestu"
   },
   "nav": {
     "lists": "Liste",
@@ -12,10 +12,8 @@
     "modules": "Moduli",
     "module": {
       "lists": "Liste",
-      "finances": "Finansije",
-      "medicine": "Medicina"
+      "finances": "Finansije"
     },
-    "medicines": "Lekovi",
     "categories": "Kategorije"
   },
   "lists": {
@@ -128,46 +126,6 @@
     "next": "Napred",
     "date": "Datum",
     "datePlaceholder": "DD.MM.GGGG"
-  },
-  "medicine": {
-    "medicines": {
-      "title": "Lekovi",
-      "empty": "Još nema lekova",
-      "emptyHint": "Dodajte lekove da biste vodili evidenciju.",
-      "name": "Naziv",
-      "unit": "Jedinica",
-      "unitPlaceholder": "kom, mg, ml…",
-      "add": "Dodaj lek",
-      "edit": "Izmeni lek",
-      "deleteConfirm": "Obrisati ovaj lek?",
-      "new": "Novi lek"
-    },
-    "today": {
-      "title": "Danas",
-      "log": "Zabeleži unos",
-      "medicine": "Lek",
-      "quantity": "Količina",
-      "date": "Datum",
-      "submit": "Dodaj",
-      "selectMedicine": "Izaberite lek",
-      "noMedicines": "Prvo dodajte lek",
-      "chartTitle": "Potrošnja",
-      "compare": "Uporedi sa prethodnim periodom",
-      "previous": "Prethodni",
-      "current": "Trenutni",
-      "emptyChart": "Nema unosa u ovom periodu",
-      "dayMedicines": "Lekovi za {{date}}",
-      "perDay": "{{qty}} {{unit}} / dan",
-      "medicineRequired": "Izaberite lek",
-      "edit": "Izmeni unos",
-      "unknownMedicine": "Lek",
-      "medicineEmpty": "Nema unosa ovog leka za izabrani period"
-    },
-    "units": {
-      "pcs": "kom",
-      "mg": "mg",
-      "ml": "ml"
-    }
   },
   "finances": {
     "categories": {

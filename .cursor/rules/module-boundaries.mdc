@@ -1,0 +1,24 @@
+---
+description: Keep app modules independent so one can be removed without touching the others
+alwaysApply: true
+---
+
+# Module boundaries
+
+Lists, finances, and any future module must be removable on their own. Deleting one module may change the shell registry and that module's files only. It must not require edits inside another module.
+
+## Ownership
+
+Each module owns its routes, API, cache, sync queue, types, copy, and styles. Other modules do not import from it.
+
+The shell knows modules only through a small registration: id, home path, nav label, route mount, and a sign-out cleanup hook. `App`, auth, and the drawer must not import a module's cache, queue, or pages by name.
+
+Shared code stays domain-free: dates, auth session, generic buttons. A shared name, CSS class, storage key, or SQL file must not belong to one module and be used by another.
+
+## Schema
+
+One SQL file per module. A script that creates or drops tables for one module must not mention another module's tables.
+
+## Check before finishing
+
+Adding or removing a module is done when the other modules' source files are unchanged and their tables are untouched.

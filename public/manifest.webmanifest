@@ -1,7 +1,7 @@
 {
   "name": "SmartLife",
   "short_name": "SmartLife",
-  "description": "To-do and shopping lists, personal finance tracking, and medicine — in one place",
+  "description": "To-do and shopping lists and personal finance tracking — in one place",
   "theme_color": "#2d6a4f",
   "background_color": "#f5f6f4",
   "display": "standalone",

@@ -6,7 +6,7 @@ import { useSettingsStore } from '../shared/store/settingsStore'
 import { ModuleDrawer } from './ModuleDrawer'
 
 type Props = {
-  /** Extra icon buttons between leading cluster and language (e.g. trash, medicines). */
+  /** Extra icon buttons between leading cluster and language (e.g. trash, categories). */
   moduleActions?: ReactNode
 }
 

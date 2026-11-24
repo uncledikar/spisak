@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "SmartLife",
-    "tagline": "To-do and shopping lists, personal finance tracking, and medicine — in one place"
+    "tagline": "To-do and shopping lists and personal finance tracking — in one place"
   },
   "nav": {
     "lists": "Lists",
@@ -12,10 +12,8 @@
     "modules": "Modules",
     "module": {
       "lists": "Lists",
-      "finances": "Finances",
-      "medicine": "Medicine"
+      "finances": "Finances"
     },
-    "medicines": "Medicines",
     "categories": "Categories"
   },
   "lists": {
@@ -128,46 +126,6 @@
     "next": "Next",
     "date": "Date",
     "datePlaceholder": "DD.MM.YYYY"
-  },
-  "medicine": {
-    "medicines": {
-      "title": "Medicines",
-      "empty": "No medicines yet",
-      "emptyHint": "Add medicines you take to start logging.",
-      "name": "Name",
-      "unit": "Unit",
-      "unitPlaceholder": "pcs, mg, ml…",
-      "add": "Add medicine",
-      "edit": "Edit medicine",
-      "deleteConfirm": "Delete this medicine?",
-      "new": "New medicine"
-    },
-    "today": {
-      "title": "Today",
-      "log": "Log intake",
-      "medicine": "Medicine",
-      "quantity": "Quantity",
-      "date": "Date",
-      "submit": "Add",
-      "selectMedicine": "Select a medicine",
-      "noMedicines": "Add a medicine first",
-      "chartTitle": "Consumption",
-      "compare": "Compare with previous period",
-      "previous": "Previous",
-      "current": "Current",
-      "emptyChart": "No intake in this period",
-      "dayMedicines": "Medicines on {{date}}",
-      "perDay": "{{qty}} {{unit}} / day",
-      "medicineRequired": "Select a medicine",
-      "edit": "Edit intake",
-      "unknownMedicine": "Medicine",
-      "medicineEmpty": "No intakes for this medicine in the selected period"
-    },
-    "units": {
-      "pcs": "pcs",
-      "mg": "mg",
-      "ml": "ml"
-    }
   },
   "finances": {
     "categories": {

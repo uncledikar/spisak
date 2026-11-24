@@ -2,8 +2,6 @@ import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
 import { clearListCache } from '../../modules/lists/api/listCache'
 import { clearSyncQueue as clearListsQueue } from '../../modules/lists/api/syncQueue'
-import { clearEntityCache as clearMedicineCache } from '../../modules/medicine/api/entityCache'
-import { clearSyncQueue as clearMedicineQueue } from '../../modules/medicine/api/syncQueue'
 import { clearEntityCache as clearFinancesCache } from '../../modules/finances/api/entityCache'
 import { clearSyncQueue as clearFinancesQueue } from '../../modules/finances/api/syncQueue'
 import { authRedirectTo, supabase } from '../lib/supabase'
@@ -13,8 +11,6 @@ import { bumpData } from './dataStore'
 function clearAllModuleCaches() {
   clearListCache()
   clearListsQueue()
-  clearMedicineCache()
-  clearMedicineQueue()
   clearFinancesCache()
   clearFinancesQueue()
   clearCachedProfile()

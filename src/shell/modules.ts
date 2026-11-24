@@ -1,17 +1,32 @@
-export type AppModule = 'lists' | 'finances' | 'medicine'
+export type AppModule = 'lists' | 'finances'
 
 export const MODULE_HOME: Record<AppModule, string> = {
   lists: '/lists',
   finances: '/finances',
-  medicine: '/medicine',
 }
 
 const STORAGE_KEY = 'myapp.activeModule'
 
+/** Client cache left by the removed Medicine module. */
+const LEGACY_MEDICINE_KEYS = ['medicine.medicines', 'medicine.consumptions', 'medicine.syncQueue']
+
+function forgetLegacyMedicine(): void {
+  try {
+    for (const key of LEGACY_MEDICINE_KEYS) localStorage.removeItem(key)
+    if (localStorage.getItem(STORAGE_KEY) === 'medicine') {
+      localStorage.setItem(STORAGE_KEY, 'lists')
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+forgetLegacyMedicine()
+
 export function readActiveModule(): AppModule {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw === 'lists' || raw === 'finances' || raw === 'medicine') return raw
+    if (raw === 'lists' || raw === 'finances') return raw
   } catch {
     /* ignore */
   }
@@ -24,7 +39,6 @@ export function writeActiveModule(module: AppModule): void {
 
 export function moduleFromPath(pathname: string): AppModule | null {
   if (pathname.startsWith('/finances')) return 'finances'
-  if (pathname.startsWith('/medicine')) return 'medicine'
   if (pathname.startsWith('/lists') || pathname.startsWith('/trash')) return 'lists'
   return null
 }
